@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="nl" data-lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Warnier Web Design — professionele websites voor kleine ondernemingen in Antwerpen en omgeving. Betaalbaar, snel en volledig op maat." />
+  <meta name="description" data-fr content="Warnier Web Design — sites web professionnels pour les petites entreprises d'Anvers et de sa région. Abordable, rapide et sur mesure." />
+  <title>Warnier Web Design — Websites voor Antwerpse ondernemers</title>
+
+  <!-- ============================================================
+       FONTS — font-display: swap ingebouwd via Google Fonts URL
+  ============================================================ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* ============================================================
+       CSS CUSTOM PROPERTIES
+    ============================================================ */
+    :root {
+      /* Colours */
+      --navy:        #0B1A4E;
+      --navy-dark:   #070F30;
+      --orange:      #F46219;
+      --orange-dark: #D4521A;
+      --white:       #FFFFFF;
+      --off-white:   #F5F7FB;
+      --text:        #1C1C2E;
+      --muted:       #6B7180;
+      --border:      #E4E8F0;
+
+      /* Typography */
+      --font-heading: 'Plus Jakarta Sans', sans-serif;
+      --font-body:    'Inter', sans-serif;
+
+      /* Tokens */
+      --radius:      12px;
+      --radius-sm:   6px;
+      --shadow:      0 4px 24px rgba(11, 26, 78, 0.10);
+      --shadow-lg:   0 8px 40px rgba(11, 26, 78, 0.18);
+
+      /* Layout */
+      --nav-height:    72px;
+      --max-width:     1140px;
+      --section-pad:   clamp(4rem, 8vw, 7rem);
+    }
+
+    /* ============================================================
+       RESET & BASE
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      line-height: 1.65;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    ul { list-style: none; }
+
+    /* ============================================================
+       LANGUAGE TOGGLE — hide/show by data-lang on <html>
+    ============================================================ */
+    [data-lang="nl"] [data-fr],
+    [data-lang="nl"] [data-en] { display: none !important; }
+    [data-lang="fr"] [data-nl],
+    [data-lang="fr"] [data-en] { display: none !important; }
+    [data-lang="en"] [data-nl],
+    [data-lang="en"] [data-fr] { display: none !important; }
+
+    /* ============================================================
+       SKIP LINK
+    ============================================================ */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: 1rem;
+      background: var(--orange);
+      color: var(--white);
+      padding: 0.5rem 1.125rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      z-index: 9999;
+      transition: top 0.2s ease;
+    }
+    .skip-link:focus { top: 1rem; }
+
+    /* ============================================================
+       GLOBAL FOCUS STYLES
+    ============================================================ */
+    :focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    /* ============================================================
+       NAVIGATION
+    ============================================================ */
+    .nav {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      height: var(--nav-height);
+      z-index: 100;
+      transition: background 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .nav.scrolled {
+      background: var(--white);
+      box-shadow: 0 2px 16px rgba(11, 26, 78, 0.10);
+    }
+
+    .nav__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    /* Logo */
+    .nav__logo {
+      display: flex;
+      align-items: center;
+      flex-shrink: 0;
+      background: var(--white);
+      border-radius: var(--radius-sm);
+      padding: 5px 12px;
+    }
+    .nav__logo img { height: 36px; width: auto; }
+
+    /* Desktop links */
+    .nav__links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .nav__links a {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      color: rgba(255, 255, 255, 0.9);
+      position: relative;
+      padding-bottom: 3px;
+      transition: color 0.2s;
+    }
+
+    .nav__links a::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--orange);
+      transition: width 0.25s ease;
+      border-radius: 2px;
+    }
+
+    .nav__links a:hover::after,
+    .nav__links a.is-active::after { width: 100%; }
+
+    .nav.scrolled .nav__links a { color: var(--navy); }
+
+    /* Language toggle */
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 999px;
+      padding: 3px;
+      flex-shrink: 0;
+      transition: background 0.35s ease;
+    }
+
+    .nav.scrolled .lang-toggle { background: var(--off-white); }
+
+    .lang-btn {
+      font-family: var(--font-heading);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.65);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      line-height: 1;
+    }
+
+    .lang-btn.active {
+      background: var(--orange);
+      color: var(--white);
+    }
+
+    .nav.scrolled .lang-btn { color: var(--muted); }
+    .nav.scrolled .lang-btn.active { color: var(--white); }
+
+    /* Hamburger button */
+    .nav__hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+    }
+
+    .nav__hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    .nav.scrolled .nav__hamburger span { background: var(--navy); }
+
+    .nav__hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav__hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav__hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Mobile drawer */
+    .nav__mobile {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      position: fixed;
+      top: var(--nav-height);
+      inset-inline: 0;
+      padding: 0.75rem 1.5rem 1.5rem;
+      box-shadow: 0 8px 32px rgba(11, 26, 78, 0.14);
+      border-top: 1px solid var(--border);
+    }
+
+    .nav__mobile.open { display: flex; }
+
+    .nav__mobile a {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--navy);
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+
+    .nav__mobile a:hover { color: var(--orange); }
+    .nav__mobile a:last-of-type { border-bottom: none; }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      background: var(--navy);
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: calc(var(--nav-height) + 4rem) 1.5rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative radial glows */
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -15%;
+      right: -8%;
+      width: clamp(300px, 50vw, 640px);
+      height: clamp(300px, 50vw, 640px);
+      background: radial-gradient(circle, rgba(244, 98, 25, 0.14) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -12%;
+      left: -4%;
+      width: clamp(200px, 35vw, 420px);
+      height: clamp(200px, 35vw, 420px);
+      background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero__label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      background: rgba(244, 98, 25, 0.16);
+      color: #FF8C4E;
+      font-family: var(--font-heading);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 0.375rem 0.875rem;
+      border-radius: 999px;
+      margin-bottom: 1.75rem;
+    }
+
+    .hero__title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.25rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.13;
+      color: var(--white);
+      max-width: 700px;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero__title em {
+      font-style: normal;
+      color: var(--orange);
+    }
+
+    .hero__sub {
+      font-size: clamp(1rem, 2vw, 1.1875rem);
+      color: rgba(255, 255, 255, 0.72);
+      max-width: 560px;
+      line-height: 1.75;
+      margin-bottom: 2.75rem;
+    }
+
+    .hero__ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      padding: 0.875rem 1.75rem;
+      border-radius: var(--radius);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,0.16); }
+    .btn:active { transform: translateY(0); }
+
+    .btn--primary { background: var(--orange); color: var(--white); border-color: var(--orange); }
+    .btn--primary:hover { background: var(--orange-dark); border-color: var(--orange-dark); }
+
+    .btn--ghost { background: transparent; color: var(--white); border-color: rgba(255, 255, 255, 0.45); }
+    .btn--ghost:hover { border-color: var(--white); background: rgba(255, 255, 255, 0.08); }
+
+    /* ============================================================
+       SECTION BASE
+    ============================================================ */
+    .section { padding: var(--section-pad) 1.5rem; }
+    .section--alt { background: var(--off-white); }
+
+    .section__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+    }
+
+    .section__tag {
+      display: inline-block;
+      font-family: var(--font-heading);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 0.625rem;
+    }
+
+    .section__title {
+      font-family: var(--font-heading);
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.18;
+      margin-bottom: 1rem;
+    }
+
+    .section__intro {
+      font-size: 1.0625rem;
+      color: var(--muted);
+      max-width: 540px;
+      line-height: 1.75;
+      margin-bottom: 3.5rem;
+    }
+
+    /* ============================================================
+       SCROLL FADE-UP ANIMATIONS
+    ============================================================ */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .fade-up.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fade-up {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
+
+    /* ============================================================
+       PRICING CARDS
+    ============================================================ */
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 1.875rem;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-lg);
+      border-color: rgba(11, 26, 78, 0.3);
+    }
+
+    .card--featured {
+      border-color: var(--navy);
+      box-shadow: var(--shadow);
+    }
+
+    .card--featured:hover { border-color: var(--orange); }
+
+    .card__badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .card__name {
+      font-family: var(--font-heading);
+      font-size: 1.0625rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 0.375rem;
+    }
+
+    .card__price {
+      font-family: var(--font-heading);
+      font-size: 2.25rem;
+      font-weight: 800;
+      color: var(--navy);
+      line-height: 1.05;
+      margin-bottom: 0.375rem;
+    }
+
+    .card__price .unit {
+      font-size: 0.9375rem;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    .card__tagline {
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.55;
+    }
+
+    .card__features {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      margin-bottom: 2rem;
+      flex: 1;
+    }
+
+    .card__feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.625rem;
+      font-size: 0.9375rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .card__feature::before {
+      content: '';
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      background: url("data:image/svg+xml,%3Csvg viewBox='0 0 18 18' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='9' cy='9' r='9' fill='%23F46219' fill-opacity='0.15'/%3E%3Cpath d='M5 9l3 3 5-5' stroke='%23F46219' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+
+    .card .btn { width: 100%; justify-content: center; }
+
+    /* ============================================================
+       ABOUT SECTION
+    ============================================================ */
+    .about__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .about__visual {
+      background: var(--navy);
+      border-radius: var(--radius);
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Subtle pattern overlay */
+    .about__visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 30% 70%, rgba(244,98,25,0.18) 0%, transparent 55%),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
+    }
+
+    .about__visual-body {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2.5rem;
+    }
+
+    .about__visual-body img {
+      height: 60px;
+      width: auto;
+      margin: 0 auto 2rem;
+      border-radius: var(--radius-sm);
+      padding: 6px 14px;
+      background: var(--white);
+    }
+
+    .about__city {
+      color: var(--white);
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .about__subtitle {
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 0.875rem;
+      font-family: var(--font-heading);
+      font-weight: 500;
+    }
+
+    /* Text side */
+    .about__content { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .about__content .section__tag { margin-bottom: 0; }
+
+    .about__content p {
+      font-size: 1.0625rem;
+      line-height: 1.78;
+      color: var(--text);
+    }
+
+    .about__tagline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 0.9375rem;
+      margin-top: 0.25rem;
+    }
+
+    /* ============================================================
+       CONTACT SECTION
+    ============================================================ */
+    .contact__grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    /* Info column */
+    .contact__info { display: flex; flex-direction: column; gap: 1.5rem; }
+
+    .contact__intro {
+      font-size: 1.0625rem;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .contact__detail {
+      display: flex;
+      align-items: center;
+      gap: 0.875rem;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .contact__icon {
+      width: 42px;
+      height: 42px;
+      background: rgba(11, 26, 78, 0.07);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.125rem;
+      flex-shrink: 0;
+    }
+
+    /* Form */
+    .form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .form__row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .form__field { display: flex; flex-direction: column; gap: 0.375rem; }
+
+    .form__label {
+      font-family: var(--font-heading);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .form__input,
+    .form__textarea {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      width: 100%;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      appearance: none;
+    }
+
+    .form__input::placeholder,
+    .form__textarea::placeholder { color: var(--muted); }
+
+    .form__input:focus,
+    .form__textarea:focus {
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px rgba(11, 26, 78, 0.09);
+      outline: none;
+    }
+
+    .form__textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    /* Honeypot — hidden from real users */
+    .form__honeypot {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+      tab-index: -1;
+    }
+
+    /* GDPR consent */
+    .form__gdpr {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .form__gdpr input[type="checkbox"] {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+      accent-color: var(--navy);
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .form__gdpr label {
+      font-size: 0.8125rem;
+      color: var(--muted);
+      line-height: 1.65;
+      cursor: pointer;
+    }
+
+    .form__gdpr a {
+      color: var(--navy);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    .form__gdpr a:hover { color: var(--orange); }
+
+    /* Submit alignment */
+    .form__actions { display: flex; align-items: center; gap: 1rem; }
+
+    /* Success message */
+    .form__success {
+      display: none;
+      background: #EAF4EB;
+      color: #2A6B2F;
+      padding: 1rem 1.25rem;
+      border-radius: var(--radius-sm);
+      font-weight: 600;
+      font-size: 0.9375rem;
+      border: 1px solid #B6D9B9;
+    }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      background: var(--navy-dark);
+      color: rgba(255, 255, 255, 0.55);
+      padding: 2.5rem 1.5rem;
+    }
+
+    .footer__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+
+    .footer__logo img {
+      height: 36px;
+      width: auto;
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      background: var(--white);
+      opacity: 0.9;
+    }
+
+    .footer__copy { font-size: 0.875rem; }
+
+    /* ============================================================
+       RESPONSIVE — 640px+
+    ============================================================ */
+    @media (min-width: 640px) {
+      .form__row { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ============================================================
+       RESPONSIVE — 768px+
+    ============================================================ */
+    @media (min-width: 768px) {
+      .pricing-grid { grid-template-columns: repeat(3, 1fr); }
+
+      .about__grid { grid-template-columns: 1fr 1.15fr; }
+
+      .contact__grid { grid-template-columns: 1fr 1.6fr; }
+
+      .footer__inner {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+      }
+    }
+
+    /* ============================================================
+       RESPONSIVE — mobile (below 768px) — hamburger
+    ============================================================ */
+    @media (max-width: 767px) {
+      .nav__links { display: none; }
+      .nav__hamburger { display: flex; }
+    }
+
+    /* ============================================================
+       RESPONSIVE — 1200px+
+    ============================================================ */
+    @media (min-width: 1200px) {
+      .hero__title { font-size: 4.25rem; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       SKIP TO MAIN CONTENT
+  ============================================================ -->
+  <a href="#main" class="skip-link" data-nl>Ga naar inhoud</a>
+  <a href="#main" class="skip-link" data-fr>Aller au contenu</a>
+  <a href="#main" class="skip-link" data-en>Skip to content</a>
+
+
+  <!-- ============================================================
+       NAVIGATION
+  ============================================================ -->
+  <header>
+    <nav class="nav" id="nav" role="navigation" aria-label="Hoofdnavigatie / Navigation principale">
+      <div class="nav__inner">
+
+        <!-- Logo -->
+        <a href="#home" class="nav__logo" aria-label="Warnier Web Design — naar startpagina">
+          <img
+            src="Logo Warnier Web Design snip.png"
+            alt="Warnier Web Design"
+            width="160"
+            height="44"
+          />
+        </a>
+
+        <!-- Desktop nav links -->
+        <ul class="nav__links" role="list">
+          <li>
+            <a href="#home" data-nl>Home</a>
+            <a href="#home" data-fr>Accueil</a>
+            <a href="#home" data-en>Home</a>
+          </li>
+          <li>
+            <a href="#diensten" data-nl>Diensten</a>
+            <a href="#diensten" data-fr>Services</a>
+            <a href="#diensten" data-en>Services</a>
+          </li>
+          <li>
+            <a href="#over-ons" data-nl>Over ons</a>
+            <a href="#over-ons" data-fr>À propos</a>
+            <a href="#over-ons" data-en>About us</a>
+          </li>
+          <li>
+            <a href="#contact">Contact</a>
+          </li>
+        </ul>
+
+        <!-- Right side: lang toggle + hamburger -->
+        <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
+          <div class="lang-toggle" role="group" aria-label="Taal kiezen / Choisir la langue / Choose language">
+            <button class="lang-btn active" data-lang-btn="nl" aria-pressed="true">NL</button>
+            <button class="lang-btn" data-lang-btn="fr" aria-pressed="false">FR</button>
+            <button class="lang-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+          </div>
+          <button
+            class="nav__hamburger"
+            id="hamburger"
+            aria-expanded="false"
+            aria-controls="mobile-nav"
+            aria-label="Menu openen"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </div>
+
+      </div><!-- /nav__inner -->
+
+      <!-- Mobile drawer -->
+      <div class="nav__mobile" id="mobile-nav" role="navigation" aria-label="Mobiel menu">
+        <a href="#home" data-nl>Home</a>
+        <a href="#home" data-fr>Accueil</a>
+        <a href="#home" data-en>Home</a>
+        <a href="#diensten" data-nl>Diensten</a>
+        <a href="#diensten" data-fr>Services</a>
+        <a href="#diensten" data-en>Services</a>
+        <a href="#over-ons" data-nl>Over ons</a>
+        <a href="#over-ons" data-fr>À propos</a>
+        <a href="#over-ons" data-en>About us</a>
+        <a href="#contact">Contact</a>
+      </div>
+
+    </nav>
+  </header>
+
+
+  <!-- ============================================================
+       MAIN
+  ============================================================ -->
+  <main id="main">
+
+    <!-- ============================================================
+         HERO
+    ============================================================ -->
+    <section class="hero" id="home" aria-labelledby="hero-title">
+      <div class="hero__inner">
+
+        <p class="hero__label" aria-hidden="true">
+          <span data-nl>📍 Antwerpen &amp; omgeving</span>
+          <span data-fr>📍 Anvers &amp; région</span>
+          <span data-en>📍 Antwerp &amp; surroundings</span>
+        </p>
+
+        <h1 class="hero__title" id="hero-title">
+          <span data-nl>Uw zaak verdient een website die <em>werkt.</em></span>
+          <span data-fr>Votre entreprise mérite un site web qui <em>travaille pour vous.</em></span>
+          <span data-en>Your business deserves a website that <em>works.</em></span>
+        </h1>
+
+        <p class="hero__sub">
+          <span data-nl>Van restaurant tot vakman — wij bouwen professionele websites voor kleine ondernemingen in Antwerpen en omgeving. Betaalbaar, snel en volledig op maat.</span>
+          <span data-fr>Du restaurant à l'artisan — nous créons des sites web professionnels pour les petites entreprises d'Anvers et de sa région. Abordable, rapide et entièrement sur mesure.</span>
+          <span data-en>From restaurant to tradesperson — we build professional websites for small businesses in Antwerp and the surrounding area. Affordable, fast and fully tailored to you.</span>
+        </p>
+
+        <div class="hero__ctas">
+          <a href="#diensten" class="btn btn--primary">
+            <span data-nl>Bekijk onze pakketten →</span>
+            <span data-fr>Voir nos formules →</span>
+            <span data-en>View our packages →</span>
+          </a>
+          <a href="#contact" class="btn btn--ghost">
+            <span data-nl>Neem contact op</span>
+            <span data-fr>Nous contacter</span>
+            <span data-en>Get in touch</span>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         DIENSTEN & PRIJZEN / SERVICES & TARIFS
+    ============================================================ -->
+    <section class="section section--alt" id="diensten" aria-labelledby="diensten-title">
+      <div class="section__inner">
+
+        <span class="section__tag fade-up">
+          <span data-nl>Wat wij doen</span>
+          <span data-fr>Ce que nous faisons</span>
+          <span data-en>What we do</span>
+        </span>
+
+        <h2 class="section__title fade-up" id="diensten-title">
+          <span data-nl>Diensten &amp; Prijzen</span>
+          <span data-fr>Services &amp; Tarifs</span>
+          <span data-en>Services &amp; Pricing</span>
+        </h2>
+
+        <p class="section__intro fade-up">
+          <span data-nl>Geen ingewikkeld jargon, geen verborgen kosten. Kies het pakket dat bij uw zaak past en wij regelen de rest.</span>
+          <span data-fr>Pas de jargon compliqué, pas de frais cachés. Choisissez la formule adaptée à votre activité, nous nous occupons du reste.</span>
+          <span data-en>No complicated jargon, no hidden costs. Choose the package that fits your business and we'll handle the rest.</span>
+        </p>
+
+        <div class="pricing-grid">
+
+          <!-- ── STARTER ── -->
+          <article class="card fade-up" aria-labelledby="card-starter">
+            <h3 class="card__name" id="card-starter">Starter</h3>
+            <p class="card__price">€&thinsp;349</p>
+            <p class="card__tagline">
+              <span data-nl>Ideaal voor handelszaken, zelfstandigen en starters.</span>
+              <span data-fr>Idéal pour commerçants, indépendants et starters.</span>
+              <span data-en>Ideal for retailers, self-employed and startups.</span>
+            </p>
+            <ul class="card__features" role="list">
+              <li class="card__feature" data-nl>Professionele 1-pagina website</li>
+              <li class="card__feature" data-fr>Site web 1 page professionnel</li>
+              <li class="card__feature" data-en>Professional 1-page website</li>
+              <li class="card__feature" data-nl>Mobiel-vriendelijk &amp; snel geladen</li>
+              <li class="card__feature" data-fr>Compatible mobile &amp; chargement rapide</li>
+              <li class="card__feature" data-en>Mobile-friendly &amp; fast loading</li>
+              <li class="card__feature" data-nl>Contactformulier inbegrepen</li>
+              <li class="card__feature" data-fr>Formulaire de contact inclus</li>
+              <li class="card__feature" data-en>Contact form included</li>
+              <li class="card__feature" data-nl>Basisoptimalisatie voor Google (SEO)</li>
+              <li class="card__feature" data-fr>Optimisation de base pour Google (SEO)</li>
+              <li class="card__feature" data-en>Basic Google optimisation (SEO)</li>
+              <li class="card__feature" data-nl>Oplevering binnen 7 werkdagen</li>
+              <li class="card__feature" data-fr>Livraison en 7 jours ouvrables</li>
+              <li class="card__feature" data-en>Delivered within 7 working days</li>
+            </ul>
+            <a href="#contact" class="btn btn--primary">
+              <span data-nl>Meer info</span>
+              <span data-fr>En savoir plus</span>
+              <span data-en>More info</span>
+            </a>
+          </article>
+
+          <!-- ── PROFESSIONEEL (featured) ── -->
+          <article class="card card--featured fade-up" style="transition-delay:0.1s;" aria-labelledby="card-pro">
+            <div class="card__badge" aria-label="Most popular package">
+              <span data-nl>⭐ Meest gekozen</span>
+              <span data-fr>⭐ Le plus choisi</span>
+              <span data-en>⭐ Most popular</span>
+            </div>
+            <h3 class="card__name" id="card-pro">
+              <span data-nl>Professioneel</span>
+              <span data-fr>Professionnel</span>
+              <span data-en>Professional</span>
+            </h3>
+            <p class="card__price">€&thinsp;699</p>
+            <p class="card__tagline">
+              <span data-nl>Ideaal voor restaurants, winkels en vrije beroepen.</span>
+              <span data-fr>Idéal pour restaurants, boutiques et professions libérales.</span>
+              <span data-en>Ideal for restaurants, shops and freelance professionals.</span>
+            </p>
+            <ul class="card__features" role="list">
+              <li class="card__feature" data-nl>Tot 5 pagina's op maat</li>
+              <li class="card__feature" data-fr>Jusqu'à 5 pages personnalisées</li>
+              <li class="card__feature" data-en>Up to 5 custom pages</li>
+              <li class="card__feature" data-nl>Stijlvolle fotogalerij of menusectie</li>
+              <li class="card__feature" data-fr>Galerie photo ou section menu élégante</li>
+              <li class="card__feature" data-en>Elegant photo gallery or menu section</li>
+              <li class="card__feature" data-nl>Contactformulier + Google Maps</li>
+              <li class="card__feature" data-fr>Formulaire de contact + Google Maps</li>
+              <li class="card__feature" data-en>Contact form + Google Maps</li>
+              <li class="card__feature" data-nl>Zoekmachineoptimalisatie (SEO)</li>
+              <li class="card__feature" data-fr>Optimisation pour les moteurs de recherche</li>
+              <li class="card__feature" data-en>Search engine optimisation (SEO)</li>
+              <li class="card__feature" data-nl>1 jaar gratis technische ondersteuning</li>
+              <li class="card__feature" data-fr>1 an de support technique gratuit</li>
+              <li class="card__feature" data-en>1 year free technical support</li>
+            </ul>
+            <a href="#contact" class="btn btn--primary">
+              <span data-nl>Meer info</span>
+              <span data-fr>En savoir plus</span>
+              <span data-en>More info</span>
+            </a>
+          </article>
+
+          <!-- ── OP MAAT ── -->
+          <article class="card fade-up" style="transition-delay:0.2s;" aria-labelledby="card-custom">
+            <h3 class="card__name" id="card-custom">
+              <span data-nl>Op Maat</span>
+              <span data-fr>Sur Mesure</span>
+              <span data-en>Custom</span>
+            </h3>
+            <p class="card__price" style="font-size:1.375rem;padding-top:0.375rem;">
+              <span data-nl>Offerte op aanvraag</span>
+              <span data-fr>Devis sur demande</span>
+              <span data-en>Quote on request</span>
+            </p>
+            <p class="card__tagline">
+              <span data-nl>Ideaal voor ondernemers met specifieke wensen.</span>
+              <span data-fr>Idéal pour entrepreneurs avec des besoins spécifiques.</span>
+              <span data-en>Ideal for businesses with specific requirements.</span>
+            </p>
+            <ul class="card__features" role="list">
+              <li class="card__feature" data-nl>Alles van Professioneel, plus:</li>
+              <li class="card__feature" data-fr>Tout de Professionnel, plus :</li>
+              <li class="card__feature" data-en>Everything in Professional, plus:</li>
+              <li class="card__feature" data-nl>Meertalige website (NL / FR / EN)</li>
+              <li class="card__feature" data-fr>Site multilingue (NL / FR / EN)</li>
+              <li class="card__feature" data-en>Multilingual website (NL / FR / EN)</li>
+              <li class="card__feature" data-nl>Webshop of reserveringssysteem</li>
+              <li class="card__feature" data-fr>Boutique en ligne ou réservation</li>
+              <li class="card__feature" data-en>Webshop or booking system</li>
+              <li class="card__feature" data-nl>Uitgebreide SEO-strategie</li>
+              <li class="card__feature" data-fr>Stratégie SEO avancée</li>
+              <li class="card__feature" data-en>Advanced SEO strategy</li>
+              <li class="card__feature" data-nl>Maandelijks onderhoud &amp; rapportage</li>
+              <li class="card__feature" data-fr>Maintenance mensuelle &amp; rapportage</li>
+              <li class="card__feature" data-en>Monthly maintenance &amp; reporting</li>
+            </ul>
+            <a href="#contact" class="btn btn--primary">
+              <span data-nl>Neem contact op</span>
+              <span data-fr>Nous contacter</span>
+              <span data-en>Get in touch</span>
+            </a>
+          </article>
+
+        </div><!-- /pricing-grid -->
+      </div><!-- /section__inner -->
+    </section>
+
+
+    <!-- ============================================================
+         OVER ONS / À PROPOS
+    ============================================================ -->
+    <section class="section" id="over-ons" aria-labelledby="about-title">
+      <div class="section__inner">
+        <div class="about__grid">
+
+          <!-- Visual panel -->
+          <div class="about__visual fade-up" role="img" aria-label="Warnier Web Design, gevestigd in Antwerpen">
+            <div class="about__visual-body">
+              <img
+                src="Logo Warnier Web Design snip.png"
+                alt=""
+                width="180"
+                height="50"
+              />
+              <strong class="about__city">Antwerpen</strong>
+              <span class="about__subtitle">
+                <span data-nl>Lokaal verankerd. Digitaal vooruitstrevend.</span>
+                <span data-fr>Ancré localement. Résolument digital.</span>
+                <span data-en>Locally rooted. Digitally forward.</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Text -->
+          <div class="about__content fade-up" style="transition-delay:0.12s;">
+            <span class="section__tag">
+              <span data-nl>Wie wij zijn</span>
+              <span data-fr>Qui sommes-nous</span>
+              <span data-en>Who we are</span>
+            </span>
+            <h2 class="section__title" id="about-title">
+              <span data-nl>Over ons</span>
+              <span data-fr>À propos</span>
+              <span data-en>About us</span>
+            </h2>
+
+            <p data-nl>Warnier Web Design is een kleine, gepassioneerde webstudio uit Antwerpen. Wij geloven dat élke onderneming — groot of klein — recht heeft op een website waar ze trots op kunnen zijn.</p>
+            <p data-fr>Warnier Web Design est un petit studio web passionné, basé à Anvers. Nous croyons que chaque entreprise — grande ou petite — mérite un site dont elle peut être fière.</p>
+            <p data-en>Warnier Web Design is a small, passionate web studio based in Antwerp. We believe that every business — large or small — deserves a website they can be proud of.</p>
+
+            <p data-nl>Wij werken rechtstreeks samen met onze klanten: geen tussenpersonen, geen onduidelijke facturen. U belt ons, wij luisteren, en samen bouwen we een online aanwezigheid die klanten aantrekt en uw verhaal vertelt.</p>
+            <p data-fr>Nous travaillons directement avec nos clients : pas d'intermédiaires, pas de factures obscures. Vous nous appelez, nous écoutons, et ensemble nous construisons une présence en ligne qui attire des clients et raconte votre histoire.</p>
+            <p data-en>We work directly with our clients — no middlemen, no unclear invoices. You call us, we listen, and together we build an online presence that attracts customers and tells your story.</p>
+
+            <p class="about__tagline" data-nl>📍 Gevestigd in Antwerpen. Actief in heel de regio.</p>
+            <p class="about__tagline" data-fr>📍 Basés à Anvers. Actifs dans toute la région.</p>
+            <p class="about__tagline" data-en>📍 Based in Antwerp. Active throughout the region.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ============================================================
+         CONTACT
+    ============================================================ -->
+    <section class="section section--alt" id="contact" aria-labelledby="contact-title">
+      <div class="section__inner">
+
+        <span class="section__tag fade-up">
+          <span data-nl>Klaar om te starten?</span>
+          <span data-fr>Prêt à vous lancer ?</span>
+          <span data-en>Ready to get started?</span>
+        </span>
+        <h2 class="section__title fade-up" id="contact-title">Contact</h2>
+
+        <div class="contact__grid">
+
+          <!-- Info column -->
+          <div class="contact__info fade-up">
+            <p class="contact__intro">
+              <span data-nl>Vertel ons over uw project. Wij nemen binnen de 24 uur contact met u op voor een vrijblijvend gesprek.</span>
+              <span data-fr>Parlez-nous de votre projet. Nous vous recontactons dans les 24 heures pour un entretien sans engagement.</span>
+              <span data-en>Tell us about your project. We'll get back to you within 24 hours for a no-obligation conversation.</span>
+            </p>
+
+            <div class="contact__detail">
+              <span class="contact__icon" aria-hidden="true">📍</span>
+              <span>Antwerpen, België</span>
+            </div>
+            <div class="contact__detail">
+              <span class="contact__icon" aria-hidden="true">✉️</span>
+              <a href="mailto:hello@warnierwebdesign.be">hello@warnierwebdesign.be</a>
+            </div>
+            <div class="contact__detail">
+              <span class="contact__icon" aria-hidden="true">📞</span>
+              <a href="tel:+32XXXXXXXXX">+32 XXX XX XX XX</a>
+            </div>
+          </div>
+
+          <!-- Form column -->
+          <div class="fade-up" style="transition-delay:0.1s;">
+
+            <!-- Netlify Forms: data-netlify="true", honeypot, hidden form-name -->
+            <form
+              class="form"
+              id="contact-form"
+              name="contact"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="bot-field"
+              novalidate
+            >
+              <!-- Required by Netlify for AJAX submissions -->
+              <input type="hidden" name="form-name" value="contact" />
+
+              <!-- Honeypot — hidden from real users, traps bots -->
+              <div class="form__honeypot" aria-hidden="true">
+                <label>
+                  Do not fill this field
+                  <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+                </label>
+              </div>
+
+              <!-- Name + Email row -->
+              <div class="form__row">
+                <div class="form__field">
+                  <label class="form__label" for="name">
+                    <span data-nl>Naam <span aria-hidden="true">*</span></span>
+                    <span data-fr>Nom <span aria-hidden="true">*</span></span>
+                    <span data-en>Name <span aria-hidden="true">*</span></span>
+                  </label>
+                  <input
+                    class="form__input"
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    autocomplete="name"
+                    placeholder="Jan Janssen"
+                  />
+                </div>
+                <div class="form__field">
+                  <label class="form__label" for="email">
+                    <span data-nl>E-mailadres <span aria-hidden="true">*</span></span>
+                    <span data-fr>Adresse e-mail <span aria-hidden="true">*</span></span>
+                    <span data-en>Email address <span aria-hidden="true">*</span></span>
+                  </label>
+                  <input
+                    class="form__input"
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                    placeholder="jan@uwzaak.be"
+                  />
+                </div>
+              </div>
+
+              <!-- Phone -->
+              <div class="form__field">
+                <label class="form__label" for="phone">
+                  <span data-nl>Telefoonnummer <em style="font-weight:400;color:var(--muted)">(optioneel)</em></span>
+                  <span data-fr>Numéro de téléphone <em style="font-weight:400;color:var(--muted)">(optionnel)</em></span>
+                  <span data-en>Phone number <em style="font-weight:400;color:var(--muted)">(optional)</em></span>
+                </label>
+                <input
+                  class="form__input"
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  autocomplete="tel"
+                  placeholder="+32 XXX XX XX XX"
+                />
+              </div>
+
+              <!-- Message -->
+              <div class="form__field">
+                <label class="form__label" for="message">
+                  <span data-nl>Uw bericht <span aria-hidden="true">*</span></span>
+                  <span data-fr>Votre message <span aria-hidden="true">*</span></span>
+                  <span data-en>Your message <span aria-hidden="true">*</span></span>
+                </label>
+                <textarea
+                  class="form__textarea"
+                  id="message"
+                  name="message"
+                  required
+                ></textarea>
+              </div>
+
+              <!-- GDPR consent -->
+              <div class="form__gdpr">
+                <input type="checkbox" id="gdpr" name="gdpr" required />
+                <label for="gdpr">
+                  <span data-nl>Ik ga akkoord dat Warnier Web Design mijn gegevens gebruikt om mijn aanvraag te beantwoorden. Uw gegevens worden nooit gedeeld met derden. <a href="#">Privacybeleid</a></span>
+                  <span data-fr>J'accepte que Warnier Web Design utilise mes coordonnées pour traiter ma demande. Vos données ne seront jamais partagées avec des tiers. <a href="#">Politique de confidentialité</a></span>
+                  <span data-en>I agree that Warnier Web Design may use my details to respond to my enquiry. Your data will never be shared with third parties. <a href="#">Privacy policy</a></span>
+                </label>
+              </div>
+
+              <!-- Submit -->
+              <div class="form__actions">
+                <button type="submit" class="btn btn--primary">
+                  <span data-nl>Verstuur bericht →</span>
+                  <span data-fr>Envoyer le message →</span>
+                  <span data-en>Send message →</span>
+                </button>
+              </div>
+
+              <!-- Success message (shown after AJAX submit) -->
+              <div class="form__success" role="alert" id="form-success" aria-live="polite">
+                <span data-nl>✅ Bedankt! Wij nemen zo snel mogelijk contact met u op.</span>
+                <span data-fr>✅ Merci ! Nous vous contacterons dans les plus brefs délais.</span>
+                <span data-en>✅ Thank you! We'll be in touch as soon as possible.</span>
+              </div>
+
+            </form>
+          </div><!-- /form column -->
+
+        </div><!-- /contact__grid -->
+      </div><!-- /section__inner -->
+    </section>
+
+  </main>
+
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <div class="footer__logo">
+        <img
+          src="Logo Warnier Web Design snip.png"
+          alt="Warnier Web Design"
+          width="140"
+          height="38"
+        />
+      </div>
+      <p class="footer__copy">
+        <span data-nl>© 2025 Warnier Web Design. Alle rechten voorbehouden.</span>
+        <span data-fr>© 2025 Warnier Web Design. Tous droits réservés.</span>
+        <span data-en>© 2025 Warnier Web Design. All rights reserved.</span>
+      </p>
+    </div>
+  </footer>
+
+
+  <!-- ============================================================
+       JAVASCRIPT
+  ============================================================ -->
+  <script>
+    'use strict';
+
+    /* ----------------------------------------------------------
+       LANGUAGE TOGGLE
+    ---------------------------------------------------------- */
+    const htmlEl   = document.documentElement;
+    const langBtns = document.querySelectorAll('[data-lang-btn]');
+
+    function setLang(lang) {
+      htmlEl.setAttribute('data-lang', lang);
+      htmlEl.setAttribute('lang', lang);
+      localStorage.setItem('wwdLang', lang);
+      langBtns.forEach(btn => {
+        const active = btn.dataset.langBtn === lang;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    }
+
+    // Restore saved preference, default to 'nl'
+    setLang(localStorage.getItem('wwdLang') || 'nl');
+
+    langBtns.forEach(btn =>
+      btn.addEventListener('click', () => setLang(btn.dataset.langBtn))
+    );
+
+
+    /* ----------------------------------------------------------
+       STICKY NAV + ACTIVE SECTION HIGHLIGHT
+    ---------------------------------------------------------- */
+    const nav      = document.getElementById('nav');
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav__links a');
+
+    function onScroll() {
+      nav.classList.toggle('scrolled', window.scrollY > 48);
+
+      let current = '';
+      sections.forEach(sec => {
+        if (window.scrollY >= sec.offsetTop - 110) current = sec.id;
+      });
+
+      navLinks.forEach(a => {
+        const href = a.getAttribute('href');
+        a.classList.toggle('is-active', href === '#' + current);
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // run once on load
+
+
+    /* ----------------------------------------------------------
+       MOBILE HAMBURGER
+    ---------------------------------------------------------- */
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+
+    hamburger.addEventListener('click', () => {
+      const isOpen = mobileNav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute(
+        'aria-label',
+        isOpen ? 'Menu sluiten' : 'Menu openen'
+      );
+    });
+
+    // Close mobile nav when a link is clicked
+    mobileNav.querySelectorAll('a').forEach(a =>
+      a.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'Menu openen');
+      })
+    );
+
+    // Close on outside click
+    document.addEventListener('click', e => {
+      if (!nav.contains(e.target) && mobileNav.classList.contains('open')) {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+
+    /* ----------------------------------------------------------
+       SCROLL ANIMATIONS — IntersectionObserver
+    ---------------------------------------------------------- */
+    const fadeEls = document.querySelectorAll('.fade-up');
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    fadeEls.forEach(el => observer.observe(el));
+
+
+    /* ----------------------------------------------------------
+       CONTACT FORM — Netlify AJAX submit
+    ---------------------------------------------------------- */
+    const form       = document.getElementById('contact-form');
+    const successMsg = document.getElementById('form-success');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+
+      // Native HTML5 validation
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const submitBtn = form.querySelector('[type="submit"]');
+      submitBtn.disabled = true;
+
+      try {
+        const res = await fetch('/', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body:    new URLSearchParams(new FormData(form)).toString(),
+        });
+
+        if (res.ok) {
+          form.style.display   = 'none';
+          successMsg.style.display = 'block';
+        } else {
+          const lang = htmlEl.dataset.lang;
+          alert(
+            lang === 'fr' ? 'Une erreur est survenue. Veuillez réessayer ou nous envoyer un e-mail.'
+            : lang === 'en' ? 'Something went wrong. Please try again or send us an email.'
+            : 'Er is iets misgegaan. Probeer het opnieuw of stuur ons een e-mail.'
+          );
+          submitBtn.disabled = false;
+        }
+      } catch {
+        const l = htmlEl.dataset.lang;
+        alert(
+          l === 'fr' ? 'Une erreur est survenue. Vérifiez votre connexion.'
+          : l === 'en' ? 'Something went wrong. Please check your connection.'
+          : 'Er is iets misgegaan. Controleer uw verbinding.'
+        );
+        submitBtn.disabled = false;
+      }
+    });
+
+  </script>
+
+</body>
+</html>
+
+<!--
+==================================================================
+  DEPLOY NOTES
+==================================================================
+
+1. GITHUB
+   - Maak een nieuw repository aan op github.com
+   - Voeg index.html en het logo-bestand toe:
+       git init
+       git add index.html "Logo Warnier Web Design snip.png"
+       git commit -m "Initial build"
+       git remote add origin https://github.com/<jouw-naam>/<repo>.git
+       git push -u origin main
+
+2. NETLIFY
+   - Ga naar app.netlify.com → "Add new site" → "Import an existing project"
+   - Koppel uw GitHub-account en selecteer de repository
+   - Build command: leeg laten (statische site)
+   - Publish directory: / (root)
+   - Klik "Deploy site"
+   - Netlify Forms worden automatisch gedetecteerd dankzij data-netlify="true"
+
+3. EIGEN DOMEIN
+   - Ga in Netlify naar Site settings → Domain management → Add a domain
+   - Voer uw domeinnaam in (bv. warnierwebdesign.be)
+   - Kies "Use Netlify DNS" → kopieer de 4 Netlify nameservers
+   - Log in bij uw domeinregistrar en vervang de bestaande nameservers
+   - Netlify regelt SSL automatisch via Let's Encrypt
+
+==================================================================
+-->
