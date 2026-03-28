@@ -866,6 +866,131 @@
     @media (min-width: 1200px) {
       .hero__title { font-size: 4.25rem; }
     }
+
+    /* ============================================================
+       WHO WE SERVE — IMAGE ACCORDION
+    ============================================================ */
+    .who-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .who-text { display: flex; flex-direction: column; gap: 1.25rem; }
+    .who-text .section__tag { margin-bottom: 0; }
+    .who-text .section__title { margin-bottom: 0; }
+
+    .who-intro {
+      font-size: 1.0625rem;
+      line-height: 1.75;
+      color: var(--muted);
+    }
+
+    /* Accordion container */
+    .who-accordion {
+      display: flex;
+      gap: 10px;
+      height: 400px;
+      overflow: hidden;
+    }
+
+    /* Each panel */
+    .acc-item {
+      position: relative;
+      height: 100%;
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      width: 58px; /* JS will override this */
+      flex-shrink: 0;
+      transition: width 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .acc-item:focus-visible {
+      outline: 3px solid var(--orange);
+      outline-offset: 3px;
+    }
+
+    .acc-item img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.65s ease;
+    }
+
+    .acc-item.is-active img { transform: scale(1.04); }
+
+    .acc-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(7, 15, 48, 0.85) 0%,
+        rgba(0, 0, 0, 0.22) 55%,
+        transparent 100%
+      );
+    }
+
+    /* Panel label — rotates vertical when collapsed */
+    .acc-label {
+      position: absolute;
+      color: #fff;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 0.9375rem;
+      white-space: nowrap;
+      bottom: 4.5rem;
+      left: 50%;
+      transform: translateX(-50%) rotate(90deg);
+      transform-origin: center center;
+      transition: bottom 0.45s ease, transform 0.45s ease;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.6);
+      pointer-events: none;
+    }
+
+    .acc-item.is-active .acc-label {
+      bottom: 1.5rem;
+      transform: translateX(-50%) rotate(0deg);
+    }
+
+    /* Mobile: pill badges instead of accordion */
+    .who-pills {
+      display: none;
+      flex-wrap: wrap;
+      gap: 0.625rem;
+    }
+
+    .who-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 0.5rem 1.125rem;
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: var(--navy);
+    }
+
+    @media (max-width: 639px) {
+      .who-accordion { display: none; }
+      .who-pills    { display: flex; }
+    }
+
+    @media (min-width: 768px) {
+      .who-layout { grid-template-columns: 1fr 1.35fr; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .acc-item,
+      .acc-item img,
+      .acc-label { transition: none !important; }
+    }
   </style>
 </head>
 
@@ -1001,6 +1126,167 @@
         </div>
 
       </div>
+    </section>
+
+
+    <!-- ============================================================
+         WIE BEDIENEN WIJ / QUI SERVONS-NOUS / WHO DO WE SERVE
+    ============================================================ -->
+    <section class="section section--alt" id="klanten" aria-labelledby="klanten-title">
+      <div class="section__inner">
+        <div class="who-layout">
+
+          <!-- Left: text -->
+          <div class="who-text fade-up">
+            <span class="section__tag">
+              <span data-nl>Wie wij helpen</span>
+              <span data-fr>Qui nous aidons</span>
+              <span data-en>Who we help</span>
+            </span>
+            <h2 class="section__title" id="klanten-title">
+              <span data-nl>Wie bedienen wij?</span>
+              <span data-fr>Qui servons-nous&nbsp;?</span>
+              <span data-en>Who do we serve?</span>
+            </h2>
+            <p class="who-intro">
+              <span data-nl>Van de lokale frituur tot de tandarts om de hoek — als u klanten wilt aantrekken, bouwen wij de website die dat doet.</span>
+              <span data-fr>Du restaurant de quartier au médecin généraliste — si vous voulez attirer des clients, nous construisons le site web qui le fait.</span>
+              <span data-en>From the local bistro to the dentist around the corner — if you want to attract customers, we build the website that does it.</span>
+            </p>
+            <div>
+              <a href="#contact" class="btn btn--primary">
+                <span data-nl>Neem contact op →</span>
+                <span data-fr>Nous contacter →</span>
+                <span data-en>Get in touch →</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: image accordion + mobile pills -->
+          <div class="fade-up" style="transition-delay:0.12s;">
+
+            <!-- Accordion (640px+) -->
+            <div class="who-accordion" id="who-accordion" role="list" aria-label="Types of clients">
+
+              <!-- 1: Horeca -->
+              <div class="acc-item" role="listitem" tabindex="0"
+                   aria-label="Horeca & restaurants">
+                <img
+                  src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&h=400&fit=crop&auto=format"
+                  alt="Restaurant interieur"
+                  width="600" height="400" loading="lazy"
+                  onerror="this.src='https://placehold.co/600x400/0B1A4E/ffffff?text=Horeca'"
+                />
+                <div class="acc-overlay" aria-hidden="true"></div>
+                <div class="acc-label">
+                  <span data-nl>Horeca &amp; restaurants</span>
+                  <span data-fr>Horeca &amp; restaurants</span>
+                  <span data-en>Restaurants &amp; cafés</span>
+                </div>
+              </div>
+
+              <!-- 2: Retail -->
+              <div class="acc-item" role="listitem" tabindex="0"
+                   aria-label="Winkels & boetiekken">
+                <img
+                  src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&h=400&fit=crop&auto=format"
+                  alt="Winkelinterieur"
+                  width="600" height="400" loading="lazy"
+                  onerror="this.src='https://placehold.co/600x400/0B1A4E/ffffff?text=Retail'"
+                />
+                <div class="acc-overlay" aria-hidden="true"></div>
+                <div class="acc-label">
+                  <span data-nl>Winkels &amp; boetiekken</span>
+                  <span data-fr>Boutiques &amp; commerces</span>
+                  <span data-en>Retail &amp; boutiques</span>
+                </div>
+              </div>
+
+              <!-- 3: Tradespeople -->
+              <div class="acc-item" role="listitem" tabindex="0"
+                   aria-label="Vaklui & ambachtslieden">
+                <img
+                  src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=600&h=400&fit=crop&auto=format"
+                  alt="Vakman aan het werk"
+                  width="600" height="400" loading="lazy"
+                  onerror="this.src='https://placehold.co/600x400/0B1A4E/ffffff?text=Vaklui'"
+                />
+                <div class="acc-overlay" aria-hidden="true"></div>
+                <div class="acc-label">
+                  <span data-nl>Vaklui &amp; ambachtslieden</span>
+                  <span data-fr>Artisans &amp; métiers</span>
+                  <span data-en>Tradespeople &amp; craftsmen</span>
+                </div>
+              </div>
+
+              <!-- 4: Professionals -->
+              <div class="acc-item" role="listitem" tabindex="0"
+                   aria-label="Vrije beroepen">
+                <img
+                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop&auto=format"
+                  alt="Professionele dienstverlening"
+                  width="600" height="400" loading="lazy"
+                  onerror="this.src='https://placehold.co/600x400/0B1A4E/ffffff?text=Professionals'"
+                />
+                <div class="acc-overlay" aria-hidden="true"></div>
+                <div class="acc-label">
+                  <span data-nl>Vrije beroepen</span>
+                  <span data-fr>Professions libérales</span>
+                  <span data-en>Freelancers &amp; professionals</span>
+                </div>
+              </div>
+
+              <!-- 5: Beauty & wellness (default active) -->
+              <div class="acc-item is-active" role="listitem" tabindex="0"
+                   aria-label="Schoonheid & welzijn">
+                <img
+                  src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&h=400&fit=crop&auto=format"
+                  alt="Schoonheidssalon"
+                  width="600" height="400" loading="lazy"
+                  onerror="this.src='https://placehold.co/600x400/0B1A4E/ffffff?text=Welzijn'"
+                />
+                <div class="acc-overlay" aria-hidden="true"></div>
+                <div class="acc-label">
+                  <span data-nl>Schoonheid &amp; welzijn</span>
+                  <span data-fr>Beauté &amp; bien-être</span>
+                  <span data-en>Beauty &amp; wellness</span>
+                </div>
+              </div>
+
+            </div><!-- /who-accordion -->
+
+            <!-- Pill list (mobile fallback, below 640px) -->
+            <ul class="who-pills" role="list">
+              <li class="who-pill">
+                <span data-nl>🍽️ Horeca &amp; restaurants</span>
+                <span data-fr>🍽️ Horeca &amp; restaurants</span>
+                <span data-en>🍽️ Restaurants &amp; cafés</span>
+              </li>
+              <li class="who-pill">
+                <span data-nl>🛍️ Winkels &amp; boetiekken</span>
+                <span data-fr>🛍️ Boutiques &amp; commerces</span>
+                <span data-en>🛍️ Retail &amp; boutiques</span>
+              </li>
+              <li class="who-pill">
+                <span data-nl>🔧 Vaklui &amp; ambachtslieden</span>
+                <span data-fr>🔧 Artisans &amp; métiers</span>
+                <span data-en>🔧 Tradespeople &amp; craftsmen</span>
+              </li>
+              <li class="who-pill">
+                <span data-nl>💼 Vrije beroepen</span>
+                <span data-fr>💼 Professions libérales</span>
+                <span data-en>💼 Freelancers &amp; professionals</span>
+              </li>
+              <li class="who-pill">
+                <span data-nl>💆 Schoonheid &amp; welzijn</span>
+                <span data-fr>💆 Beauté &amp; bien-être</span>
+                <span data-en>💆 Beauty &amp; wellness</span>
+              </li>
+            </ul>
+
+          </div><!-- /right column -->
+        </div><!-- /who-layout -->
+      </div><!-- /section__inner -->
     </section>
 
 
@@ -1481,6 +1767,55 @@
         hamburger.setAttribute('aria-expanded', 'false');
       }
     });
+
+
+    /* ----------------------------------------------------------
+       WHO WE SERVE — IMAGE ACCORDION
+    ---------------------------------------------------------- */
+    (function () {
+      const accordion = document.getElementById('who-accordion');
+      if (!accordion) return;
+
+      const items = accordion.querySelectorAll('.acc-item');
+      const GAP = 10;
+      const INACTIVE_W = 58;
+
+      function setActive(index) {
+        const totalW = accordion.offsetWidth;
+        const n = items.length;
+        const activeW = Math.max(120, totalW - (n - 1) * (INACTIVE_W + GAP) - GAP);
+
+        items.forEach((item, i) => {
+          const isActive = i === index;
+          item.classList.toggle('is-active', isActive);
+          item.style.width = (isActive ? activeW : INACTIVE_W) + 'px';
+        });
+      }
+
+      // Find index of pre-marked active item, default to last
+      const initial = [...items].findIndex(el => el.classList.contains('is-active'));
+      setActive(initial >= 0 ? initial : items.length - 1);
+
+      items.forEach((item, i) => {
+        item.addEventListener('mouseenter', () => setActive(i));
+        // Keyboard: Enter / Space activates; arrow keys move between panels
+        item.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActive(i); }
+          if (e.key === 'ArrowRight') { e.preventDefault(); setActive(Math.min(i + 1, items.length - 1)); items[Math.min(i + 1, items.length - 1)].focus(); }
+          if (e.key === 'ArrowLeft')  { e.preventDefault(); setActive(Math.max(i - 1, 0)); items[Math.max(i - 1, 0)].focus(); }
+        });
+      });
+
+      // Recalculate on window resize
+      let resizeTimer;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          const active = [...items].findIndex(el => el.classList.contains('is-active'));
+          setActive(active >= 0 ? active : 0);
+        }, 120);
+      }, { passive: true });
+    })();
 
 
     /* ----------------------------------------------------------
