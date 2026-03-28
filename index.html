@@ -991,6 +991,356 @@
       .acc-item img,
       .acc-label { transition: none !important; }
     }
+
+    /* ============================================================
+       HERO — TWO-COLUMN LAYOUT (text + orbital)
+    ============================================================ */
+    @media (min-width: 900px) {
+      .hero__inner {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        align-items: center;
+      }
+    }
+
+    /* ============================================================
+       DEVICE MOCKUPS  (laptop + iPad + iPhone)
+    ============================================================ */
+
+    .lp-wrap {
+      display: none;
+    }
+
+    @media (min-width: 900px) {
+      .lp-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding-top: 1rem;
+      }
+    }
+
+    /* Staggered float — each device at its own speed & amplitude */
+    @keyframes lpFloatA {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-6px); }
+    }
+    @keyframes lpFloatB {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    @keyframes lpFloatC {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-14px); }
+    }
+
+    /* Subtle screen glow pulse */
+    @keyframes screenPulse {
+      0%, 100% { box-shadow: 0 0 6px rgba(140, 180, 255, 0.04); }
+      50%       { box-shadow: 0 0 18px rgba(140, 180, 255, 0.11); }
+    }
+
+    /* Scene: positions all three devices relative to each other */
+    .lp-scene {
+      position: relative;
+      width: 380px;
+      height: 260px;
+      flex-shrink: 0;
+    }
+
+    /* ── SHARED PALETTE ── */
+    /* frame: #1c2d4e / border: #28395e / screen bg: #08101e */
+
+    /* ── LAPTOP (back, z=1) ── */
+    .lp-laptop {
+      position: absolute;
+      left: 20px;
+      top: 0;
+      width: 255px;
+      z-index: 1;
+      animation: lpFloatA 6s ease-in-out infinite;
+    }
+
+    .lp-lid {
+      background: #1c2d4e;
+      border: 3px solid #28395e;
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      padding: 7px 7px 0;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .lp-screen {
+      background: #08101e;
+      border-radius: 4px 4px 0 0;
+      overflow: hidden;
+      animation: screenPulse 5s ease-in-out infinite;
+    }
+
+    /* Browser chrome */
+    .lp-bar {
+      background: #0d1828;
+      padding: 6px 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .lp-dots { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .lp-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .lp-dot--red   { background: #ff5f57; }
+    .lp-dot--amber { background: #febc2e; }
+    .lp-dot--green { background: #28c840; }
+
+    .lp-url {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 3px;
+      height: 13px;
+      display: flex;
+      align-items: center;
+      padding: 0 6px;
+    }
+
+    .lp-url-text {
+      font-family: var(--font-body);
+      font-size: 0.4375rem;
+      color: rgba(255, 255, 255, 0.22);
+    }
+
+    /* Fake website content — shared between devices */
+    .lp-content { background: #0a1526; }
+
+    .lp-fake-header {
+      background: #0d1828;
+      padding: 7px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .lp-fake-logo {
+      width: 36px; height: 5px;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 2px;
+    }
+
+    .lp-fake-nav-links { display: flex; gap: 5px; }
+    .lp-fake-nav-link  { width: 13px; height: 4px; background: rgba(255, 255, 255, 0.22); border-radius: 2px; }
+
+    .lp-fake-hero {
+      background: #111f3a;
+      padding: 12px 10px 14px;
+    }
+
+    .lp-fake-h1 {
+      width: 70%; height: 7px;
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 2px;
+      margin-bottom: 6px;
+    }
+
+    .lp-fake-h2 {
+      width: 46%; height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      margin-bottom: 10px;
+    }
+
+    .lp-fake-btn {
+      width: 40px; height: 11px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 3px;
+    }
+
+    .lp-fake-body {
+      padding: 9px 10px 7px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .lp-fake-line { height: 4px; background: rgba(255, 255, 255, 0.08); border-radius: 2px; }
+    .lp-fake-line--long  { width: 86%; }
+    .lp-fake-line--med   { width: 65%; }
+    .lp-fake-line--short { width: 46%; }
+
+    .lp-fake-cards { display: flex; gap: 5px; padding: 0 10px 10px; }
+    .lp-fake-card  { flex: 1; height: 22px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 3px; }
+
+    /* Laptop hinge + base */
+    .lp-hinge {
+      height: 3px;
+      background: #111c36;
+      border-left: 3px solid #28395e;
+      border-right: 3px solid #28395e;
+    }
+
+    .lp-base {
+      width: calc(100% + 10px);
+      margin-left: -5px;
+      height: 14px;
+      background: linear-gradient(to bottom, #1c2d4e, #121e3c);
+      border: 3px solid #28395e;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lp-trackpad {
+      width: 46px; height: 6px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 2px;
+    }
+
+    .lp-shadow {
+      width: 80%; height: 6px;
+      margin: 0 auto;
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 50%;
+      filter: blur(6px);
+    }
+
+    /* ── iPAD (right side, partially behind laptop, z=1) ── */
+    /* ── iPAD (middle, z=2) ── */
+    .lp-ipad-wrap {
+      position: absolute;
+      left: 253px;
+      top: 18px;
+      z-index: 2;
+      width: 108px;
+      animation: lpFloatB 4.5s ease-in-out infinite 0.6s;
+    }
+
+    .lp-ipad {
+      background: #1c2d4e;
+      border: 3px solid #28395e;
+      border-radius: 8px;
+      padding: 9px 5px 17px;
+      position: relative;
+    }
+
+    /* camera */
+    .lp-ipad::before {
+      content: '';
+      position: absolute;
+      top: 3px; left: 50%; transform: translateX(-50%);
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* home bar */
+    .lp-ipad::after {
+      content: '';
+      position: absolute;
+      bottom: 5px; left: 50%; transform: translateX(-50%);
+      width: 24px; height: 3px;
+      border-radius: 2px;
+      background: rgba(255, 255, 255, 0.18);
+    }
+
+    .lp-ipad-screen {
+      background: #08101e;
+      border-radius: 3px;
+      overflow: hidden;
+      animation: screenPulse 5s ease-in-out infinite 1.2s;
+    }
+
+    .lp-ipad-header {
+      background: #0d1828;
+      padding: 5px 6px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .lp-ipad-logo { width: 26px; height: 4px; background: rgba(255, 255, 255, 0.65); border-radius: 2px; }
+
+    .lp-ipad-hero { background: #111f3a; padding: 9px 7px 11px; }
+    .lp-ipad-h1 { width: 74%; height: 5px; background: rgba(255, 255, 255, 0.78); border-radius: 2px; margin-bottom: 5px; }
+    .lp-ipad-h2 { width: 52%; height: 3px; background: rgba(255, 255, 255, 0.28); border-radius: 2px; margin-bottom: 8px; }
+    .lp-ipad-btn { width: 28px; height: 9px; background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 2px; }
+
+    .lp-ipad-body { padding: 6px 7px 5px; display: flex; flex-direction: column; gap: 4px; }
+    .lp-ipad-line { height: 3px; background: rgba(255, 255, 255, 0.07); border-radius: 2px; }
+    .lp-ipad-line--l { width: 84%; }
+    .lp-ipad-line--m { width: 60%; }
+    .lp-ipad-line--s { width: 40%; }
+
+    /* ── iPHONE (front right, z=3) ── */
+    /* ── iPHONE (front, z=3) ── */
+    .lp-phone-wrap {
+      position: absolute;
+      left: 318px;
+      top: 96px;
+      z-index: 3;
+      width: 52px;
+      animation: lpFloatC 3.8s ease-in-out infinite 1.3s;
+    }
+
+    .lp-phone {
+      background: #1c2d4e;
+      border: 3px solid #28395e;
+      border-radius: 11px;
+      padding: 11px 4px 13px;
+      position: relative;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    /* dynamic island */
+    .lp-phone::before {
+      content: '';
+      position: absolute;
+      top: 4px; left: 50%; transform: translateX(-50%);
+      width: 11px; height: 4px;
+      background: #08101e;
+      border-radius: 3px;
+    }
+
+    /* home indicator */
+    .lp-phone::after {
+      content: '';
+      position: absolute;
+      bottom: 4px; left: 50%; transform: translateX(-50%);
+      width: 13px; height: 2px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+    }
+
+    .lp-phone-screen {
+      background: #08101e;
+      border-radius: 3px;
+      overflow: hidden;
+      animation: screenPulse 5s ease-in-out infinite 2.4s;
+    }
+
+    .lp-phone-header { background: #0d1828; padding: 4px 5px; }
+    .lp-phone-logo   { width: 20px; height: 4px; background: rgba(255, 255, 255, 0.6); border-radius: 2px; }
+
+    .lp-phone-hero { background: #111f3a; padding: 7px 5px 9px; }
+    .lp-phone-h1 { width: 76%; height: 4px; background: rgba(255, 255, 255, 0.72); border-radius: 2px; margin-bottom: 4px; }
+    .lp-phone-h2 { width: 54%; height: 3px; background: rgba(255, 255, 255, 0.25); border-radius: 2px; margin-bottom: 7px; }
+    .lp-phone-btn { width: 22px; height: 7px; background: rgba(255, 255, 255, 0.09); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 2px; }
+
+    .lp-phone-body { padding: 5px 5px 4px; display: flex; flex-direction: column; gap: 4px; }
+    .lp-phone-line { height: 3px; background: rgba(255, 255, 255, 0.07); border-radius: 2px; }
+    .lp-phone-line--l { width: 80%; }
+    .lp-phone-line--m { width: 56%; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .lp-laptop,
+      .lp-ipad-wrap,
+      .lp-phone-wrap,
+      .lp-screen,
+      .lp-ipad-screen,
+      .lp-phone-screen { animation: none !important; }
+    }
   </style>
 </head>
 
@@ -1094,36 +1444,127 @@
     <section class="hero" id="home" aria-labelledby="hero-title">
       <div class="hero__inner">
 
-        <p class="hero__label" aria-hidden="true">
-          <span data-nl>📍 Antwerpen &amp; omgeving</span>
-          <span data-fr>📍 Anvers &amp; région</span>
-          <span data-en>📍 Antwerp &amp; surroundings</span>
-        </p>
+        <!-- Left: text content -->
+        <div class="hero__left">
+          <p class="hero__label" aria-hidden="true">
+            <span data-nl>📍 Antwerpen &amp; omgeving</span>
+            <span data-fr>📍 Anvers &amp; région</span>
+            <span data-en>📍 Antwerp &amp; surroundings</span>
+          </p>
 
-        <h1 class="hero__title" id="hero-title">
-          <span data-nl>Uw zaak verdient een website die <em>werkt.</em></span>
-          <span data-fr>Votre entreprise mérite un site web qui <em>travaille pour vous.</em></span>
-          <span data-en>Your business deserves a website that <em>works.</em></span>
-        </h1>
+          <h1 class="hero__title" id="hero-title">
+            <span data-nl>Uw zaak verdient een website die <em>werkt.</em></span>
+            <span data-fr>Votre entreprise mérite un site web qui <em>travaille pour vous.</em></span>
+            <span data-en>Your business deserves a website that <em>works.</em></span>
+          </h1>
 
-        <p class="hero__sub">
-          <span data-nl>Van restaurant tot vakman — wij bouwen professionele websites voor kleine ondernemingen in Antwerpen en omgeving. Betaalbaar, snel en volledig op maat.</span>
-          <span data-fr>Du restaurant à l'artisan — nous créons des sites web professionnels pour les petites entreprises d'Anvers et de sa région. Abordable, rapide et entièrement sur mesure.</span>
-          <span data-en>From restaurant to tradesperson — we build professional websites for small businesses in Antwerp and the surrounding area. Affordable, fast and fully tailored to you.</span>
-        </p>
+          <p class="hero__sub">
+            <span data-nl>Van restaurant tot vakman — wij bouwen professionele websites voor kleine ondernemingen in Antwerpen en omgeving. Betaalbaar, snel en volledig op maat.</span>
+            <span data-fr>Du restaurant à l'artisan — nous créons des sites web professionnels pour les petites entreprises d'Anvers et de sa région. Abordable, rapide et entièrement sur mesure.</span>
+            <span data-en>From restaurant to tradesperson — we build professional websites for small businesses in Antwerp and the surrounding area. Affordable, fast and fully tailored to you.</span>
+          </p>
 
-        <div class="hero__ctas">
-          <a href="#diensten" class="btn btn--primary">
-            <span data-nl>Bekijk onze pakketten →</span>
-            <span data-fr>Voir nos formules →</span>
-            <span data-en>View our packages →</span>
-          </a>
-          <a href="#contact" class="btn btn--ghost">
-            <span data-nl>Neem contact op</span>
-            <span data-fr>Nous contacter</span>
-            <span data-en>Get in touch</span>
-          </a>
-        </div>
+          <div class="hero__ctas">
+            <a href="#diensten" class="btn btn--primary">
+              <span data-nl>Bekijk onze pakketten →</span>
+              <span data-fr>Voir nos formules →</span>
+              <span data-en>View our packages →</span>
+            </a>
+            <a href="#contact" class="btn btn--ghost">
+              <span data-nl>Neem contact op</span>
+              <span data-fr>Nous contacter</span>
+              <span data-en>Get in touch</span>
+            </a>
+          </div>
+        </div><!-- /hero__left -->
+
+        <!-- Right: device mockups — laptop + iPad + iPhone (visible 900px+) -->
+        <div class="lp-wrap" aria-hidden="true">
+          <div class="lp-scene">
+
+            <!-- Laptop -->
+            <div class="lp-laptop">
+              <div class="lp-lid">
+                <div class="lp-screen">
+                  <div class="lp-bar">
+                    <div class="lp-dots">
+                      <div class="lp-dot lp-dot--red"></div>
+                      <div class="lp-dot lp-dot--amber"></div>
+                      <div class="lp-dot lp-dot--green"></div>
+                    </div>
+                    <div class="lp-url"><span class="lp-url-text">www.uwbedrijf.be</span></div>
+                  </div>
+                  <div class="lp-content">
+                    <div class="lp-fake-header">
+                      <div class="lp-fake-logo"></div>
+                      <div class="lp-fake-nav-links">
+                        <div class="lp-fake-nav-link"></div>
+                        <div class="lp-fake-nav-link"></div>
+                        <div class="lp-fake-nav-link"></div>
+                      </div>
+                    </div>
+                    <div class="lp-fake-hero">
+                      <div class="lp-fake-h1"></div>
+                      <div class="lp-fake-h2"></div>
+                      <div class="lp-fake-btn"></div>
+                    </div>
+                    <div class="lp-fake-body">
+                      <div class="lp-fake-line lp-fake-line--long"></div>
+                      <div class="lp-fake-line lp-fake-line--med"></div>
+                      <div class="lp-fake-line lp-fake-line--short"></div>
+                    </div>
+                    <div class="lp-fake-cards">
+                      <div class="lp-fake-card"></div>
+                      <div class="lp-fake-card"></div>
+                      <div class="lp-fake-card"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="lp-hinge"></div>
+              <div class="lp-base"><div class="lp-trackpad"></div></div>
+              <div class="lp-shadow"></div>
+            </div>
+
+            <!-- iPad -->
+            <div class="lp-ipad-wrap">
+              <div class="lp-ipad">
+                <div class="lp-ipad-screen">
+                  <div class="lp-ipad-header"><div class="lp-ipad-logo"></div></div>
+                  <div class="lp-ipad-hero">
+                    <div class="lp-ipad-h1"></div>
+                    <div class="lp-ipad-h2"></div>
+                    <div class="lp-ipad-btn"></div>
+                  </div>
+                  <div class="lp-ipad-body">
+                    <div class="lp-ipad-line lp-ipad-line--l"></div>
+                    <div class="lp-ipad-line lp-ipad-line--m"></div>
+                    <div class="lp-ipad-line lp-ipad-line--s"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- iPhone -->
+            <div class="lp-phone-wrap">
+              <div class="lp-phone">
+                <div class="lp-phone-screen">
+                  <div class="lp-phone-header"><div class="lp-phone-logo"></div></div>
+                  <div class="lp-phone-hero">
+                    <div class="lp-phone-h1"></div>
+                    <div class="lp-phone-h2"></div>
+                    <div class="lp-phone-btn"></div>
+                  </div>
+                  <div class="lp-phone-body">
+                    <div class="lp-phone-line lp-phone-line--l"></div>
+                    <div class="lp-phone-line lp-phone-line--m"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div><!-- /lp-wrap -->
 
       </div>
     </section>
