@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galactic Video — Where the Force Meets Film</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Orbitron:wght@500;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+
+    /* ═══════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════ */
+    :root {
+      --bg:          #f4e9d6;
+      --bg2:         #fffaf2;
+      --nav-bg:      #0a0e28;
+      --text:        #1a0e00;
+      --text-sub:    #5a4020;
+      --muted:       #907050;
+      --accent:      #c9961a;
+      --accent-dim:  rgba(201,150,26,0.18);
+      --border:      #e0c890;
+      --card-bg:     #fff9ee;
+      --glow:        rgba(201,150,26,0.5);
+      --glow-spread: rgba(201,150,26,0.15);
+      --nav-h:       62px;
+      --tr:          0.65s cubic-bezier(.4,0,.2,1);
+      --radius:      14px;
+    }
+    body.dark-side {
+      --bg:          #060612;
+      --bg2:         #0c0c22;
+      --nav-bg:      #02020e;
+      --text:        #e8e0f8;
+      --text-sub:    #b0a0d0;
+      --muted:       #7060a0;
+      --accent:      #e53333;
+      --accent-dim:  rgba(229,51,51,0.16);
+      --border:      #1e1e40;
+      --card-bg:     #0f0f28;
+      --glow:        rgba(229,51,51,0.55);
+      --glow-spread: rgba(229,51,51,0.12);
+    }
+
+    /* ═══════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      transition: background var(--tr), color var(--tr);
+    }
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; border: none; background: none; font-family: inherit; }
+    img, video { display: block; }
+
+    /* ═══════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════ */
+    .gv-nav {
+      position: fixed; inset-block-start: 0; inset-inline: 0;
+      height: var(--nav-h); z-index: 100;
+      background: var(--nav-bg);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center;
+      padding: 0 1rem;
+      gap: 1rem;
+      transition: background var(--tr);
+    }
+    .gv-nav__logo {
+      display: flex; flex-direction: column; flex-shrink: 0; line-height: 1;
+    }
+    .gv-nav__logo-name {
+      font-family: 'Cinzel', serif; font-weight: 900; font-size: 0.9375rem;
+      letter-spacing: 0.1em; color: var(--accent);
+      transition: color var(--tr);
+    }
+    .gv-nav__logo-sub {
+      font-family: 'Orbitron', monospace; font-size: 0.4375rem; font-weight: 500;
+      letter-spacing: 0.18em; color: rgba(255,255,255,0.35);
+      text-transform: uppercase; margin-top: 2px;
+    }
+
+    .gv-nav__links {
+      display: flex; align-items: center; gap: 1rem;
+      list-style: none; flex: 1; justify-content: center;
+    }
+    .gv-nav__links a {
+      font-family: 'Orbitron', monospace; font-weight: 500; font-size: 0.5rem;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      transition: color 0.2s;
+      position: relative; padding-bottom: 2px;
+    }
+    .gv-nav__links a::after {
+      content: ''; position: absolute; bottom: -1px; left: 0;
+      width: 0; height: 2px; background: var(--accent);
+      transition: width 0.25s ease, background var(--tr);
+    }
+    .gv-nav__links a:hover { color: rgba(255,255,255,0.9); }
+    .gv-nav__links a:hover::after,
+    .gv-nav__links a.active::after { width: 100%; }
+    .gv-nav__links a.active { color: rgba(255,255,255,0.9); }
+    @media (max-width: 600px) { .gv-nav__links { display: none; } }
+
+    /* Toggle zone */
+    .gv-nav__toggle-zone {
+      display: flex; align-items: center; gap: 0.375rem; flex-shrink: 0;
+    }
+    .side-label {
+      font-family: 'Orbitron', monospace; font-size: 0.45rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      transition: color 0.4s, opacity 0.4s;
+    }
+    .side-label--light { color: #d4a017; opacity: 1; }
+    .side-label--dark  { color: #bb2222; opacity: 0.4; }
+    body.dark-side .side-label--light { opacity: 0.4; }
+    body.dark-side .side-label--dark  { opacity: 1; }
+
+    /* ═══════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════ */
+    .gv-hero {
+      min-height: 100svh;
+      padding-top: var(--nav-h);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 3rem;
+      padding-left: 4vw; padding-right: 4vw;
+      background: var(--bg);
+      position: relative;
+      overflow: hidden;
+      transition: background var(--tr);
+    }
+    @media (max-width: 768px) {
+      .gv-hero { grid-template-columns: 1fr; padding-top: calc(var(--nav-h) + 1rem); }
+    }
+
+    /* Hero background texture */
+    .gv-hero::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 60% 50%, var(--glow-spread) 0%, transparent 70%);
+      transition: background var(--tr);
+      pointer-events: none;
+    }
+
+    .gv-hero__text { position: relative; z-index: 1; }
+    .gv-hero__eyebrow {
+      display: inline-block;
+      font-family: 'Orbitron', monospace; font-size: 0.625rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); padding: 0.3rem 0.75rem;
+      border: 1px solid var(--accent); border-radius: 999px;
+      margin-bottom: 1.25rem;
+      transition: color var(--tr), border-color var(--tr);
+    }
+    .gv-hero h1 {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.1; color: var(--text);
+      margin-bottom: 1rem;
+      transition: color var(--tr);
+    }
+    .gv-hero h1 em {
+      font-style: normal; color: var(--accent);
+      transition: color var(--tr);
+    }
+    .gv-hero__sub {
+      font-size: 1rem; line-height: 1.65;
+      color: var(--text-sub); max-width: 420px;
+      margin-bottom: 2rem;
+      transition: color var(--tr);
+    }
+    .gv-hero__actions { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+    .btn {
+      font-family: 'Orbitron', monospace; font-weight: 700;
+      font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.75rem 1.5rem; border-radius: 999px;
+      transition: all 0.25s;
+    }
+    .btn--primary {
+      background: var(--accent); color: #fff;
+      box-shadow: 0 4px 20px var(--glow);
+    }
+    .btn--primary:hover {
+      filter: brightness(1.15);
+      box-shadow: 0 6px 28px var(--glow);
+      transform: translateY(-1px);
+    }
+    .btn--ghost {
+      border: 1px solid var(--border); color: var(--text);
+      transition: border-color 0.25s, color 0.25s, background var(--tr);
+    }
+    .btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ═══════════════════════════════════════
+       VIDEO STAGE
+    ═══════════════════════════════════════ */
+    .video-stage-wrap { position: relative; z-index: 1; }
+    .video-stage {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      aspect-ratio: 9/16;
+      max-height: 68svh;
+      margin: 0 auto;
+      background: #000;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 0 60px var(--glow),
+        0 30px 80px rgba(0,0,0,0.35);
+      transition: box-shadow var(--tr);
+    }
+
+    /* Film-strip aesthetic: scanlines + vignette */
+    .video-stage::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 4; pointer-events: none;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(0,0,0,0) 0px, rgba(0,0,0,0) 3px,
+          rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+        );
+    }
+    .video-stage::after {
+      content: '';
+      position: absolute; inset: 0; z-index: 5; pointer-events: none; border-radius: inherit;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+    }
+
+    .video-clip {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.8s cubic-bezier(.4,0,.2,1), opacity 0.8s ease, filter 0.8s ease;
+    }
+    .video-jedi {
+      transform: translateX(0); opacity: 1; z-index: 2;
+      filter: saturate(1.1) sepia(0.08) brightness(1.02);
+      animation: videoReveal 1.1s ease both;
+      animation-delay: 0.3s;
+    }
+    .video-vader {
+      transform: translateX(100%); opacity: 0; z-index: 1;
+      filter: contrast(1.1) brightness(0.85) hue-rotate(330deg);
+    }
+    body.dark-side .video-jedi {
+      transform: translateX(-110%); opacity: 0;
+    }
+    body.dark-side .video-vader {
+      transform: translateX(0); opacity: 1; z-index: 2;
+    }
+
+    @keyframes videoReveal {
+      from { opacity: 0; transform: scale(1.06) translateY(8px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    /* Caption bar below video */
+    .video-caption {
+      margin-top: 0.875rem; text-align: center;
+      font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      transition: color var(--tr);
+    }
+    .video-caption .cap-jedi { color: #c9961a; }
+    .video-caption .cap-vader { color: #e53333; display: none; }
+    body.dark-side .video-caption .cap-jedi { display: none; }
+    body.dark-side .video-caption .cap-vader { display: block; }
+
+    /* ═══════════════════════════════════════
+       NOW SHOWING
+    ═══════════════════════════════════════ */
+    .gv-section {
+      padding: 4rem 4vw;
+      background: var(--bg2);
+      transition: background var(--tr);
+    }
+    .gv-section:nth-child(even) { background: var(--bg); }
+    .gv-section__head {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: 1.75rem; gap: 1rem;
+    }
+    .gv-section__title {
+      font-family: 'Cinzel', serif; font-weight: 700;
+      font-size: clamp(1.25rem, 3vw, 1.625rem);
+      color: var(--text); letter-spacing: 0.04em;
+      transition: color var(--tr);
+    }
+    .gv-section__more {
+      font-family: 'Orbitron', monospace; font-size: 0.625rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--accent); white-space: nowrap;
+      transition: color var(--tr);
+    }
+    .gv-section__more:hover { text-decoration: underline; }
+
+    /* Scrollable card row */
+    .card-row {
+      display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.75rem;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+      -webkit-overflow-scrolling: touch;
+    }
+    .card-row::-webkit-scrollbar { height: 4px; }
+    .card-row::-webkit-scrollbar-track { background: transparent; }
+    .card-row::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Film card */
+    .film-card {
+      flex: 0 0 160px; border-radius: var(--radius);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform 0.25s, box-shadow 0.25s, background var(--tr), border-color var(--tr);
+      cursor: pointer;
+    }
+    .film-card:hover {
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 12px 36px rgba(0,0,0,0.2), 0 0 0 1px var(--accent);
+    }
+    .film-card__poster {
+      width: 100%; aspect-ratio: 2/3;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-end;
+      padding: 0.75rem; position: relative; overflow: hidden;
+    }
+    .film-card__episode {
+      font-family: 'Orbitron', monospace; font-size: 0.45rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(255,255,255,0.6); margin-bottom: 0.25rem;
+    }
+    .film-card__title-on-poster {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: 0.875rem; text-align: center; line-height: 1.2;
+      color: rgba(255,255,255,0.95);
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+    .film-card__info {
+      padding: 0.625rem 0.75rem;
+    }
+    .film-card__year-rating {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.6875rem; color: var(--muted); margin-bottom: 0.35rem;
+      transition: color var(--tr);
+    }
+    .film-card__stars { color: #f0b400; font-size: 0.6rem; letter-spacing: -1px; }
+    .film-card__rent-btn {
+      width: 100%; text-align: center;
+      font-family: 'Orbitron', monospace; font-size: 0.5rem; font-weight: 700;
+      letter-spacing: 0.14em; text-transform: uppercase;
+      padding: 0.4rem; border-radius: 6px;
+      background: var(--accent-dim); color: var(--accent);
+      border: 1px solid transparent;
+      transition: background 0.2s, border-color 0.2s, color var(--tr);
+    }
+    .film-card__rent-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Film poster gradients */
+    .poster-iv   { background: linear-gradient(to bottom, #020818, #0c1e3d, #1a3060, #0c1835); }
+    .poster-v    { background: linear-gradient(to bottom, #0a1520, #1a3050, #8ab0d0, #daeaf8); }
+    .poster-vi   { background: linear-gradient(to bottom, #021002, #0a2010, #1a4820, #2d7030); }
+    .poster-i    { background: linear-gradient(to bottom, #4a2a05, #9a6010, #d4a060, #f0d090); }
+    .poster-ii   { background: linear-gradient(to bottom, #200a02, #601820, #c03040, #800820); }
+    .poster-iii  { background: linear-gradient(to bottom, #100000, #400808, #c02000, #ff6000); }
+    .poster-rogue{ background: linear-gradient(to bottom, #050510, #0c1428, #1a2840, #0c0c20); }
+    .poster-mando{ background: linear-gradient(to bottom, #080808, #1a1205, #3a2808, #503808); }
+
+    /* ═══════════════════════════════════════
+       CATEGORIES
+    ═══════════════════════════════════════ */
+    .cat-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+    }
+    @media (max-width: 600px) { .cat-grid { grid-template-columns: 1fr; } }
+    .cat-tile {
+      border-radius: var(--radius); padding: 2rem 1.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      border: 1px solid var(--border); background: var(--card-bg);
+      cursor: pointer; transition: all 0.25s, background var(--tr), border-color var(--tr);
+      position: relative; overflow: hidden;
+    }
+    .cat-tile::before {
+      content: ''; position: absolute; inset: 0;
+      opacity: 0; transition: opacity 0.3s;
+      background: radial-gradient(ellipse at 30% 30%, var(--glow-spread), transparent 70%);
+    }
+    .cat-tile:hover { transform: translateY(-3px); border-color: var(--accent); }
+    .cat-tile:hover::before { opacity: 1; }
+    .cat-tile__icon { font-size: 1.75rem; }
+    .cat-tile__name {
+      font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
+      color: var(--text); transition: color var(--tr);
+    }
+    .cat-tile__count {
+      font-size: 0.75rem; color: var(--muted); transition: color var(--tr);
+    }
+
+    /* ═══════════════════════════════════════
+       BANNER / FEATURED
+    ═══════════════════════════════════════ */
+    .gv-banner {
+      padding: 3rem 4vw;
+      background: var(--nav-bg);
+      display: flex; align-items: center; gap: 2rem;
+      flex-wrap: wrap;
+      transition: background var(--tr);
+    }
+    .gv-banner__text { flex: 1; min-width: 200px; }
+    .gv-banner__eyebrow {
+      font-family: 'Orbitron', monospace; font-size: 0.6rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.5rem;
+      transition: color var(--tr);
+    }
+    .gv-banner h2 {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: clamp(1.25rem, 3vw, 2rem);
+      color: #fff; margin-bottom: 0.75rem; line-height: 1.2;
+    }
+    .gv-banner p { color: rgba(255,255,255,0.55); font-size: 0.9375rem; line-height: 1.6; }
+
+    /* ═══════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════ */
+    .gv-footer {
+      background: var(--nav-bg); color: rgba(255,255,255,0.45);
+      padding: 2rem 4vw;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      transition: background var(--tr);
+    }
+    .gv-footer__logo {
+      font-family: 'Cinzel', serif; font-weight: 900;
+      font-size: 1rem; letter-spacing: 0.1em;
+      color: var(--accent); transition: color var(--tr);
+    }
+    .gv-footer__links {
+      display: flex; gap: 1.5rem; list-style: none;
+    }
+    .gv-footer__links a {
+      font-family: 'Orbitron', monospace; font-size: 0.55rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); transition: color 0.2s;
+    }
+    .gv-footer__links a:hover { color: rgba(255,255,255,0.8); }
+    .gv-footer__copy { font-size: 0.75rem; }
+
+    /* ═══════════════════════════════════════
+       BB8 TOGGLE (converted from React component)
+       Original by: UIverse / styled-components
+    ═══════════════════════════════════════ */
+    .bb8-toggle {
+      --toggle-size: 8px;
+      --toggle-width: 10.625em;
+      --toggle-height: 5.625em;
+      --toggle-offset: calc((var(--toggle-height) - var(--bb8-diameter)) / 2);
+      --toggle-bg: linear-gradient(#2c4770, #070e2b 35%, #628cac 50% 70%, #a6c5d4) no-repeat;
+      --bb8-diameter: 4.375em;
+      --radius: 99em;
+      --transition: 0.4s;
+      --accent: #de7d2f;
+      --bb8-bg: #fff;
+    }
+    .bb8-toggle, .bb8-toggle *, .bb8-toggle *::before, .bb8-toggle *::after { box-sizing: border-box; }
+    .bb8-toggle { cursor: pointer; font-size: var(--toggle-size); }
+    .bb8-toggle__checkbox { appearance: none; display: none; }
+    .bb8-toggle__container {
+      width: var(--toggle-width); height: var(--toggle-height);
+      background: var(--toggle-bg);
+      background-size: 100% 11.25em; background-position-y: -5.625em;
+      border-radius: var(--radius); position: relative;
+      transition: var(--transition);
+    }
+    .bb8 {
+      display: flex; flex-direction: column; align-items: center;
+      position: absolute;
+      top: calc(var(--toggle-offset) - 1.688em + 0.188em);
+      left: var(--toggle-offset);
+      transition: var(--transition); z-index: 2;
+    }
+    .bb8__head-container {
+      position: relative; transition: var(--transition); z-index: 2;
+      transform-origin: 1.25em 3.75em;
+    }
+    .bb8__head {
+      overflow: hidden; margin-bottom: -0.188em;
+      width: 2.5em; height: 1.688em;
+      background:
+        linear-gradient(transparent .063em, dimgray .063em .313em, transparent .313em .375em, var(--accent) .375em .5em, transparent .5em 1.313em, silver 1.313em 1.438em, transparent 1.438em),
+        linear-gradient(45deg, transparent .188em, var(--bb8-bg) .188em 1.25em, transparent 1.25em),
+        linear-gradient(-45deg, transparent .188em, var(--bb8-bg) .188em 1.25em, transparent 1.25em),
+        linear-gradient(var(--bb8-bg) 1.25em, transparent 1.25em);
+      border-radius: var(--radius) var(--radius) 0 0;
+      position: relative; z-index: 1;
+      filter: drop-shadow(0 .063em .125em gray);
+    }
+    .bb8__head::before {
+      content: ''; position: absolute;
+      width: .563em; height: .563em;
+      background:
+        radial-gradient(.125em circle at .25em .375em, red, transparent),
+        radial-gradient(.063em circle at .375em .188em, var(--bb8-bg) 50%, transparent 100%),
+        linear-gradient(45deg, #000 .188em, dimgray .313em .375em, #000 .5em);
+      border-radius: var(--radius); top: .413em; left: 50%;
+      transform: translate(-50%);
+      box-shadow: 0 0 0 .089em lightgray, .563em .281em 0 -.148em, .563em .281em 0 -.1em var(--bb8-bg), .563em .281em 0 -.063em;
+      z-index: 1; transition: var(--transition);
+    }
+    .bb8__head::after {
+      content: ''; position: absolute; bottom: .375em; left: 0;
+      width: 100%; height: .188em;
+      background: linear-gradient(to right, var(--accent) .125em, transparent .125em .188em, var(--accent) .188em .313em, transparent .313em .375em, var(--accent) .375em .938em, transparent .938em 1em, var(--accent) 1em 1.125em, transparent 1.125em 1.875em, var(--accent) 1.875em 2em, transparent 2em 2.063em, var(--accent) 2.063em 2.25em, transparent 2.25em 2.313em, var(--accent) 2.313em 2.375em, transparent 2.375em 2.438em, var(--accent) 2.438em);
+      transition: var(--transition);
+    }
+    .bb8__antenna {
+      position: absolute; transform: translateY(-90%);
+      width: .059em; border-radius: var(--radius) var(--radius) 0 0;
+      transition: var(--transition);
+    }
+    .bb8__antenna:nth-child(1) { height: .938em; right: .938em; background: linear-gradient(#000 .188em, silver .188em); }
+    .bb8__antenna:nth-child(2) { height: .375em; left: 50%; transform: translate(-50%, -90%); background: silver; }
+    .bb8__body {
+      width: 4.375em; height: 4.375em;
+      background-color: var(--bb8-bg);
+      border-radius: var(--radius); position: relative; overflow: hidden;
+      transition: var(--transition); z-index: 1;
+      transform: rotate(45deg);
+      background:
+        linear-gradient(-90deg, var(--bb8-bg) 4%, var(--accent) 4% 10%, transparent 10% 90%, var(--accent) 90% 96%, var(--bb8-bg) 96%),
+        linear-gradient(var(--bb8-bg) 4%, var(--accent) 4% 10%, transparent 10% 90%, var(--accent) 90% 96%, var(--bb8-bg) 96%),
+        linear-gradient(to right, transparent 2.156em, silver 2.156em 2.219em, transparent 2.188em),
+        linear-gradient(transparent 2.156em, silver 2.156em 2.219em, transparent 2.188em);
+      background-color: var(--bb8-bg);
+    }
+    .bb8__body::after {
+      content: ''; bottom: 1.5em; left: .563em; position: absolute;
+      width: .188em; height: .188em; background: rgb(236,236,236); color: rgb(236,236,236);
+      border-radius: 50%;
+      box-shadow: .875em .938em, 0 -1.25em, .875em -2.125em, 2.125em -2.125em, 3.063em -1.25em, 3.063em 0, 2.125em .938em;
+    }
+    .bb8__body::before {
+      content: ''; width: 2.625em; height: 2.625em; position: absolute;
+      border-radius: 50%; z-index: .1; overflow: hidden;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      border: .313em solid var(--accent);
+      background:
+        radial-gradient(1em circle at center, rgb(236,236,236) 50%, transparent 51%),
+        radial-gradient(1.25em circle at center, var(--bb8-bg) 50%, transparent 51%),
+        linear-gradient(-90deg, transparent 42%, var(--accent) 42% 58%, transparent 58%),
+        linear-gradient(var(--bb8-bg) 42%, var(--accent) 42% 58%, var(--bb8-bg) 58%);
+    }
+    .artificial__hidden {
+      position: absolute; border-radius: inherit; inset: 0;
+      pointer-events: none; overflow: hidden;
+    }
+    .bb8__shadow {
+      width: var(--bb8-diameter); height: 20%; border-radius: 50%;
+      background: #3a271c; box-shadow: .313em 0 3.125em #3a271c;
+      opacity: .25; position: absolute; bottom: 0;
+      left: calc(var(--toggle-offset) - .938em);
+      transition: var(--transition); transform: skew(-70deg); z-index: 1;
+    }
+    .bb8-toggle__scenery {
+      width: 100%; height: 100%; pointer-events: none;
+      overflow: hidden; position: relative; border-radius: inherit;
+    }
+    .bb8-toggle__scenery::before {
+      content: ''; position: absolute; width: 100%; height: 30%;
+      bottom: 0; background: #b18d71; z-index: 1;
+    }
+    .bb8-toggle__cloud { z-index: 1; position: absolute; border-radius: 50%; }
+    .bb8-toggle__cloud:nth-last-child(1) {
+      width: .875em; height: .625em;
+      filter: blur(.125em) drop-shadow(.313em .313em #ffffffae) drop-shadow(-.625em 0 #fff) drop-shadow(-.938em -.125em #fff);
+      right: 1.875em; top: 2.813em;
+      background: linear-gradient(to top right, #ffffffae, #ffffffae);
+      transition: var(--transition);
+    }
+    .bb8-toggle__cloud:nth-last-child(2) {
+      top: .625em; right: 4.375em; width: .875em; height: .375em;
+      background: #dfdedeae;
+      filter: blur(.125em) drop-shadow(-.313em -.188em #e0dfdfae) drop-shadow(-.625em -.188em #bbbbbbae) drop-shadow(-1em .063em #cfcfcfae);
+      transition: .6s;
+    }
+    .bb8-toggle__cloud:nth-last-child(3) {
+      top: 1.25em; right: .938em; width: .875em; height: .375em;
+      background: #ffffffae;
+      filter: blur(.125em) drop-shadow(.438em .188em #ffffffae) drop-shadow(-.625em .313em #ffffffae);
+      transition: .8s;
+    }
+    .gomrassen, .hermes, .chenini {
+      position: absolute; border-radius: var(--radius);
+      background: linear-gradient(#fff, #6e8ea2); top: 100%;
+    }
+    .gomrassen {
+      left: .938em; width: 1.875em; height: 1.875em;
+      box-shadow: 0 0 .188em #ffffff52, 0 0 .188em #6e8ea24b;
+      transition: var(--transition);
+    }
+    .gomrassen::before, .gomrassen::after {
+      content: ''; position: absolute; border-radius: inherit;
+      box-shadow: inset 0 0 .063em rgb(140,162,169); background: rgb(184,196,200);
+    }
+    .gomrassen::before { left: .313em; top: .313em; width: .438em; height: .438em; }
+    .gomrassen::after  { width: .25em; height: .25em; left: 1.25em; top: .75em; }
+    .hermes { left: 3.438em; width: .625em; height: .625em; box-shadow: 0 0 .125em #ffffff52, 0 0 .125em #6e8ea24b; transition: .6s; }
+    .chenini{ left: 4.375em; width: .5em;  height: .5em;  box-shadow: 0 0 .125em #ffffff52, 0 0 .125em #6e8ea24b; transition: .8s; }
+    .tatto-1, .tatto-2 { position: absolute; width: 1.25em; height: 1.25em; border-radius: var(--radius); }
+    .tatto-1 { background: #fefefe; right: 3.125em; top: .625em; box-shadow: 0 0 .438em #fdf4e1; transition: var(--transition); }
+    .tatto-2 { background: linear-gradient(#e6ac5c, #d75449); right: 1.25em; top: 2.188em; box-shadow: 0 0 .438em #e6ad5c3d, 0 0 .438em #d755494f; transition: .7s; }
+    .bb8-toggle__star {
+      position: absolute; width: .063em; height: .063em;
+      background: #fff; border-radius: var(--radius);
+      filter: drop-shadow(0 0 .063em #fff); color: #fff; top: 100%;
+    }
+    .bb8-toggle__star:nth-child(1) { left: 3.75em; box-shadow: 1.25em .938em, -1.25em 2.5em, 0 1.25em, 1.875em .625em, -3.125em 1.875em, 1.25em 2.813em; transition: .2s; }
+    .bb8-toggle__star:nth-child(2) { left: 4.688em; box-shadow: .625em 0, 0 .625em, -.625em -.625em, .625em .938em, -3.125em 1.25em, 1.25em -1.563em; transition: .3s; }
+    .bb8-toggle__star:nth-child(3) { left: 5.313em; box-shadow: -.625em -.625em, -2.188em 1.25em, -2.188em 0, -3.75em -.625em, -3.125em -.625em, -2.5em -.313em, .75em -.625em; transition: var(--transition); }
+    .bb8-toggle__star:nth-child(4) { left: 1.875em; width: .125em; height: .125em; transition: .5s; }
+    .bb8-toggle__star:nth-child(5) { left: 5em;     width: .125em; height: .125em; transition: .6s; }
+    .bb8-toggle__star:nth-child(6) { left: 2.5em;   width: .125em; height: .125em; transition: .7s; }
+    .bb8-toggle__star:nth-child(7) { left: 3.438em; width: .125em; height: .125em; transition: .8s; }
+
+    /* Toggle checked states */
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(1) { top: .625em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(2) { top: 1.875em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(3) { top: 1.25em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(4) { top: 3.438em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(5) { top: 3.438em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(6) { top: .313em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__star:nth-child(7) { top: 1.875em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8-toggle__cloud   { right: -100%; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .gomrassen { top: .938em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .hermes    { top: 2.5em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .chenini   { top: 2.75em; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container { background-position-y: 0; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .tatto-1 { top: 100%; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .tatto-2 { top: 100%; }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8 { left: calc(100% - var(--bb8-diameter) - var(--toggle-offset)); }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8__shadow { left: calc(100% - var(--bb8-diameter) - var(--toggle-offset) + .938em); transform: skew(70deg); }
+    .bb8-toggle__checkbox:checked + .bb8-toggle__container .bb8__body { transform: rotate(225deg); }
+    .bb8-toggle__checkbox:hover + .bb8-toggle__container .bb8__head::before { left: 100%; }
+    .bb8-toggle__checkbox:not(:checked):hover + .bb8-toggle__container .bb8__antenna:nth-child(1) { right: 1.5em; }
+    .bb8-toggle__checkbox:hover + .bb8-toggle__container .bb8__antenna:nth-child(2) { left: .938em; }
+    .bb8-toggle__checkbox:hover + .bb8-toggle__container .bb8__head::after { background-position: 1.375em 0; }
+    .bb8-toggle__checkbox:checked:hover + .bb8-toggle__container .bb8__head::before { left: 0; }
+    .bb8-toggle__checkbox:checked:hover + .bb8-toggle__container .bb8__antenna:nth-child(2) { left: calc(100% - .938em); }
+    .bb8-toggle__checkbox:checked:hover + .bb8-toggle__container .bb8__head::after { background-position: -1.375em 0; }
+    .bb8-toggle__checkbox:active + .bb8-toggle__container .bb8__head-container { transform: rotate(25deg); }
+    .bb8-toggle__checkbox:checked:active + .bb8-toggle__container .bb8__head-container { transform: rotate(-25deg); }
+
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAV ═══ -->
+  <nav class="gv-nav">
+    <div class="gv-nav__logo">
+      <span class="gv-nav__logo-name">Galactic Video</span>
+      <span class="gv-nav__logo-sub">Your Galaxy of Films</span>
+    </div>
+
+    <ul class="gv-nav__links">
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="#">New Releases</a></li>
+      <li><a href="#">Classics</a></li>
+      <li><a href="#">Saga Collection</a></li>
+      <li><a href="#">My List</a></li>
+    </ul>
+
+    <div class="gv-nav__toggle-zone">
+      <span class="side-label side-label--light">Light</span>
+      <label class="bb8-toggle" aria-label="Switch between Light Side and Dark Side">
+        <input class="bb8-toggle__checkbox" type="checkbox" id="darkToggle" />
+        <div class="bb8-toggle__container">
+          <div class="bb8-toggle__scenery">
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="bb8-toggle__star"></div>
+            <div class="tatto-1"></div>
+            <div class="tatto-2"></div>
+            <div class="gomrassen"></div>
+            <div class="hermes"></div>
+            <div class="chenini"></div>
+            <div class="bb8-toggle__cloud"></div>
+            <div class="bb8-toggle__cloud"></div>
+            <div class="bb8-toggle__cloud"></div>
+          </div>
+          <div class="bb8">
+            <div class="bb8__head-container">
+              <div class="bb8__antenna"></div>
+              <div class="bb8__antenna"></div>
+              <div class="bb8__head"></div>
+            </div>
+            <div class="bb8__body"></div>
+          </div>
+          <div class="artificial__hidden">
+            <div class="bb8__shadow"></div>
+          </div>
+        </div>
+      </label>
+      <span class="side-label side-label--dark">Dark</span>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section class="gv-hero">
+    <div class="gv-hero__text">
+      <div class="gv-hero__eyebrow">Now Featuring</div>
+      <h1>The <em>Force</em><br>Awaits You</h1>
+      <p class="gv-hero__sub">
+        Step into a galaxy of stories. From the deserts of Tatooine to the depths of the dark side — rent, watch, and relive the saga that changed cinema forever.
+      </p>
+      <div class="gv-hero__actions">
+        <button class="btn btn--primary">Browse Collection</button>
+        <button class="btn btn--ghost">New Arrivals →</button>
+      </div>
+    </div>
+
+    <div class="video-stage-wrap">
+      <div class="video-stage">
+        <video
+          class="video-clip video-jedi"
+          src="video%20Obe%20Wan.mp4"
+          autoplay muted loop playsinline
+          aria-label="Obi-Wan Kenobi feature"
+        ></video>
+        <video
+          class="video-clip video-vader"
+          src="Video%20Darth%20Vader.mp4"
+          autoplay muted loop playsinline
+          aria-label="Darth Vader feature"
+        ></video>
+      </div>
+      <p class="video-caption">
+        <span class="cap-jedi">⚔ Obi-Wan Kenobi — Guardian of the Light</span>
+        <span class="cap-vader">⚡ Darth Vader — Lord of the Sith</span>
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ NOW SHOWING ═══ -->
+  <section class="gv-section">
+    <div class="gv-section__head">
+      <h2 class="gv-section__title">Now Showing</h2>
+      <a href="#" class="gv-section__more">View all →</a>
+    </div>
+    <div class="card-row">
+
+      <div class="film-card">
+        <div class="film-card__poster poster-iv">
+          <span class="film-card__episode">Episode IV</span>
+          <span class="film-card__title-on-poster">A New Hope</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>1977</span>
+            <span class="film-card__stars">★★★★★</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-v">
+          <span class="film-card__episode">Episode V</span>
+          <span class="film-card__title-on-poster">The Empire Strikes Back</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>1980</span>
+            <span class="film-card__stars">★★★★★</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-vi">
+          <span class="film-card__episode">Episode VI</span>
+          <span class="film-card__title-on-poster">Return of the Jedi</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>1983</span>
+            <span class="film-card__stars">★★★★☆</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-i">
+          <span class="film-card__episode">Episode I</span>
+          <span class="film-card__title-on-poster">The Phantom Menace</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>1999</span>
+            <span class="film-card__stars">★★★☆☆</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-ii">
+          <span class="film-card__episode">Episode II</span>
+          <span class="film-card__title-on-poster">Attack of the Clones</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>2002</span>
+            <span class="film-card__stars">★★★☆☆</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-iii">
+          <span class="film-card__episode">Episode III</span>
+          <span class="film-card__title-on-poster">Revenge of the Sith</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>2005</span>
+            <span class="film-card__stars">★★★★☆</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-rogue">
+          <span class="film-card__episode">Anthology</span>
+          <span class="film-card__title-on-poster">Rogue One</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>2016</span>
+            <span class="film-card__stars">★★★★☆</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+      <div class="film-card">
+        <div class="film-card__poster poster-mando">
+          <span class="film-card__episode">Series</span>
+          <span class="film-card__title-on-poster">The Mandalorian</span>
+        </div>
+        <div class="film-card__info">
+          <div class="film-card__year-rating">
+            <span>2019</span>
+            <span class="film-card__stars">★★★★★</span>
+          </div>
+          <button class="film-card__rent-btn">Rent Now</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══ FEATURED BANNER ═══ -->
+  <div class="gv-banner">
+    <div class="gv-banner__text">
+      <div class="gv-banner__eyebrow">This Month's Pick</div>
+      <h2>The Skywalker Saga — Complete Collection</h2>
+      <p>All nine episodes in one bundle. Experience the rise and fall — and redemption — of the most iconic family in cinematic history.</p>
+    </div>
+    <button class="btn btn--primary">Get the Bundle</button>
+  </div>
+
+  <!-- ═══ CATEGORIES ═══ -->
+  <section class="gv-section">
+    <div class="gv-section__head">
+      <h2 class="gv-section__title">Browse the Galaxy</h2>
+    </div>
+    <div class="cat-grid">
+      <div class="cat-tile">
+        <div class="cat-tile__icon">⚔️</div>
+        <div class="cat-tile__name">Action &amp; Battle</div>
+        <div class="cat-tile__count">42 titles</div>
+      </div>
+      <div class="cat-tile">
+        <div class="cat-tile__icon">🌌</div>
+        <div class="cat-tile__name">Sci-Fi &amp; Space</div>
+        <div class="cat-tile__count">38 titles</div>
+      </div>
+      <div class="cat-tile">
+        <div class="cat-tile__icon">🎭</div>
+        <div class="cat-tile__name">Drama &amp; Story</div>
+        <div class="cat-tile__count">27 titles</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer class="gv-footer">
+    <div class="gv-footer__logo">Galactic Video</div>
+    <ul class="gv-footer__links">
+      <li><a href="#">About</a></li>
+      <li><a href="#">Membership</a></li>
+      <li><a href="#">Help</a></li>
+      <li><a href="#">Privacy</a></li>
+    </ul>
+    <p class="gv-footer__copy">© 2026 Galactic Video. May the Force be with you.</p>
+  </footer>
+
+  <script>
+    'use strict';
+    document.getElementById('darkToggle').addEventListener('change', function () {
+      document.body.classList.toggle('dark-side', this.checked);
+    });
+  </script>
+
+</body>
+</html>

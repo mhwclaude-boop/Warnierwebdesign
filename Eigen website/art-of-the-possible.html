@@ -83,21 +83,183 @@
     /* Hero area */
     .page-hero {
       padding-top: var(--nav-height);
-      min-height: 50svh;
+      min-height: 42svh;
       background: var(--navy);
       display: flex; align-items: center; justify-content: center; text-align: center;
       padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 4rem;
     }
-    .page-hero__inner { max-width: 640px; }
+    .page-hero__inner { max-width: 680px; }
     .page-hero__label { display: inline-block; background: rgba(244,98,25,0.16); color: #FF8C4E; font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.375rem 0.875rem; border-radius: 999px; margin-bottom: 1.5rem; }
     .page-hero h1 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; color: var(--white); line-height: 1.15; margin-bottom: 1.25rem; }
-    .page-hero p { color: rgba(255,255,255,0.65); font-size: 1.0625rem; }
+    .page-hero p { color: rgba(255,255,255,0.70); font-size: 1.0625rem; }
 
-    /* Content */
-    .page-content { padding: 5rem 1.5rem; max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem; text-align: center; }
-    .coming-soon-badge { display: inline-block; background: rgba(244,98,25,0.12); color: var(--orange); font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.375rem 0.875rem; border-radius: 999px; }
-    .page-content p { color: var(--muted); font-size: 1.0625rem; max-width: 520px; }
-    .back-link { font-family: var(--font-heading); font-weight: 600; color: var(--navy); font-size: 0.9375rem; text-decoration: underline; text-underline-offset: 3px; }
+    /* Carousel section */
+    .carousel-section {
+      background: var(--off-white);
+      padding: 4rem 0 5rem;
+      position: relative;
+    }
+    .carousel-section__inner {
+      max-width: 960px; margin: 0 auto; position: relative;
+    }
+
+    /* Carousel shell */
+    .carousel { overflow: hidden; border-radius: 12px; }
+    .carousel__track {
+      display: flex;
+      transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .carousel__slide {
+      flex: 0 0 100%; width: 100%;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2.5rem 5rem;
+      gap: 1.25rem;
+    }
+    @media (max-width: 767px) {
+      .carousel__slide { padding: 2rem 1.5rem; }
+    }
+
+    /* Store badge */
+    .store-badge {
+      display: inline-block;
+      background: rgba(11,26,78,0.08); color: var(--navy);
+      font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase;
+      padding: 0.375rem 0.875rem; border-radius: 999px;
+    }
+    .store-badge--muted {
+      background: rgba(107,113,128,0.10); color: var(--muted);
+    }
+
+    /* Store description */
+    .store-desc {
+      color: var(--muted); font-size: 1.0625rem; text-align: center; max-width: 560px;
+    }
+
+    /* Browser mockup frame */
+    .browser-frame {
+      width: 100%;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(11,26,78,0.10), 0 2px 8px rgba(11,26,78,0.06);
+      overflow: hidden;
+    }
+    .browser-bar {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.625rem 1rem;
+      background: #F0F2F7;
+      border-bottom: 1px solid var(--border);
+    }
+    .browser-dots { display: flex; gap: 6px; flex-shrink: 0; }
+    .browser-dots span {
+      display: block; width: 11px; height: 11px; border-radius: 50%;
+    }
+    .browser-dots span:nth-child(1) { background: #FF5F57; }
+    .browser-dots span:nth-child(2) { background: #FFBD2E; }
+    .browser-dots span:nth-child(3) { background: #28CA41; }
+    .browser-url {
+      flex: 1; background: var(--white); border: 1px solid var(--border);
+      border-radius: 6px; padding: 3px 10px;
+      font-family: var(--font-body); font-size: 0.8125rem; color: var(--muted);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .browser-viewport {
+      position: relative; padding-top: 62.5%; /* 16:10 */
+      background: var(--off-white);
+    }
+    .browser-viewport iframe {
+      position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;
+    }
+    @media (max-width: 767px) {
+      .browser-viewport { padding-top: 75%; }
+    }
+
+    /* Coming-soon slide placeholder */
+    .slide-placeholder {
+      width: 100%; aspect-ratio: 16/10;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 0.75rem;
+      color: var(--muted);
+      background: var(--white);
+    }
+    .slide-placeholder__icon { font-size: 2.5rem; opacity: 0.4; }
+    .slide-placeholder__text {
+      font-family: var(--font-heading); font-weight: 700; font-size: 0.875rem;
+      letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.6;
+    }
+    @media (max-width: 767px) {
+      .slide-placeholder { aspect-ratio: 4/3; }
+    }
+
+    /* Arrows */
+    .carousel__arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--navy); color: var(--white);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(11,26,78,0.20);
+      transition: background 0.2s, opacity 0.2s;
+      z-index: 10; font-size: 1.25rem; line-height: 1;
+    }
+    .carousel__arrow:hover { background: var(--orange); }
+    .carousel__arrow:disabled { opacity: 0.3; cursor: not-allowed; }
+    .carousel__arrow--prev { left: -22px; }
+    .carousel__arrow--next { right: -22px; }
+    @media (max-width: 767px) {
+      .carousel__arrow--prev { left: 6px; }
+      .carousel__arrow--next { right: 6px; }
+    }
+
+    /* Dots */
+    .carousel__dots {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      margin-top: 1.75rem;
+    }
+    .carousel__dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--border); transition: background 0.25s, transform 0.25s;
+    }
+    .carousel__dot.is-active { background: var(--orange); transform: scale(1.35); }
+
+    /* BB8 hint — floats outside the browser frame, appears only on video store slide */
+    .browser-frame-wrap { width: 100%; }
+    .bb8-hint {
+      position: absolute;
+      /* sits above the browser-frame's top-right corner, outside the picture-in-picture */
+      top: 116px;
+      right: 10px;
+      z-index: 20;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.45s ease;
+    }
+    .bb8-hint.is-visible {
+      opacity: 1;
+      animation: hintBob 1.8s ease-in-out 0.7s infinite;
+    }
+    @keyframes hintBob {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .bb8-hint__bubble {
+      background: rgba(255,243,224,0.97);
+      border: 1.5px solid var(--orange);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-family: var(--font-heading); font-weight: 700; font-size: 0.6875rem;
+      color: var(--orange);
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(244,98,25,0.22);
+    }
+    .bb8-hint__arrow { display: block; }
 
     /* Footer */
     .footer { background: var(--navy-dark, #070F30); color: rgba(255,255,255,0.55); padding: 2.5rem 1.5rem; }
@@ -154,25 +316,113 @@
       <span class="page-hero__label" data-fr>Inspiration</span>
       <span class="page-hero__label" data-en>Inspiration</span>
       <h1>Art of the Possible</h1>
-      <p data-nl>Wat is er allemaal mogelijk voor uw online aanwezigheid? Ontdek het hier.</p>
-      <p data-fr>Qu'est-il possible pour votre présence en ligne ? Découvrez-le ici.</p>
-      <p data-en>What's possible for your online presence? Discover it here.</p>
+      <p data-nl>Bekijk hoe een website voor uw type zaak er echt uit kan zien. We maakten demo's voor verschillende soorten lokale winkels — blader erdoorheen en laat u inspireren.</p>
+      <p data-fr>Découvrez à quoi pourrait ressembler votre site web. Nous avons créé des démos pour différents types de commerces locaux — parcourez-les et laissez-vous inspirer.</p>
+      <p data-en>See what a website for your type of business could really look like. We built demos for different kinds of local stores — browse through them and get inspired.</p>
     </div>
   </section>
 
-  <main class="page-content">
-    <span class="coming-soon-badge" data-nl>Binnenkort beschikbaar</span>
-    <span class="coming-soon-badge" data-fr>Bientôt disponible</span>
-    <span class="coming-soon-badge" data-en>Coming soon</span>
+  <section class="carousel-section" aria-label="Store demos">
+    <div class="carousel-section__inner">
 
-    <p data-nl>Hier plaatsen we binnenkort voorbeeldprojecten, casestudies en inspiratie om u te tonen wat we voor uw bedrijf kunnen bouwen.</p>
-    <p data-fr>Bientôt, vous trouverez ici des exemples de projets, des études de cas et de l'inspiration pour vous montrer ce que nous pouvons construire pour votre entreprise.</p>
-    <p data-en>Coming soon — example projects, case studies, and inspiration to show you what we can build for your business.</p>
+      <div class="carousel" id="carousel" aria-live="polite">
+        <div class="carousel__track" id="carousel-track">
 
-    <a href="index.html" class="back-link" data-nl>← Terug naar home</a>
-    <a href="index.html" class="back-link" data-fr>← Retour à l'accueil</a>
-    <a href="index.html" class="back-link" data-en>← Back to home</a>
-  </main>
+          <!-- Slide 1: Video Store -->
+          <div class="carousel__slide" role="group" aria-label="Slide 1 van 3">
+            <span class="store-badge" data-nl>Videotheek</span>
+            <span class="store-badge" data-fr>Vidéothèque</span>
+            <span class="store-badge" data-en>Video Store</span>
+
+            <p class="store-desc" data-nl>Een moderne website voor een videotheek — met filmbeheer, reservaties en actueel aanbod.</p>
+            <p class="store-desc" data-fr>Un site moderne pour une vidéothèque — gestion des films, réservations et catalogue en ligne.</p>
+            <p class="store-desc" data-en>A modern website for a video store — film catalogue, reservations, and up-to-date listings.</p>
+
+            <div class="browser-frame-wrap">
+              <div class="browser-frame">
+                <div class="browser-bar">
+                  <div class="browser-dots">
+                    <span></span><span></span><span></span>
+                  </div>
+                  <span class="browser-url">galacticvideo.netlify.app</span>
+                </div>
+                <div class="browser-viewport">
+                  <iframe src="video-store-demo.html" title="Video Store demo" loading="lazy"></iframe>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2: Bike Shop -->
+          <div class="carousel__slide" role="group" aria-label="Slide 2 van 3">
+            <span class="store-badge" data-nl>Fietsenwinkel</span>
+            <span class="store-badge" data-fr>Magasin de vélos</span>
+            <span class="store-badge" data-en>Bike Shop</span>
+
+            <p class="store-desc" data-nl>Een website voor een fietsenwinkel — met merken, onderhoud en een eenvoudig contactformulier.</p>
+            <p class="store-desc" data-fr>Un site pour un magasin de vélos — marques, entretien et formulaire de contact simple.</p>
+            <p class="store-desc" data-en>A website for a bike shop — brands, servicing, and a simple contact form.</p>
+
+            <div class="browser-frame">
+              <div class="browser-bar">
+                <div class="browser-dots">
+                  <span></span><span></span><span></span>
+                </div>
+                <span class="browser-url">bike-shop-demo.netlify.app</span>
+              </div>
+              <div class="browser-viewport">
+                <iframe src="about:blank" title="Bike Shop demo" loading="lazy"></iframe>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3: Coming soon -->
+          <div class="carousel__slide" role="group" aria-label="Slide 3 van 3">
+            <span class="store-badge store-badge--muted" data-nl>Binnenkort beschikbaar</span>
+            <span class="store-badge store-badge--muted" data-fr>Bientôt disponible</span>
+            <span class="store-badge store-badge--muted" data-en>Coming soon</span>
+
+            <p class="store-desc" data-nl>We werken aan een derde demo. Benieuwd welk type winkel het wordt?</p>
+            <p class="store-desc" data-fr>Nous travaillons sur une troisième démo. Curieux de savoir quel type de commerce ce sera ?</p>
+            <p class="store-desc" data-en>We're working on a third demo. Curious what type of store it will be?</p>
+
+            <div class="slide-placeholder">
+              <div class="slide-placeholder__icon">🔜</div>
+              <p class="slide-placeholder__text" data-nl>Binnenkort beschikbaar</p>
+              <p class="slide-placeholder__text" data-fr>Bientôt disponible</p>
+              <p class="slide-placeholder__text" data-en>Coming soon</p>
+            </div>
+          </div>
+
+        </div><!-- /track -->
+      </div><!-- /carousel -->
+
+      <button class="carousel__arrow carousel__arrow--prev" id="carousel-prev" aria-label="Vorige demo">&#8249;</button>
+      <button class="carousel__arrow carousel__arrow--next" id="carousel-next" aria-label="Volgende demo">&#8250;</button>
+
+      <!-- BB8 hint: outside the carousel overflow, floats above browser-frame top-right -->
+      <div class="bb8-hint is-visible" id="bb8-hint" aria-hidden="true">
+        <div class="bb8-hint__bubble">
+          <span data-nl>Probeer de BB-8 toggle!</span>
+          <span data-fr>Essayez le toggle BB-8 !</span>
+          <span data-en>Try the BB-8 toggle!</span>
+        </div>
+        <svg class="bb8-hint__arrow" width="180" height="90" viewBox="0 0 180 90" fill="none" aria-hidden="true">
+          <!-- arc sweeps from upper-right down to the BB-8 toggle inside the nav -->
+          <path d="M170 5 C170 50 20 50 20 78" stroke="#F46219" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- arrowhead pointing straight down onto the toggle -->
+          <path d="M10 70 L20 84 L30 70" stroke="#F46219" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div><!-- /inner -->
+
+    <div class="carousel__dots" id="carousel-dots" aria-hidden="true">
+      <span class="carousel__dot is-active"></span>
+      <span class="carousel__dot"></span>
+      <span class="carousel__dot"></span>
+    </div>
+  </section>
 
   <footer class="footer" role="contentinfo">
     <div class="footer__inner">
@@ -189,6 +439,8 @@
 
   <script>
     'use strict';
+
+    /* ── Language toggle ─────────────────────────────── */
     const htmlEl = document.documentElement;
     const langBtns = document.querySelectorAll('[data-lang-btn]');
     function setLang(lang) {
@@ -206,6 +458,7 @@
       btn.addEventListener('click', function () { setLang(btn.dataset.langBtn); });
     });
 
+    /* ── Hamburger ────────────────────────────────────── */
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobile-nav');
     hamburger.addEventListener('click', function () {
@@ -220,6 +473,43 @@
         hamburger.setAttribute('aria-label', 'Menu openen');
       });
     });
+
+    /* ── Carousel ─────────────────────────────────────── */
+    (function () {
+      const track  = document.getElementById('carousel-track');
+      const prev   = document.getElementById('carousel-prev');
+      const next   = document.getElementById('carousel-next');
+      const dots   = document.querySelectorAll('#carousel-dots .carousel__dot');
+      const hint   = document.getElementById('bb8-hint');
+      const total  = 3;
+      let current  = 0;
+
+      function goTo(n) {
+        current = (n + total) % total;
+        track.style.transform = 'translateX(-' + (current * 100) + '%)';
+        dots.forEach(function (dot, i) {
+          dot.classList.toggle('is-active', i === current);
+        });
+        prev.disabled = current === 0;
+        next.disabled = current === total - 1;
+        if (hint) hint.classList.toggle('is-visible', current === 0);
+      }
+
+      prev.addEventListener('click', function () { goTo(current - 1); });
+      next.addEventListener('click', function () { goTo(current + 1); });
+
+      /* Touch / swipe support */
+      var touchStartX = 0;
+      track.addEventListener('touchstart', function (e) {
+        touchStartX = e.touches[0].clientX;
+      }, { passive: true });
+      track.addEventListener('touchend', function (e) {
+        var delta = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(delta) > 50) goTo(delta > 0 ? current + 1 : current - 1);
+      }, { passive: true });
+
+      goTo(0); /* initialise arrow state */
+    })();
   </script>
 </body>
 </html>
