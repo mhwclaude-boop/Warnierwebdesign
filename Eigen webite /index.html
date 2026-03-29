@@ -151,11 +151,11 @@
       display: flex;
       align-items: center;
       flex-shrink: 0;
-      background: var(--white);
-      border-radius: var(--radius-sm);
-      padding: 5px 12px;
+      background: #FDFDFD;
+      border-radius: 8px;
+      padding: 4px 10px;
     }
-    .nav__logo img { height: 36px; width: auto; }
+    .nav__logo img { height: 32px; width: auto; }
 
     /* Desktop links */
     .nav__links {
@@ -701,6 +701,72 @@
       margin-top: 3px;
     }
 
+    /* ── Discovery call note + brochure bar ── */
+    .pricing-footer {
+      margin-top: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+      text-align: center;
+    }
+
+    .pricing-discovery {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      font-family: var(--font-heading);
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+
+    .pricing-discovery__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      background: rgba(244, 98, 25, 0.1);
+      color: var(--orange);
+      border: 1px solid rgba(244, 98, 25, 0.25);
+      border-radius: 999px;
+      font-family: var(--font-heading);
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+    }
+
+    .btn--brochure {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: transparent;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.625rem 1.25rem;
+      font-family: var(--font-heading);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-decoration: none;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    .btn--brochure:hover {
+      border-color: var(--navy);
+      background: var(--navy);
+      color: var(--white);
+    }
+
+    .btn--brochure svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .btn--brochure-disabled {
+      opacity: 0.45;
+      cursor: default;
+      pointer-events: none;
+    }
+
     /* ============================================================
        ABOUT SECTION
     ============================================================ */
@@ -714,52 +780,67 @@
     .about__visual {
       background: var(--navy);
       border-radius: var(--radius);
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 3 / 4;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       position: relative;
     }
 
-    /* Subtle pattern overlay */
+    /* Subtle pattern overlay on navy bg */
     .about__visual::before {
       content: '';
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 30% 70%, rgba(244,98,25,0.18) 0%, transparent 55%),
-        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 50%);
-    }
-
-    .about__visual-body {
-      position: relative;
+        radial-gradient(circle at 20% 80%, rgba(244,98,25,0.18) 0%, transparent 50%),
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,0.05) 0%, transparent 45%);
       z-index: 1;
+      pointer-events: none;
+    }
+
+    /* PiP photo frame — floats inside the navy panel */
+    .about__pip {
+      position: relative;
+      z-index: 2;
+      width: 82%;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45), 0 0 0 3px rgba(255,255,255,0.08);
+      margin-bottom: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    /* Full photo — no cropping */
+    .about__photo {
+      width: 100%;
+      height: auto;
+      display: block;
+      image-orientation: from-image;
+    }
+
+    /* Name card below the photo frame */
+    .about__namecard {
+      position: relative;
+      z-index: 2;
       text-align: center;
-      padding: 2.5rem;
+      padding: 0 1.5rem 1.75rem;
     }
 
-    .about__visual-body img {
-      height: 60px;
-      width: auto;
-      margin: 0 auto 2rem;
-      border-radius: var(--radius-sm);
-      padding: 6px 14px;
-      background: var(--white);
-    }
-
-    .about__city {
+    .about__name {
       color: var(--white);
       font-family: var(--font-heading);
-      font-size: 1.25rem;
+      font-size: 1.125rem;
       font-weight: 800;
       display: block;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.2rem;
     }
 
-    .about__subtitle {
-      color: rgba(255, 255, 255, 0.55);
-      font-size: 0.875rem;
+    .about__role {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.8125rem;
       font-family: var(--font-heading);
       font-weight: 500;
     }
@@ -929,6 +1010,83 @@
     }
 
     /* ============================================================
+       PRIVACY MODAL
+    ============================================================ */
+    .privacy-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(7, 15, 48, 0.72);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 9000;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
+
+    .privacy-overlay.is-open {
+      display: flex;
+    }
+
+    .privacy-modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      max-width: 560px;
+      width: 100%;
+      max-height: 80vh;
+      overflow-y: auto;
+      padding: 2rem 2rem 1.75rem;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.28);
+    }
+
+    .privacy-modal__close {
+      position: absolute;
+      top: 1rem; right: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      padding: 4px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .privacy-modal__close:hover { color: var(--navy); }
+    .privacy-modal__close svg   { width: 20px; height: 20px; display: block; }
+
+    .privacy-modal h2 {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 1.25rem;
+    }
+
+    .privacy-modal h3 {
+      font-family: var(--font-heading);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin: 1.125rem 0 0.375rem;
+    }
+
+    .privacy-modal p,
+    .privacy-modal li {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .privacy-modal ul {
+      padding-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    /* ============================================================
        FOOTER
     ============================================================ */
     .footer {
@@ -948,12 +1106,11 @@
     }
 
     .footer__logo img {
-      height: 36px;
+      height: 32px;
       width: auto;
-      border-radius: var(--radius-sm);
+      background: #FDFDFD;
+      border-radius: 8px;
       padding: 4px 10px;
-      background: var(--white);
-      opacity: 0.9;
     }
 
     .footer__copy { font-size: 0.875rem; }
@@ -1498,10 +1655,10 @@
         <!-- Logo -->
         <a href="#home" class="nav__logo" aria-label="Warnier Web Design — naar startpagina">
           <img
-            src="Logo Warnier Web Design snip.png"
+            src="file.svg"
             alt="Warnier Web Design"
             width="160"
-            height="44"
+            height="59"
           />
         </a>
 
@@ -2021,9 +2178,9 @@
                 <span data-en>Multi-language</span>
               </h4>
               <p class="build-addon__desc">
-                <span data-nl>NL, FR en EN — uw website spreekt elke klant aan.</span>
-                <span data-fr>NL, FR et EN — votre site parle à chaque client.</span>
-                <span data-en>NL, FR &amp; EN — your site speaks to every customer.</span>
+                <span data-nl>NL, FR en EN standaard — andere talen op aanvraag mogelijk.</span>
+                <span data-fr>NL, FR et EN par défaut — d'autres langues disponibles sur demande.</span>
+                <span data-en>NL, FR &amp; EN as standard — other languages available on request.</span>
               </p>
               <p class="build-addon__price">
                 <span class="build-addon__price-prefix">+</span>€150
@@ -2089,6 +2246,28 @@
 
           </div><!-- /build-addons-grid -->
         </article><!-- /stap 3 -->
+
+        <!-- Discovery call + brochure -->
+        <div class="pricing-footer fade-up">
+          <p class="pricing-discovery">
+            <span class="pricing-discovery__badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.68A2 2 0 012 1h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91A16 16 0 0015.1 17.9l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+              <span data-nl>Gratis</span>
+              <span data-fr>Gratuit</span>
+              <span data-en>Free</span>
+            </span>
+            <span data-nl>Elke samenwerking start met een gratis kennismakingsgesprek — zonder verplichtingen.</span>
+            <span data-fr>Chaque collaboration commence par un appel découverte gratuit — sans engagement.</span>
+            <span data-en>Every collaboration starts with a free discovery call — no strings attached.</span>
+          </p>
+          <span class="btn--brochure btn--brochure-disabled" aria-disabled="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-nl>Brochure downloaden — binnenkort beschikbaar</span>
+            <span data-fr>Télécharger la brochure — bientôt disponible</span>
+            <span data-en>Download brochure — coming soon</span>
+          </span>
+        </div>
+
       </div><!-- /section__inner -->
     </section>
 
@@ -2100,20 +2279,21 @@
       <div class="section__inner">
         <div class="about__grid">
 
-          <!-- Visual panel -->
-          <div class="about__visual fade-up" role="img" aria-label="Warnier Web Design, gevestigd in Antwerpen">
-            <div class="about__visual-body">
+          <!-- Visual panel: navy bg + PiP photo -->
+          <div class="about__visual fade-up" aria-label="Martin Warnier">
+            <div class="about__pip">
               <img
-                src="Logo Warnier Web Design snip.png"
-                alt=""
-                width="180"
-                height="50"
+                class="about__photo"
+                src="Snip20260329_3.png"
+                alt="Martin Warnier"
               />
-              <strong class="about__city">Antwerpen</strong>
-              <span class="about__subtitle">
-                <span data-nl>Lokaal verankerd. Digitaal vooruitstrevend.</span>
-                <span data-fr>Ancré localement. Résolument digital.</span>
-                <span data-en>Locally rooted. Digitally forward.</span>
+            </div>
+            <div class="about__namecard">
+              <strong class="about__name">Martin Warnier</strong>
+              <span class="about__role">
+                <span data-nl>Oprichter, Warnier Web Design</span>
+                <span data-fr>Fondateur, Warnier Web Design</span>
+                <span data-en>Founder, Warnier Web Design</span>
               </span>
             </div>
           </div>
@@ -2121,26 +2301,26 @@
           <!-- Text -->
           <div class="about__content fade-up" style="transition-delay:0.12s;">
             <span class="section__tag">
-              <span data-nl>Wie wij zijn</span>
-              <span data-fr>Qui sommes-nous</span>
-              <span data-en>Who we are</span>
+              <span data-nl>Wie ik ben</span>
+              <span data-fr>Qui je suis</span>
+              <span data-en>Who I am</span>
             </span>
             <h2 class="section__title" id="about-title">
-              <span data-nl>Over ons</span>
+              <span data-nl>Over mij</span>
               <span data-fr>À propos</span>
-              <span data-en>About us</span>
+              <span data-en>About me</span>
             </h2>
 
-            <p data-nl>Warnier Web Design is een kleine, gepassioneerde webstudio uit Antwerpen. Wij geloven dat élke onderneming — groot of klein — recht heeft op een website waar ze trots op kunnen zijn.</p>
-            <p data-fr>Warnier Web Design est un petit studio web passionné, basé à Anvers. Nous croyons que chaque entreprise — grande ou petite — mérite un site dont elle peut être fière.</p>
-            <p data-en>Warnier Web Design is a small, passionate web studio based in Antwerp. We believe that every business — large or small — deserves a website they can be proud of.</p>
+            <p data-nl>In mijn professionele leven werk ik als technologieconsultant bij Deloitte, gespecialiseerd in indirecte belastingen. Ik help bedrijven complexe fiscale processen te vereenvoudigen met slimme technologieoplossingen — van automatisering tot data-analyse.</p>
+            <p data-fr>Dans ma vie professionnelle, je travaille comme consultant en technologie chez Deloitte, spécialisé en fiscalité indirecte. J'aide les entreprises à simplifier des processus fiscaux complexes grâce à des solutions technologiques intelligentes — de l'automatisation à l'analyse de données.</p>
+            <p data-en>In my professional life I work as a technology consultant at Deloitte, specialising in indirect tax. I help companies simplify complex fiscal processes using smart technology solutions — from automation to data analytics.</p>
 
-            <p data-nl>Wij werken rechtstreeks samen met onze klanten: geen tussenpersonen, geen onduidelijke facturen. U belt ons, wij luisteren, en samen bouwen we een online aanwezigheid die klanten aantrekt en uw verhaal vertelt.</p>
-            <p data-fr>Nous travaillons directement avec nos clients : pas d'intermédiaires, pas de factures obscures. Vous nous appelez, nous écoutons, et ensemble nous construisons une présence en ligne qui attire des clients et raconte votre histoire.</p>
-            <p data-en>We work directly with our clients — no middlemen, no unclear invoices. You call us, we listen, and together we build an online presence that attracts customers and tells your story.</p>
+            <p data-nl>Naast mijn dagelijkse job heb ik een grote passie voor AI en SaaS-toepassingen. Die interesse bracht me ertoe om Warnier Web Design op te richten: een manier om lokale ondernemers te helpen met de digitale tools die ze verdienen — snel, betaalbaar en op maat gebouwd.</p>
+            <p data-fr>En dehors de mon travail quotidien, j'ai une grande passion pour les applications d'IA et SaaS. C'est cet intérêt qui m'a conduit à créer Warnier Web Design : une façon d'aider les entrepreneurs locaux avec les outils numériques qu'ils méritent — rapides, abordables et sur mesure.</p>
+            <p data-en>Alongside my day job I have a strong passion for AI and SaaS applications. That interest led me to found Warnier Web Design — a way to help local business owners get the digital tools they deserve, built fast, affordably and entirely to their needs.</p>
 
             <p class="about__tagline" data-nl>📍 Gevestigd in Antwerpen. Actief in heel de regio.</p>
-            <p class="about__tagline" data-fr>📍 Basés à Anvers. Actifs dans toute la région.</p>
+            <p class="about__tagline" data-fr>📍 Basé à Anvers. Actif dans toute la région.</p>
             <p class="about__tagline" data-en>📍 Based in Antwerp. Active throughout the region.</p>
           </div>
 
@@ -2282,9 +2462,9 @@
               <div class="form__gdpr">
                 <input type="checkbox" id="gdpr" name="gdpr" required />
                 <label for="gdpr">
-                  <span data-nl>Ik ga akkoord dat Warnier Web Design mijn gegevens gebruikt om mijn aanvraag te beantwoorden. Uw gegevens worden nooit gedeeld met derden. <a href="#">Privacybeleid</a></span>
-                  <span data-fr>J'accepte que Warnier Web Design utilise mes coordonnées pour traiter ma demande. Vos données ne seront jamais partagées avec des tiers. <a href="#">Politique de confidentialité</a></span>
-                  <span data-en>I agree that Warnier Web Design may use my details to respond to my enquiry. Your data will never be shared with third parties. <a href="#">Privacy policy</a></span>
+                  <span data-nl>Ik ga akkoord dat Warnier Web Design mijn gegevens gebruikt om mijn aanvraag te beantwoorden. Uw gegevens worden nooit gedeeld met derden. <a href="#" class="privacy-trigger">Privacybeleid</a></span>
+                  <span data-fr>J'accepte que Warnier Web Design utilise mes coordonnées pour traiter ma demande. Vos données ne seront jamais partagées avec des tiers. <a href="#" class="privacy-trigger">Politique de confidentialité</a></span>
+                  <span data-en>I agree that Warnier Web Design may use my details to respond to my enquiry. Your data will never be shared with third parties. <a href="#" class="privacy-trigger">Privacy policy</a></span>
                 </label>
               </div>
 
@@ -2321,19 +2501,102 @@
     <div class="footer__inner">
       <div class="footer__logo">
         <img
-          src="Logo Warnier Web Design snip.png"
+          src="file.svg"
           alt="Warnier Web Design"
           width="140"
-          height="38"
+          height="52"
         />
       </div>
       <p class="footer__copy">
-        <span data-nl>© 2025 Warnier Web Design. Alle rechten voorbehouden.</span>
-        <span data-fr>© 2025 Warnier Web Design. Tous droits réservés.</span>
-        <span data-en>© 2025 Warnier Web Design. All rights reserved.</span>
+        <span data-nl>© 2026 Warnier Web Design. Alle rechten voorbehouden.</span>
+        <span data-fr>© 2026 Warnier Web Design. Tous droits réservés.</span>
+        <span data-en>© 2026 Warnier Web Design. All rights reserved.</span>
       </p>
     </div>
   </footer>
+
+  <!-- ============================================================
+       PRIVACY MODAL
+  ============================================================ -->
+  <div class="privacy-overlay" id="privacy-overlay" role="dialog" aria-modal="true" aria-labelledby="privacy-title">
+    <div class="privacy-modal">
+      <button class="privacy-modal__close" id="privacy-close" aria-label="Sluiten">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+
+      <h2 id="privacy-title">
+        <span data-nl>Privacybeleid</span>
+        <span data-fr>Politique de confidentialité</span>
+        <span data-en>Privacy policy</span>
+      </h2>
+
+      <h3>
+        <span data-nl>Wie zijn wij?</span>
+        <span data-fr>Qui sommes-nous ?</span>
+        <span data-en>Who are we?</span>
+      </h3>
+      <p>
+        <span data-nl>Warnier Web Design, gevestigd in Antwerpen, is verantwoordelijk voor de verwerking van uw persoonsgegevens zoals beschreven in dit beleid.</span>
+        <span data-fr>Warnier Web Design, basé à Anvers, est responsable du traitement de vos données personnelles tel que décrit dans cette politique.</span>
+        <span data-en>Warnier Web Design, based in Antwerp, is responsible for the processing of your personal data as described in this policy.</span>
+      </p>
+
+      <h3>
+        <span data-nl>Welke gegevens verzamelen wij?</span>
+        <span data-fr>Quelles données collectons-nous ?</span>
+        <span data-en>What data do we collect?</span>
+      </h3>
+      <p>
+        <span data-nl>Via het contactformulier verzamelen wij uitsluitend de gegevens die u zelf invult: naam, e-mailadres en uw bericht. Wij verzamelen geen tracking- of analysegegevens.</span>
+        <span data-fr>Via le formulaire de contact, nous collectons uniquement les données que vous saisissez : nom, adresse e-mail et votre message. Nous ne collectons pas de données de suivi ou d'analyse.</span>
+        <span data-en>Via the contact form we only collect the data you enter yourself: name, email address and your message. We do not collect tracking or analytics data.</span>
+      </p>
+
+      <h3>
+        <span data-nl>Waarvoor gebruiken wij uw gegevens?</span>
+        <span data-fr>À quoi servent vos données ?</span>
+        <span data-en>How do we use your data?</span>
+      </h3>
+      <ul>
+        <li><span data-nl>Om uw aanvraag te beantwoorden.</span><span data-fr>Pour répondre à votre demande.</span><span data-en>To respond to your enquiry.</span></li>
+        <li><span data-nl>Om een offerte of voorstel op te stellen indien gevraagd.</span><span data-fr>Pour établir un devis si demandé.</span><span data-en>To prepare a quote or proposal if requested.</span></li>
+      </ul>
+
+      <h3>
+        <span data-nl>Worden uw gegevens gedeeld?</span>
+        <span data-fr>Vos données sont-elles partagées ?</span>
+        <span data-en>Is your data shared?</span>
+      </h3>
+      <p>
+        <span data-nl>Nee. Uw gegevens worden nooit verkocht of gedeeld met derden voor commerciële doeleinden.</span>
+        <span data-fr>Non. Vos données ne sont jamais vendues ni partagées avec des tiers à des fins commerciales.</span>
+        <span data-en>No. Your data is never sold or shared with third parties for commercial purposes.</span>
+      </p>
+
+      <h3>
+        <span data-nl>Hoe lang bewaren wij uw gegevens?</span>
+        <span data-fr>Combien de temps conservons-nous vos données ?</span>
+        <span data-en>How long do we keep your data?</span>
+      </h3>
+      <p>
+        <span data-nl>Uw gegevens worden bewaard zolang nodig voor de afhandeling van uw aanvraag en daarna verwijderd.</span>
+        <span data-fr>Vos données sont conservées le temps nécessaire au traitement de votre demande, puis supprimées.</span>
+        <span data-en>Your data is kept for as long as necessary to handle your request and then deleted.</span>
+      </p>
+
+      <h3>
+        <span data-nl>Uw rechten</span>
+        <span data-fr>Vos droits</span>
+        <span data-en>Your rights</span>
+      </h3>
+      <p>
+        <span data-nl>U heeft het recht op inzage, correctie of verwijdering van uw persoonsgegevens. Neem hiervoor contact op via het contactformulier.</span>
+        <span data-fr>Vous avez le droit d'accéder à vos données personnelles, de les corriger ou de les supprimer. Contactez-nous via le formulaire de contact.</span>
+        <span data-en>You have the right to access, correct or delete your personal data. Please contact us via the contact form.</span>
+      </p>
+
+    </div>
+  </div>
 
 
   <!-- ============================================================
@@ -2541,6 +2804,44 @@
         submitBtn.disabled = false;
       }
     });
+
+
+    /* ----------------------------------------------------------
+       PRIVACY MODAL
+    ---------------------------------------------------------- */
+    (function () {
+      const overlay = document.getElementById('privacy-overlay');
+      const closeBtn = document.getElementById('privacy-close');
+      if (!overlay) return;
+
+      function openModal(e) {
+        e.preventDefault();
+        overlay.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
+        closeBtn.focus();
+      }
+
+      function closeModal() {
+        overlay.classList.remove('is-open');
+        document.body.style.overflow = '';
+      }
+
+      document.querySelectorAll('.privacy-trigger').forEach(function (el) {
+        el.addEventListener('click', openModal);
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+
+      // Click outside modal to close
+      overlay.addEventListener('click', function (e) {
+        if (e.target === overlay) closeModal();
+      });
+
+      // Esc key to close
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeModal();
+      });
+    })();
 
   </script>
 

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warnier Web Design — Brochure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:       #0B1A4E;
+      --navy-mid:   #112060;
+      --orange:     #F46219;
+      --white:      #FFFFFF;
+      --off-white:  #F5F7FB;
+      --muted:      #6B7180;
+      --border:     #E4E8F0;
+      --font-h:     'Plus Jakarta Sans', sans-serif;
+      --font-b:     'Inter', sans-serif;
+    }
+
+    /* ── Page setup ── */
+    html, body {
+      width: 210mm;
+      background: #e8eaf0;
+      font-family: var(--font-b);
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      background: var(--white);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Header band ── */
+    .hdr {
+      background: var(--navy);
+      padding: 22px 32px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .hdr__brand {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .hdr__logo {
+      font-family: var(--font-h);
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -0.02em;
+    }
+
+    .hdr__logo span { color: var(--orange); }
+
+    .hdr__tagline {
+      font-family: var(--font-h);
+      font-size: 8px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .hdr__right {
+      text-align: right;
+    }
+
+    .hdr__doc-label {
+      font-family: var(--font-h);
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      margin-bottom: 3px;
+    }
+
+    .hdr__doc-title {
+      font-family: var(--font-h);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--white);
+    }
+
+    /* ── Orange accent bar ── */
+    .accent-bar {
+      height: 3px;
+      background: linear-gradient(to right, var(--orange), #FF8C4E);
+    }
+
+    /* ── Body ── */
+    .body {
+      flex: 1;
+      padding: 22px 32px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    /* ── Intro ── */
+    .intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .intro__text h2 {
+      font-family: var(--font-h);
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    .intro__text p {
+      font-size: 8px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .discovery-box {
+      background: rgba(244, 98, 25, 0.07);
+      border: 1px solid rgba(244, 98, 25, 0.22);
+      border-radius: 6px;
+      padding: 11px 13px;
+    }
+
+    .discovery-box__label {
+      font-family: var(--font-h);
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .discovery-box__dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--orange);
+      flex-shrink: 0;
+    }
+
+    .discovery-box h3 {
+      font-family: var(--font-h);
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .discovery-box p {
+      font-size: 7.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── Pricing ── */
+    .section-label {
+      font-family: var(--font-h);
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 8px;
+    }
+
+    .pricing-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .price-block {
+      flex: 2;
+      background: var(--navy);
+      border-radius: 7px;
+      padding: 13px 15px;
+      color: var(--white);
+    }
+
+    .price-block__step {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-bottom: 7px;
+    }
+
+    .price-block__num {
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--orange);
+      color: var(--white);
+      font-family: var(--font-h);
+      font-size: 7px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .price-block__step-label {
+      font-family: var(--font-h);
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .price-block__name {
+      font-family: var(--font-h);
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--white);
+      margin-bottom: 2px;
+    }
+
+    .price-block__price {
+      font-family: var(--font-h);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .price-block__note {
+      font-size: 7px;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .price-block__features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .price-block__feature {
+      font-size: 7.5px;
+      color: rgba(255,255,255,0.75);
+      display: flex;
+      align-items: flex-start;
+      gap: 5px;
+      line-height: 1.4;
+    }
+
+    .price-block__feature::before {
+      content: '✓';
+      color: var(--orange);
+      font-size: 7px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .addons-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .addon-chip {
+      background: var(--off-white);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 10px;
+    }
+
+    .addon-chip--dashed {
+      border-style: dashed;
+    }
+
+    .addon-chip__name {
+      font-family: var(--font-h);
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 2px;
+    }
+
+    .addon-chip__desc {
+      font-size: 7px;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 4px;
+    }
+
+    .addon-chip__price {
+      font-family: var(--font-h);
+      font-size: 10px;
+      font-weight: 800;
+      color: var(--navy);
+    }
+
+    .addon-chip__price span { color: var(--orange); }
+
+    .addon-chip__price-note {
+      font-size: 6.5px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-left: 2px;
+    }
+
+    /* ── Process ── */
+    .process {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0;
+      position: relative;
+    }
+
+    .process-steps::before {
+      content: '';
+      position: absolute;
+      top: 11px;
+      left: 11px;
+      right: 11px;
+      height: 1px;
+      background: var(--border);
+      z-index: 0;
+    }
+
+    .process-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .process-step__dot {
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-h);
+      font-size: 7.5px;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 1px var(--border);
+    }
+
+    .process-step__dot--orange {
+      background: var(--orange);
+    }
+
+    .process-step__text {
+      text-align: center;
+      font-family: var(--font-h);
+      font-size: 6.5px;
+      font-weight: 700;
+      color: var(--navy);
+      line-height: 1.4;
+    }
+
+    .process-step__sub {
+      display: block;
+      font-family: var(--font-b);
+      font-size: 6px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+      line-height: 1.4;
+    }
+
+    /* ── Care service note ── */
+    .care-note {
+      background: var(--off-white);
+      border-left: 3px solid var(--orange);
+      border-radius: 0 5px 5px 0;
+      padding: 8px 11px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .care-note__icon {
+      font-size: 14px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .care-note__text {
+      font-size: 7.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .care-note__text strong {
+      color: var(--navy);
+      font-family: var(--font-h);
+      font-weight: 700;
+    }
+
+    /* ── Footer ── */
+    .ftr {
+      background: var(--navy);
+      padding: 11px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ftr__left {
+      font-family: var(--font-h);
+      font-size: 7.5px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.55);
+    }
+
+    .ftr__left strong { color: var(--white); }
+
+    .ftr__right {
+      display: flex;
+      gap: 14px;
+    }
+
+    .ftr__item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 7px;
+      color: rgba(255,255,255,0.45);
+      font-family: var(--font-h);
+      font-weight: 600;
+    }
+
+    .ftr__item span { color: rgba(255,255,255,0.7); }
+
+    /* ── Print ── */
+    @media print {
+      html, body { background: white; width: 210mm; }
+      .page {
+        width: 210mm;
+        min-height: 297mm;
+        box-shadow: none;
+      }
+      @page { size: A4; margin: 0; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <div class="hdr">
+    <div class="hdr__brand">
+      <div class="hdr__logo">Warnier<span>.</span> Web Design</div>
+      <div class="hdr__tagline">Antwerpen — Professionele websites voor lokale ondernemers</div>
+    </div>
+    <div class="hdr__right">
+      <div class="hdr__doc-label">Document</div>
+      <div class="hdr__doc-title">Diensten &amp; Prijzen 2026</div>
+    </div>
+  </div>
+  <div class="accent-bar"></div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Intro row -->
+    <div class="intro">
+      <div class="intro__text">
+        <h2>Een professionele website,<br>gebouwd op maat van uw zaak.</h2>
+        <p>
+          Warnier Web Design helpt lokale ondernemers in en rondom Antwerpen aan een sterke digitale aanwezigheid.
+          Wij werken transparant en stap voor stap — van eerste gesprek tot opgeleverde website.
+          Geen verborgen kosten, geen jargon. Alleen een eerlijk partnerschap.
+        </p>
+      </div>
+      <div class="discovery-box">
+        <div class="discovery-box__label">
+          <div class="discovery-box__dot"></div>
+          Gratis &amp; Vrijblijvend
+        </div>
+        <h3>Kennismakingsgesprek</h3>
+        <p>
+          Elke samenwerking start met een gratis ontdekkingsgesprek. We bespreken uw zaak, uw doelstellingen
+          en uw wensen — en stellen samen een Product Requirements Document (PRD) op als basis voor uw website.
+          Geen verplichtingen, enkel helderheid.
+        </p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Pricing -->
+    <div>
+      <div class="section-label">Transparante Prijzen</div>
+      <div class="pricing-row">
+
+        <!-- Foundation -->
+        <div class="price-block">
+          <div class="price-block__step">
+            <div class="price-block__num">1</div>
+            <span class="price-block__step-label">Uw basis</span>
+          </div>
+          <div class="price-block__name">Website</div>
+          <div class="price-block__price">€250</div>
+          <div class="price-block__note">eenmalig — oplevering binnen 7 werkdagen</div>
+          <ul class="price-block__features" style="margin-top:8px;">
+            <li class="price-block__feature">Professionele 1-pagina website op maat</li>
+            <li class="price-block__feature">Mobielvriendelijk &amp; snel geladen</li>
+            <li class="price-block__feature">Contactformulier inbegrepen</li>
+            <li class="price-block__feature">Basisoptimalisatie voor Google (SEO)</li>
+            <li class="price-block__feature">SSL-certificaat &amp; GDPR-conform</li>
+          </ul>
+        </div>
+
+        <!-- Add-ons column -->
+        <div class="addons-col">
+
+          <div class="addon-chip addon-chip--dashed">
+            <div class="addon-chip__name">⊕ Stap 2 — Extra pagina's</div>
+            <div class="addon-chip__desc">Portfolio, galerij, over ons, menu … Elke extra pagina in overleg.</div>
+            <div class="addon-chip__price"><span>+</span>Prijs in overleg</div>
+          </div>
+
+          <div class="addon-chip addon-chip--dashed">
+            <div class="addon-chip__name">⊕ Stap 3 — Add-ons</div>
+            <div class="addon-chip__desc" style="margin-bottom:5px;">Kies wat u nodig heeft:</div>
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <div style="font-size:7px;color:#1C1C2E;display:flex;justify-content:space-between;">
+                <span>🌐 Meertalig (NL / FR / EN / …)</span><strong style="color:#0B1A4E;">+€150 eenmalig</strong>
+              </div>
+              <div style="font-size:7px;color:#1C1C2E;display:flex;justify-content:space-between;">
+                <span>🔗 Domein &amp; Hosting</span><strong style="color:#0B1A4E;">+€15/maand</strong>
+              </div>
+              <div style="font-size:7px;color:#1C1C2E;display:flex;justify-content:space-between;">
+                <span>🔧 Care Service</span><strong style="color:#0B1A4E;">+€45/maand</strong>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Process -->
+    <div class="process">
+      <div class="section-label">Ons Proces — Stap voor Stap</div>
+      <div class="process-steps">
+
+        <div class="process-step">
+          <div class="process-step__dot process-step__dot--orange">1</div>
+          <div class="process-step__text">
+            Kennismakings-gesprek
+            <span class="process-step__sub">Gratis &amp; vrijblijvend. We bespreken uw zaak en stellen een PRD op.</span>
+          </div>
+        </div>
+
+        <div class="process-step">
+          <div class="process-step__dot">2</div>
+          <div class="process-step__text">
+            Eerste pagina
+            <span class="process-step__sub">Oplevering binnen 7 werkdagen. Halverwege stuurt u een voortgangsupdate.</span>
+          </div>
+        </div>
+
+        <div class="process-step">
+          <div class="process-step__dot">3</div>
+          <div class="process-step__text">
+            Extra pagina's &amp; add-ons
+            <span class="process-step__sub">Bijkomende pagina's en modules worden gerealiseerd in een afgesproken tijdframe.</span>
+          </div>
+        </div>
+
+        <div class="process-step">
+          <div class="process-step__dot">4</div>
+          <div class="process-step__text">
+            Revisieronde
+            <span class="process-step__sub">We bekijken de website samen en voeren een ronde aanpassingen door.</span>
+          </div>
+        </div>
+
+        <div class="process-step">
+          <div class="process-step__dot">5</div>
+          <div class="process-step__text">
+            Oplevering &amp; workshop
+            <span class="process-step__sub">Optionele 30 min. toelichting over hosting en eventueel eigen beheer.</span>
+          </div>
+        </div>
+
+        <div class="process-step">
+          <div class="process-step__dot process-step__dot--orange">6</div>
+          <div class="process-step__text">
+            Care Service
+            <span class="process-step__sub">2× per maand updates — teksten, foto's of kleine aanpassingen op aanvraag.</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Care note -->
+    <div class="care-note">
+      <div class="care-note__icon">💡</div>
+      <div class="care-note__text">
+        <strong>Care Service inbegrepen?</strong> Dan kunt u ons maandelijks tot 2× contacteren met inhoudelijke updates voor uw website —
+        nieuwe foto's, tekstwijzigingen, openingsuren, promoties of andere kleine aanpassingen.
+        Wij verwerken deze professioneel en snel, zonder dat u zelf iets technisch hoeft te doen.
+        <br><br>
+        <strong>Andere talen gewenst?</strong> Naast Nederlands, Frans en Engels zijn ook andere talen mogelijk. Vraag naar de mogelijkheden tijdens uw kennismakingsgesprek.
+      </div>
+    </div>
+
+  </div><!-- /body -->
+
+  <!-- Footer -->
+  <div class="ftr">
+    <div class="ftr__left">
+      <strong>Warnier Web Design</strong> &nbsp;·&nbsp; Antwerpen, België &nbsp;·&nbsp; © 2026
+    </div>
+    <div class="ftr__right">
+      <div class="ftr__item">✉ <span>info@warnierwebdesign.be</span></div>
+      <div class="ftr__item">🌐 <span>warnierwebdesign.be</span></div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+  // Auto-trigger PDF download when ?pdf=1 is in the URL
+  if (window.location.search.includes('pdf=1')) {
+    document.fonts.ready.then(function () {
+      var opt = {
+        margin:      0,
+        filename:    'Warnier Web Design - Brochure.pdf',
+        image:       { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+        jsPDF:       { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+      html2pdf().set(opt).from(document.querySelector('.page')).save().then(function () {
+        window.close();
+      });
+    });
+  }
+</script>
+</body>
+</html>
