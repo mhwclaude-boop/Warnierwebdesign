@@ -44,9 +44,11 @@
       --shadow-lg:   0 8px 40px rgba(11, 26, 78, 0.18);
 
       /* Layout */
-      --nav-height:    72px;
-      --max-width:     1140px;
-      --section-pad:   clamp(4rem, 8vw, 7rem);
+      --nav-height:       72px;
+      --progress-height:  34px;
+      --header-height:    calc(var(--nav-height) + var(--progress-height));
+      --max-width:        1140px;
+      --section-pad:      clamp(4rem, 8vw, 7rem);
     }
 
     /* ============================================================
@@ -261,7 +263,7 @@
       flex-direction: column;
       background: var(--white);
       position: fixed;
-      top: var(--nav-height);
+      top: var(--header-height);
       inset-inline: 0;
       padding: 0.75rem 1.5rem 1.5rem;
       box-shadow: 0 8px 32px rgba(11, 26, 78, 0.14);
@@ -284,6 +286,68 @@
     .nav__mobile a:last-of-type { border-bottom: none; }
 
     /* ============================================================
+       SECTION PROGRESS BAR
+    ============================================================ */
+    .section-progress {
+      position: fixed;
+      top: var(--nav-height);
+      inset-inline: 0;
+      height: var(--progress-height);
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+    }
+
+    .section-progress__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+    }
+
+    .progress-seg {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-heading);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      position: relative;
+      transition: color 0.22s;
+      padding: 0 0.5rem;
+      white-space: nowrap;
+      border-right: 1px solid var(--border);
+    }
+    .progress-seg:last-child { border-right: none; }
+
+    /* orange bottom fill on active */
+    .progress-seg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 3px;
+      background: var(--orange);
+      border-radius: 3px 3px 0 0;
+      transition: width 0.3s ease;
+    }
+
+    .progress-seg.is-active {
+      color: var(--navy);
+    }
+    .progress-seg.is-active::after {
+      width: 100%;
+    }
+
+    /* ============================================================
        HERO
     ============================================================ */
     .hero {
@@ -291,7 +355,7 @@
       min-height: 100svh;
       display: flex;
       align-items: center;
-      padding: calc(var(--nav-height) + 4rem) 1.5rem 5rem;
+      padding: calc(var(--header-height) + 3rem) 1.5rem 5rem;
       position: relative;
       overflow: hidden;
     }
@@ -1664,24 +1728,13 @@
 
         <!-- Desktop nav links -->
         <ul class="nav__links" role="list">
+          <li><a href="index.html" class="is-active">Home</a></li>
           <li>
-            <a href="#home" data-nl>Home</a>
-            <a href="#home" data-fr>Accueil</a>
-            <a href="#home" data-en>Home</a>
+            <a href="news.html" data-nl>Nieuws</a>
+            <a href="news.html" data-fr>Actualités</a>
+            <a href="news.html" data-en>News</a>
           </li>
-          <li>
-            <a href="#diensten" data-nl>Diensten</a>
-            <a href="#diensten" data-fr>Services</a>
-            <a href="#diensten" data-en>Services</a>
-          </li>
-          <li>
-            <a href="#over-ons" data-nl>Over ons</a>
-            <a href="#over-ons" data-fr>À propos</a>
-            <a href="#over-ons" data-en>About us</a>
-          </li>
-          <li>
-            <a href="#contact">Contact</a>
-          </li>
+          <li><a href="art-of-the-possible.html">Art of the Possible</a></li>
         </ul>
 
         <!-- Right side: lang toggle + hamburger -->
@@ -1708,19 +1761,34 @@
 
       <!-- Mobile drawer -->
       <div class="nav__mobile" id="mobile-nav" role="navigation" aria-label="Mobiel menu">
-        <a href="#home" data-nl>Home</a>
-        <a href="#home" data-fr>Accueil</a>
-        <a href="#home" data-en>Home</a>
-        <a href="#diensten" data-nl>Diensten</a>
-        <a href="#diensten" data-fr>Services</a>
-        <a href="#diensten" data-en>Services</a>
-        <a href="#over-ons" data-nl>Over ons</a>
-        <a href="#over-ons" data-fr>À propos</a>
-        <a href="#over-ons" data-en>About us</a>
-        <a href="#contact">Contact</a>
+        <a href="index.html">Home</a>
+        <a href="news.html" data-nl>Nieuws</a>
+        <a href="news.html" data-fr>Actualités</a>
+        <a href="news.html" data-en>News</a>
+        <a href="art-of-the-possible.html">Art of the Possible</a>
       </div>
 
     </nav>
+
+    <!-- Section progress bar -->
+    <div class="section-progress" id="section-progress" aria-hidden="true">
+      <div class="section-progress__inner">
+        <button class="progress-seg is-active" data-target="home">
+          <span data-nl>Intro</span><span data-fr>Intro</span><span data-en>Intro</span>
+        </button>
+        <button class="progress-seg" data-target="klanten">
+          <span data-nl>Klanten</span><span data-fr>Clients</span><span data-en>Clients</span>
+        </button>
+        <button class="progress-seg" data-target="diensten">
+          <span data-nl>Diensten</span><span data-fr>Services</span><span data-en>Services</span>
+        </button>
+        <button class="progress-seg" data-target="over-ons">
+          <span data-nl>Over ons</span><span data-fr>À propos</span><span data-en>About</span>
+        </button>
+        <button class="progress-seg" data-target="contact">Contact</button>
+      </div>
+    </div>
+
   </header>
 
 
@@ -2631,28 +2699,59 @@
 
 
     /* ----------------------------------------------------------
-       STICKY NAV + ACTIVE SECTION HIGHLIGHT
+       STICKY NAV — scroll shadow only
     ---------------------------------------------------------- */
-    const nav      = document.getElementById('nav');
-    const sections = document.querySelectorAll('section[id]');
-    const navLinks = document.querySelectorAll('.nav__links a');
+    const nav = document.getElementById('nav');
 
     function onScroll() {
       nav.classList.toggle('scrolled', window.scrollY > 48);
-
-      let current = '';
-      sections.forEach(sec => {
-        if (window.scrollY >= sec.offsetTop - 110) current = sec.id;
-      });
-
-      navLinks.forEach(a => {
-        const href = a.getAttribute('href');
-        a.classList.toggle('is-active', href === '#' + current);
-      });
     }
 
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll(); // run once on load
+
+
+    /* ----------------------------------------------------------
+       SECTION PROGRESS BAR
+    ---------------------------------------------------------- */
+    (function () {
+      const segs = document.querySelectorAll('.progress-seg');
+      if (!segs.length) return;
+
+      // Click to scroll
+      segs.forEach(function (seg) {
+        seg.addEventListener('click', function () {
+          const target = document.getElementById(seg.dataset.target);
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // Highlight active segment via IntersectionObserver
+      const sectionIds = ['home', 'klanten', 'diensten', 'over-ons', 'contact'];
+      let activeId = 'home';
+
+      function setActive(id) {
+        if (id === activeId) return;
+        activeId = id;
+        segs.forEach(function (seg) {
+          seg.classList.toggle('is-active', seg.dataset.target === id);
+        });
+      }
+
+      const progressObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) setActive(entry.target.id);
+          });
+        },
+        { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+      );
+
+      sectionIds.forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) progressObserver.observe(el);
+      });
+    })();
 
 
     /* ----------------------------------------------------------
