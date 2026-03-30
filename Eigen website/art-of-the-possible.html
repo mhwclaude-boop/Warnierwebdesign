@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+- <!DOCTYPE html>
 <html lang="nl" data-lang="nl">
 <head>
   <meta charset="UTF-8" />
@@ -167,9 +167,16 @@
     .browser-viewport {
       position: relative; padding-top: 62.5%; /* 16:10 */
       background: var(--off-white);
+      overflow: hidden;
     }
     .browser-viewport iframe {
-      position: absolute; inset: 0; width: 100%; height: 100%; border: none; display: block;
+      position: absolute;
+      top: 0; left: 0;
+      width: calc(100% / 0.55);
+      height: calc(100% / 0.55);
+      border: none; display: block;
+      transform: scale(0.55);
+      transform-origin: top left;
     }
     @media (max-width: 767px) {
       .browser-viewport { padding-top: 75%; }
@@ -368,10 +375,10 @@
                 <div class="browser-dots">
                   <span></span><span></span><span></span>
                 </div>
-                <span class="browser-url">bike-shop-demo.com</span>
+                <span class="browser-url">cyclepath.be</span>
               </div>
               <div class="browser-viewport">
-                <iframe src="about:blank" title="Bike Shop demo" loading="lazy"></iframe>
+                <iframe src="bike-shop-demo.html" title="Bike Shop demo" loading="lazy"></iframe>
               </div>
             </div>
           </div>
@@ -391,15 +398,10 @@
                 <div class="browser-dots">
                   <span></span><span></span><span></span>
                 </div>
-                <span class="browser-url">galerie-demo.com</span>
+                <span class="browser-url">galerielumiere.com</span>
               </div>
               <div class="browser-viewport">
-                <div class="slide-placeholder" style="position:absolute;inset:0;aspect-ratio:unset;border-radius:0;border:none;">
-                  <div class="slide-placeholder__icon">🖼️</div>
-                  <p class="slide-placeholder__text" data-nl>Binnenkort beschikbaar</p>
-                  <p class="slide-placeholder__text" data-fr>Bientôt disponible</p>
-                  <p class="slide-placeholder__text" data-en>Coming soon</p>
-                </div>
+                <iframe src="art-gallery-demo.html" title="Art Gallery demo" loading="lazy"></iframe>
               </div>
             </div>
           </div>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cyclepath — Bikes &amp; Workshop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --accent:  #1f9175;
+      --dark:    #111318;
+      --darker:  #0b0d11;
+      --light:   #f5f3ef;
+      --text:    #1a1a22;
+      --sub:     #5a5a6a;
+      --border:  #e8e4dc;
+      --sidebar: 268px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--light); color: var(--text); margin-left: var(--sidebar); }
+    a { color: inherit; text-decoration: none; }
+
+    /* ═══════════════════════════════
+       SIDEBAR
+    ═══════════════════════════════ */
+    .sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar);
+      background: var(--dark); z-index: 200;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+
+    /* Logo strip */
+    .sidebar__logo-wrap { padding: 1.75rem 1.5rem 1rem; flex-shrink: 0; }
+    .sidebar__logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.75rem; letter-spacing: 0.08em; color: #fff; line-height: 1;
+    }
+    .sidebar__logo-text span { color: var(--accent); }
+    .sidebar__tagline {
+      font-size: 0.625rem; font-weight: 600; letter-spacing: 0.14em;
+      text-transform: uppercase; color: rgba(255,255,255,0.28); margin-top: 3px;
+    }
+
+    /* Two-column body: track col + nav col — NO overlap */
+    .sidebar__body { flex: 1; display: flex; min-height: 0; }
+
+    /* Track column */
+    .sidebar__track-col {
+      width: 56px; position: relative; flex-shrink: 0;
+    }
+    .track-bg {
+      position: absolute; left: 27.5px; top: 0; bottom: 0; width: 1px;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,0.13) 0, rgba(255,255,255,0.13) 8px,
+        transparent 8px, transparent 18px
+      );
+    }
+    .track-fill {
+      position: absolute; left: 27.5px; top: 0; width: 1px; height: 0%;
+      background: var(--accent);
+    }
+    .track-dot {
+      position: absolute; left: 22px; width: 12px; height: 12px; border-radius: 50%;
+      background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.25);
+      transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .track-dot.active {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(31,145,117,0.55);
+    }
+    /* Bike rides along the track — NO CSS transition (updated directly by JS) */
+    .track-bike {
+      position: absolute; left: 4px; top: 0; width: 48px;
+    }
+    .track-bike svg { width: 48px; height: auto; overflow: visible; }
+
+    /* Nav column */
+    .sidebar__nav {
+      flex: 1; min-width: 0; overflow: hidden;
+      display: flex; align-items: center;
+      padding: 2rem 1.25rem 2rem 3.5rem;
+    }
+    .nav-list { list-style: none; width: 100%; display: flex; flex-direction: column; gap: 0.125rem; }
+    .nav-item {
+      display: flex; align-items: center; overflow: hidden; cursor: pointer;
+    }
+    .nav-item__arrow {
+      color: var(--accent); flex-shrink: 0;
+      font-size: 1.5rem; font-weight: 700; line-height: 1; margin-right: 2px;
+      transform: translateX(-120%); opacity: 0;
+      transition: transform 0.26s cubic-bezier(0.4,0,0.2,1), opacity 0.26s;
+    }
+    .nav-item__label {
+      font-size: 1.875rem; font-weight: 600; color: rgba(255,255,255,0.45);
+      transform: translateX(-18px);
+      transition: transform 0.26s cubic-bezier(0.4,0,0.2,1), color 0.26s;
+      white-space: nowrap; line-height: 1.65;
+    }
+    .nav-item:hover .nav-item__arrow,
+    .nav-item.active .nav-item__arrow { transform: translateX(0); opacity: 1; }
+    .nav-item:hover .nav-item__label { transform: translateX(0); color: var(--accent); }
+    .nav-item.active .nav-item__label { transform: translateX(0); color: #fff; }
+
+    /* ═══════════════════════════════
+       MOBILE NAV
+    ═══════════════════════════════ */
+    .mobile-nav {
+      display: none; position: fixed; top: 0; left: 0; right: 0; height: 56px;
+      background: var(--dark); z-index: 200;
+      align-items: center; justify-content: space-between; padding: 0 1.25rem;
+    }
+    .mobile-nav__logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.375rem; letter-spacing: 0.08em; color: #fff; }
+    .mobile-nav__logo span { color: var(--accent); }
+    .mobile-hamburger { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 5px; padding: 4px; }
+    .mobile-hamburger span { display: block; width: 22px; height: 1.5px; background: #fff; border-radius: 2px; }
+    .mobile-drawer {
+      display: none; flex-direction: column; position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
+      background: var(--dark); z-index: 190; padding: 2rem; gap: 0.5rem;
+    }
+    .mobile-drawer.open { display: flex; }
+    .mobile-drawer a { font-size: 2rem; font-weight: 700; color: rgba(255,255,255,0.6); padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.08); transition: color 0.2s; }
+    .mobile-drawer a:hover { color: var(--accent); }
+    @media (max-width: 900px) {
+      body { margin-left: 0; padding-top: 56px; }
+      .sidebar { display: none; }
+      .mobile-nav { display: flex; }
+    }
+
+    /* ═══════════════════════════════
+       HERO BIKE — animations
+    ═══════════════════════════════ */
+    @keyframes spinWheel  { to { transform: rotate(360deg); } }
+    @keyframes spinCrank  { to { transform: rotate(360deg); } }
+    @keyframes bikeBob    { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-7px)} }
+
+    /* Spinning elements — transform-origin set to local (0,0) because they're
+       inside a parent <g transform="translate(cx,cy)"> that centers them */
+    .spin-w  { animation: spinWheel 1.05s linear infinite; transform-origin: 0px 0px; }
+    .spin-c  { animation: spinCrank 1.9s  linear infinite; transform-origin: 0px 0px; }
+    .bike-bob { animation: bikeBob 1.7s ease-in-out infinite; }
+
+    /* ═══════════════════════════════
+       SECTIONS — shared
+    ═══════════════════════════════ */
+    .section { min-height: 100vh; }
+    .section-inner { max-width: 920px; margin: 0 auto; padding: 6rem 2.5rem; }
+    .section-label { display: inline-block; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem, 6vw, 5.5rem); line-height: 0.95; letter-spacing: 0.02em; color: inherit; margin-bottom: 1.5rem; }
+    .section-body { font-size: 1.0625rem; line-height: 1.75; color: var(--sub); max-width: 520px; }
+
+    /* ═══════════════════════════════
+       § HOME
+    ═══════════════════════════════ */
+    #home { background: var(--dark); color: #fff; display: flex; align-items: center; }
+    .home-inner {
+      max-width: 920px; margin: 0 auto; padding: 6rem 2.5rem;
+      display: grid; grid-template-columns: 1fr 1fr;
+      align-items: center; gap: 3rem; width: 100%;
+    }
+    .home-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 8vw, 7.5rem); line-height: 0.92; letter-spacing: 0.02em; color: #fff; }
+    .home-headline span { color: var(--accent); display: block; }
+    .home-sub { font-size: 1.0625rem; line-height: 1.75; color: rgba(255,255,255,0.55); margin: 1.75rem 0; max-width: 400px; }
+    .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-block; padding: 0.875rem 2rem; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border-radius: 3px; transition: opacity 0.2s, transform 0.2s; cursor: pointer; border: none; }
+    .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+    .btn--primary { background: var(--accent); color: #fff; }
+    .btn--outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.3); }
+    .btn--outline:hover { border-color: #fff; }
+
+    /* Hero bike visual */
+    .home-visual {
+      position: relative; border-radius: 12px; overflow: hidden;
+      aspect-ratio: 4/3; background: #161c22;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-road {
+      position: absolute; bottom: 30px; left: 0; right: 0; height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+    .hero-bike-svg { width: 90%; height: auto; position: relative; z-index: 1; }
+    @media (max-width: 767px) { .home-inner { grid-template-columns: 1fr; } .home-visual { display: none; } }
+
+    /* ═══════════════════════════════
+       § BIKES
+    ═══════════════════════════════ */
+    #bikes { background: var(--light); }
+    .bikes-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+    .bike-card { background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); transition: transform 0.3s, box-shadow 0.3s; }
+    .bike-card:hover { transform: translateY(-5px); box-shadow: 0 16px 48px rgba(0,0,0,0.10); }
+    .bike-card__img { aspect-ratio: 4/3; overflow: hidden; background: #f0ece5; }
+    .bike-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s; display: block; }
+    .bike-card:hover .bike-card__img img { transform: scale(1.04); }
+    .bike-card__body { padding: 1.25rem 1.25rem 1.5rem; }
+    .bike-card__type { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
+    .bike-card__name { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.375rem; }
+    .bike-card__desc { font-size: 0.875rem; color: var(--sub); line-height: 1.6; margin-bottom: 1rem; }
+    .bike-card__footer { display: flex; align-items: center; justify-content: space-between; }
+    .bike-card__price { font-size: 1.25rem; font-weight: 700; color: var(--text); }
+    .bike-card__cta { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); border: 1.5px solid var(--accent); padding: 0.4rem 0.875rem; border-radius: 3px; transition: background 0.2s, color 0.2s; }
+    .bike-card__cta:hover { background: var(--accent); color: #fff; }
+    @media (max-width: 900px) { .bikes-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 560px) { .bikes-grid { grid-template-columns: 1fr; } }
+
+    /* ═══════════════════════════════
+       § REPAIR
+    ═══════════════════════════════ */
+    #repair { background: var(--darker); color: #fff; }
+    #repair .section-body { color: rgba(255,255,255,0.5); }
+    .repair-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5px; margin-top: 3rem; background: rgba(255,255,255,0.07); border-radius: 10px; overflow: hidden; }
+    .repair-card { background: #161820; padding: 2.5rem 2rem; transition: background 0.3s; position: relative; }
+    .repair-card:hover { background: #1e2028; }
+    .repair-card__num { font-family: 'Bebas Neue', sans-serif; font-size: 4rem; color: rgba(31,145,117,0.15); line-height: 1; position: absolute; top: 1.5rem; right: 1.5rem; }
+    .repair-card__icon { font-size: 2rem; margin-bottom: 1.25rem; }
+    .repair-card__name { font-family: 'Bebas Neue', sans-serif; font-size: 1.875rem; letter-spacing: 0.04em; color: #fff; margin-bottom: 0.5rem; }
+    .repair-card__price { font-size: 0.875rem; font-weight: 600; color: var(--accent); margin-bottom: 0.875rem; }
+    .repair-card__desc { font-size: 0.9rem; color: rgba(255,255,255,0.45); line-height: 1.65; }
+    @media (max-width: 767px) { .repair-grid { grid-template-columns: 1fr; } }
+
+    /* ═══════════════════════════════
+       § ROUTES
+    ═══════════════════════════════ */
+    #routes { background: var(--light); }
+    .routes-list { display: flex; flex-direction: column; gap: 1px; margin-top: 3rem; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .route-item { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 2rem; padding: 2rem; background: #fff; transition: background 0.25s; cursor: pointer; }
+    .route-item + .route-item { border-top: 1px solid var(--border); }
+    .route-item:hover { background: #faf8f4; }
+    .route-item__left { display: flex; align-items: center; gap: 2rem; }
+    .route-item__km { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; color: var(--accent); line-height: 1; flex-shrink: 0; width: 80px; }
+    .route-item__km span { display: block; font-family: 'Inter', sans-serif; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sub); margin-top: 2px; }
+    .route-item__name { font-family: 'Bebas Neue', sans-serif; font-size: 1.75rem; letter-spacing: 0.04em; color: var(--text); margin-bottom: 0.25rem; }
+    .route-item__desc { font-size: 0.9rem; color: var(--sub); max-width: 380px; line-height: 1.55; }
+    .route-item__badge { font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.35rem 0.875rem; border-radius: 999px; white-space: nowrap; }
+    .badge--easy   { background: rgba(34,197,94,0.12); color: #16a34a; }
+    .badge--medium { background: rgba(234,179,8,0.12);  color: #b45309; }
+    .badge--hard   { background: rgba(220,38,38,0.12);  color: #dc2626; }
+    @media (max-width: 600px) { .route-item { grid-template-columns: 1fr; } .route-item__left { gap: 1rem; } }
+
+    /* ═══════════════════════════════
+       § CONTACT
+    ═══════════════════════════════ */
+    #contact { background: var(--dark); color: #fff; }
+    #contact .section-body { color: rgba(255,255,255,0.5); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; margin-top: 3rem; align-items: start; }
+    .info-block { margin-bottom: 1.75rem; }
+    .info-block strong { display: block; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.28); margin-bottom: 0.4rem; }
+    .info-block p { font-size: 0.9375rem; color: rgba(255,255,255,0.6); line-height: 1.8; }
+    .info-block a { color: var(--accent); }
+    .info-block a:hover { text-decoration: underline; }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .form-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-field label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.35); }
+    .form-field input, .form-field textarea { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 0.75rem 1rem; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.9375rem; transition: border-color 0.2s, background 0.2s; }
+    .form-field input:focus, .form-field textarea:focus { outline: none; border-color: var(--accent); background: rgba(31,145,117,0.06); }
+    .form-field textarea { resize: vertical; min-height: 120px; }
+    .form-field input::placeholder, .form-field textarea::placeholder { color: rgba(255,255,255,0.2); }
+    @media (max-width: 767px) { .contact-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+    /* ═══════════════════════════════
+       FOOTER
+    ═══════════════════════════════ */
+    .footer { background: var(--darker); color: rgba(255,255,255,0.3); padding: 1.5rem 2.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.8125rem; border-top: 1px solid rgba(255,255,255,0.06); }
+    .footer__brand { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.08em; }
+    .footer__brand span { color: var(--accent); }
+    .footer__wwd a { color: var(--accent); opacity: 0.6; }
+    .footer__wwd a:hover { opacity: 1; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════
+       SIDEBAR
+  ══════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__logo-wrap">
+      <div class="sidebar__logo-text"><span>C</span>YCLEPATH</div>
+      <div class="sidebar__tagline">Bikes &amp; Workshop</div>
+    </div>
+
+    <div class="sidebar__body">
+
+      <!-- Track column (56 px wide — bike lives here) -->
+      <div class="sidebar__track-col" id="sidebar-track">
+        <div class="track-bg"></div>
+        <div class="track-fill" id="track-fill"></div>
+
+        <div class="track-dot" id="dot-home"></div>
+        <div class="track-dot" id="dot-bikes"></div>
+        <div class="track-dot" id="dot-repair"></div>
+        <div class="track-dot" id="dot-routes"></div>
+        <div class="track-dot" id="dot-contact"></div>
+
+        <div class="track-bike" id="track-bike">
+          <svg viewBox="0 0 80 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Rear wheel -->
+            <g transform="translate(15, 37)">
+              <g id="swheel-rear" class="spin-w">
+                <circle r="13" stroke="#fff" stroke-width="2.5"/>
+                <line x1="0" y1="-13" x2="0" y2="13" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-13" y1="0" x2="13" y2="0" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-9.2" y1="-9.2" x2="9.2" y2="9.2" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-9.2" y1="9.2" x2="9.2" y2="-9.2" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+              </g>
+              <circle r="2.5" fill="#fff"/>
+            </g>
+            <!-- Front wheel -->
+            <g transform="translate(65, 37)">
+              <g id="swheel-front" class="spin-w">
+                <circle r="13" stroke="#fff" stroke-width="2.5"/>
+                <line x1="0" y1="-13" x2="0" y2="13" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-13" y1="0" x2="13" y2="0" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-9.2" y1="-9.2" x2="9.2" y2="9.2" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+                <line x1="-9.2" y1="9.2" x2="9.2" y2="-9.2" stroke="rgba(255,255,255,0.45)" stroke-width="1.5"/>
+              </g>
+              <circle r="2.5" fill="#fff"/>
+            </g>
+            <!-- Frame -->
+            <line x1="15" y1="37" x2="37" y2="11" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="15" y1="37" x2="40" y2="37" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="37" y1="11" x2="40" y2="37" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="40" y1="37" x2="60" y2="14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="37" y1="11" x2="60" y2="14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="14" x2="65" y2="37" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="60" y1="14" x2="63" y2="7"  stroke="#fff" stroke-width="2"   stroke-linecap="round"/>
+            <line x1="58" y1="5"  x2="67" y2="5"  stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="37" y1="11" x2="36" y2="5"  stroke="#fff" stroke-width="2"   stroke-linecap="round"/>
+            <line x1="30" y1="5"  x2="42" y2="5"  stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+            <!-- Chainring -->
+            <circle cx="40" cy="37" r="5.5" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" fill="none"/>
+            <circle cx="40" cy="37" r="2"   fill="#fff"/>
+          </svg>
+        </div>
+      </div><!-- /track-col -->
+
+      <!-- Nav column -->
+      <nav class="sidebar__nav">
+        <ul class="nav-list" id="nav-list">
+          <li class="nav-item active" data-section="home">
+            <span class="nav-item__arrow">›</span>
+            <a class="nav-item__label" href="#home">Home</a>
+          </li>
+          <li class="nav-item" data-section="bikes">
+            <span class="nav-item__arrow">›</span>
+            <a class="nav-item__label" href="#bikes">Bikes</a>
+          </li>
+          <li class="nav-item" data-section="repair">
+            <span class="nav-item__arrow">›</span>
+            <a class="nav-item__label" href="#repair">Repair</a>
+          </li>
+          <li class="nav-item" data-section="routes">
+            <span class="nav-item__arrow">›</span>
+            <a class="nav-item__label" href="#routes">Routes</a>
+          </li>
+          <li class="nav-item" data-section="contact">
+            <span class="nav-item__arrow">›</span>
+            <a class="nav-item__label" href="#contact">Contact</a>
+          </li>
+        </ul>
+      </nav>
+
+    </div><!-- /body -->
+  </aside>
+
+  <!-- Mobile nav -->
+  <div class="mobile-nav">
+    <div class="mobile-nav__logo"><span>C</span>YCLEPATH</div>
+    <button class="mobile-hamburger" id="m-hamburger"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-drawer" id="m-drawer">
+    <a href="#home"    onclick="closeDrawer()">Home</a>
+    <a href="#bikes"   onclick="closeDrawer()">Bikes</a>
+    <a href="#repair"  onclick="closeDrawer()">Repair</a>
+    <a href="#routes"  onclick="closeDrawer()">Routes</a>
+    <a href="#contact" onclick="closeDrawer()">Contact</a>
+  </div>
+
+  <!-- ══════════════════════════════
+       § HOME
+  ══════════════════════════════ -->
+  <section class="section" id="home">
+    <div class="home-inner">
+      <div>
+        <h1 class="home-headline">
+          RIDE<br>
+          <span>FURTHER.</span>
+          FEEL<br>FREE.
+        </h1>
+        <p class="home-sub">Cyclepath is your local bike shop — handpicked bikes, expert repairs, and the best routes right outside your door.</p>
+        <div class="btn-row">
+          <a href="#bikes"  class="btn btn--primary">Shop Bikes</a>
+          <a href="#repair" class="btn btn--outline">Book Repair</a>
+        </div>
+      </div>
+
+      <!-- Animated hero bike -->
+      <div class="home-visual">
+        <div class="hero-road"></div>
+        <svg class="hero-bike-svg" viewBox="0 0 400 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Ground shadow -->
+          <ellipse cx="200" cy="230" rx="140" ry="6" fill="rgba(0,0,0,0.18)"/>
+
+          <!-- Everything bobs together -->
+          <g class="bike-bob">
+
+            <!-- Rear wheel: centered at (85,185) -->
+            <g transform="translate(85, 185)">
+              <g class="spin-w">
+                <circle r="60" stroke="rgba(255,255,255,0.9)" stroke-width="3.5"/>
+                <!-- 6 spokes -->
+                <line x1="0" y1="-60" x2="0"    y2="60"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-60" y1="0" x2="60"   y2="0"    stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-52" y1="-30" x2="52" y2="30"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-52" y1="30"  x2="52" y2="-30"  stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-30" y1="-52" x2="30" y2="52"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-30" y1="52"  x2="30" y2="-52"  stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              </g>
+              <!-- Hub -->
+              <circle r="9"  fill="#1f9175"/>
+              <circle r="3.5" fill="#fff"/>
+            </g>
+
+            <!-- Front wheel: centered at (315,185) -->
+            <g transform="translate(315, 185)">
+              <g class="spin-w">
+                <circle r="60" stroke="rgba(255,255,255,0.9)" stroke-width="3.5"/>
+                <line x1="0" y1="-60" x2="0"    y2="60"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-60" y1="0" x2="60"   y2="0"    stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-52" y1="-30" x2="52" y2="30"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-52" y1="30"  x2="52" y2="-30"  stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-30" y1="-52" x2="30" y2="52"   stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+                <line x1="-30" y1="52"  x2="30" y2="-52"  stroke="rgba(255,255,255,0.35)" stroke-width="2"/>
+              </g>
+              <circle r="9"   fill="#1f9175"/>
+              <circle r="3.5" fill="#fff"/>
+            </g>
+
+            <!-- Frame -->
+            <!-- Chain stays: rear axle → BB -->
+            <path d="M85,185 L168,185" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <!-- Seat stays: rear axle → seat cluster -->
+            <path d="M85,185 L132,88"  stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <!-- Seat tube: seat cluster → BB -->
+            <path d="M132,88 L168,185" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <!-- Down tube: BB → head -->
+            <path d="M168,185 L268,102" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <!-- Top tube: seat cluster → head -->
+            <path d="M132,88 L268,102"  stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+            <!-- Fork: head → front axle -->
+            <path d="M268,102 L315,185" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+
+            <!-- Seat post -->
+            <path d="M132,88 L129,66"  stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Saddle -->
+            <path d="M112,63 L148,63"  stroke="#fff" stroke-width="5"   stroke-linecap="round"/>
+
+            <!-- Handlebar stem -->
+            <path d="M268,102 L281,76" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+            <!-- Bar -->
+            <path d="M273,70 L295,78"  stroke="#fff" stroke-width="5"   stroke-linecap="round"/>
+
+            <!-- Chainring (static) -->
+            <circle cx="168" cy="185" r="22" stroke="rgba(255,255,255,0.3)" stroke-width="2.5" fill="none"/>
+
+            <!-- Crank + pedals (spinning) at BB (168,185) -->
+            <g transform="translate(168, 185)">
+              <g class="spin-c">
+                <!-- Arm 1 -->
+                <line x1="0" y1="0" x2="0" y2="26"  stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                <!-- Pedal 1 -->
+                <rect x="-9" y="26" width="18" height="6" rx="2" fill="#fff"/>
+                <!-- Arm 2 -->
+                <line x1="0" y1="0" x2="0" y2="-26" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+                <!-- Pedal 2 -->
+                <rect x="-9" y="-32" width="18" height="6" rx="2" fill="#fff"/>
+              </g>
+              <!-- BB center (static, on top) -->
+              <circle r="6" fill="#1f9175"/>
+              <circle r="2.5" fill="#fff"/>
+            </g>
+
+          </g><!-- /bike-bob -->
+        </svg>
+      </div><!-- /home-visual -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       § BIKES
+  ══════════════════════════════ -->
+  <section class="section" id="bikes">
+    <div class="section-inner">
+      <p class="section-label">Our collection</p>
+      <h2 class="section-title">Find your ride</h2>
+      <p class="section-body">Every bike is hand-selected and test-ridden before it reaches the shop floor. Road, mountain, city — something for every kind of rider.</p>
+      <div class="bikes-grid">
+        <div class="bike-card">
+          <div class="bike-card__img">
+            <img src="https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?w=600&auto=format&fit=crop&q=80" alt="Road bike" loading="lazy" />
+          </div>
+          <div class="bike-card__body">
+            <p class="bike-card__type">Road</p>
+            <h3 class="bike-card__name">Kinetic CR7</h3>
+            <p class="bike-card__desc">Carbon fork, Shimano 105 groupset, 28 mm tyres. Built for speed and comfort on long rides.</p>
+            <div class="bike-card__footer">
+              <span class="bike-card__price">€1,299</span>
+              <a href="#contact" class="bike-card__cta">Enquire</a>
+            </div>
+          </div>
+        </div>
+        <div class="bike-card">
+          <div class="bike-card__img">
+            <img src="https://images.unsplash.com/photo-1576435728678-68d0fbf94e91?w=600&auto=format&fit=crop&q=80" alt="Mountain bike" loading="lazy" />
+          </div>
+          <div class="bike-card__body">
+            <p class="bike-card__type">Mountain</p>
+            <h3 class="bike-card__name">Trail Blazer 29</h3>
+            <p class="bike-card__desc">29″ wheels, hydraulic disc brakes, 120 mm travel fork. Takes on anything the forest throws at you.</p>
+            <div class="bike-card__footer">
+              <span class="bike-card__price">€1,799</span>
+              <a href="#contact" class="bike-card__cta">Enquire</a>
+            </div>
+          </div>
+        </div>
+        <div class="bike-card">
+          <div class="bike-card__img">
+            <img src="https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=600&auto=format&fit=crop&q=80" alt="City bike" loading="lazy" />
+          </div>
+          <div class="bike-card__body">
+            <p class="bike-card__type">City</p>
+            <h3 class="bike-card__name">Urban Flow</h3>
+            <p class="bike-card__desc">Upright geometry, integrated lights, mudguards. The effortless daily commuter.</p>
+            <div class="bike-card__footer">
+              <span class="bike-card__price">€699</span>
+              <a href="#contact" class="bike-card__cta">Enquire</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       § REPAIR
+  ══════════════════════════════ -->
+  <section class="section" id="repair">
+    <div class="section-inner">
+      <p class="section-label">Workshop</p>
+      <h2 class="section-title" style="color:#fff">We fix every ride</h2>
+      <p class="section-body">Our mechanics have seen it all. Bring it in — we'll get you back on the road, usually the same day.</p>
+      <div class="repair-grid">
+        <div class="repair-card">
+          <div class="repair-card__num">01</div>
+          <div class="repair-card__icon">🔧</div>
+          <h3 class="repair-card__name">Quick Fix</h3>
+          <p class="repair-card__price">From €25</p>
+          <p class="repair-card__desc">Flat tyre, brake adjustment, gear tune, chain lube. In and out in 30 minutes.</p>
+        </div>
+        <div class="repair-card">
+          <div class="repair-card__num">02</div>
+          <div class="repair-card__icon">⚙️</div>
+          <h3 class="repair-card__name">Full Service</h3>
+          <p class="repair-card__price">From €95</p>
+          <p class="repair-card__desc">Complete overhaul: cables, bearings, drivetrain clean, full safety check. Ready next day.</p>
+        </div>
+        <div class="repair-card">
+          <div class="repair-card__num">03</div>
+          <div class="repair-card__icon">🏗️</div>
+          <h3 class="repair-card__name">Custom Build</h3>
+          <p class="repair-card__price">From €200</p>
+          <p class="repair-card__desc">Dream bike built to your exact specs. From bare frame to perfectly dialled-in machine.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       § ROUTES
+  ══════════════════════════════ -->
+  <section class="section" id="routes">
+    <div class="section-inner">
+      <p class="section-label">Local favourites</p>
+      <h2 class="section-title">Ride local</h2>
+      <p class="section-body">We've mapped out the best rides from the shop door. Pick up a printed cue sheet at the counter, or scan the QR for GPS files.</p>
+      <div class="routes-list">
+        <div class="route-item">
+          <div class="route-item__left">
+            <div class="route-item__km">18<span>km</span></div>
+            <div>
+              <div class="route-item__name">Canal Loop</div>
+              <p class="route-item__desc">Flat, scenic ride along the old canal towpath. Perfect for beginners and families — coffee stop halfway.</p>
+            </div>
+          </div>
+          <span class="route-item__badge badge--easy">Easy</span>
+        </div>
+        <div class="route-item">
+          <div class="route-item__left">
+            <div class="route-item__km">34<span>km</span></div>
+            <div>
+              <div class="route-item__name">Forest Climb</div>
+              <p class="route-item__desc">Rolling hills through ancient woodland. A 400 m climb rewards you with breathtaking views from the ridge.</p>
+            </div>
+          </div>
+          <span class="route-item__badge badge--medium">Moderate</span>
+        </div>
+        <div class="route-item">
+          <div class="route-item__left">
+            <div class="route-item__km">52<span>km</span></div>
+            <div>
+              <div class="route-item__name">Coastal Sprint</div>
+              <p class="route-item__desc">Exposed headlands, sea spray, fast descents — and a well-earned stop at the cliff café.</p>
+            </div>
+          </div>
+          <span class="route-item__badge badge--hard">Challenging</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════
+       § CONTACT
+  ══════════════════════════════ -->
+  <section class="section" id="contact">
+    <div class="section-inner">
+      <p class="section-label">Get in touch</p>
+      <h2 class="section-title" style="color:#fff">Come find us</h2>
+      <p class="section-body">Stop by, call, or drop us a message. We're here Tuesday to Sunday and always happy to talk bikes.</p>
+      <div class="contact-grid">
+        <div>
+          <div class="info-block">
+            <strong>Address</strong>
+            <p>15 Wheelwright Lane<br>Antwerp, 2000</p>
+          </div>
+          <div class="info-block">
+            <strong>Opening Hours</strong>
+            <p>Mon: Closed<br>Tue — Fri: 9:00 — 18:30<br>Sat: 9:00 — 17:00<br>Sun: 10:00 — 14:00</p>
+          </div>
+          <div class="info-block">
+            <strong>Contact</strong>
+            <p><a href="mailto:hello@cyclepath.be">hello@cyclepath.be</a><br>+32 3 456 78 90</p>
+          </div>
+        </div>
+        <form class="contact-form" onsubmit="return false;">
+          <div class="form-field">
+            <label for="cf-name">Name</label>
+            <input id="cf-name" type="text" placeholder="Your name" />
+          </div>
+          <div class="form-field">
+            <label for="cf-email">Email</label>
+            <input id="cf-email" type="email" placeholder="you@example.com" />
+          </div>
+          <div class="form-field">
+            <label for="cf-msg">Message</label>
+            <textarea id="cf-msg" placeholder="Tell us about your bike, your question, or your dream build…"></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary" style="align-self:flex-start">Send message</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer__brand"><span>C</span>YCLEPATH — Bikes &amp; Workshop</div>
+    <div class="footer__wwd">Demo by <a href="index.html">Warnier Web Design</a></div>
+  </footer>
+
+  <script>
+    'use strict';
+
+    /* ── Mobile drawer ─────────────────────── */
+    var mHamburger = document.getElementById('m-hamburger');
+    var mDrawer    = document.getElementById('m-drawer');
+    mHamburger.addEventListener('click', function() { mDrawer.classList.toggle('open'); });
+    function closeDrawer() { mDrawer.classList.remove('open'); }
+
+    /* ── Sidebar scroll state ──────────────── */
+    var track     = document.getElementById('sidebar-track');
+    var trackFill = document.getElementById('track-fill');
+    var trackBike = document.getElementById('track-bike');
+    var navItems  = document.querySelectorAll('.nav-item');
+    var SECTIONS  = ['home','bikes','repair','routes','contact'];
+
+    /* Dot elements */
+    var dots = {
+      home:    document.getElementById('dot-home'),
+      bikes:   document.getElementById('dot-bikes'),
+      repair:  document.getElementById('dot-repair'),
+      routes:  document.getElementById('dot-routes'),
+      contact: document.getElementById('dot-contact'),
+    };
+
+    /* Position dots to match the 5 nav items (evenly split track height) */
+    function positionDots() {
+      var trackH = track.offsetHeight;
+      var count  = SECTIONS.length;
+      SECTIONS.forEach(function(id, i) {
+        var pct = i / (count - 1); /* 0, 0.25, 0.5, 0.75, 1 */
+        var top = pct * trackH - 6; /* -6 to center 12px dot */
+        dots[id].style.top = Math.max(0, top) + 'px';
+      });
+    }
+    positionDots();
+    window.addEventListener('resize', positionDots, { passive: true });
+
+    /* ── Bike position (direct — no CSS transition) ── */
+    function getBikeTop(progress) {
+      var trackH = track.offsetHeight;
+      var bikeH  = trackBike.offsetHeight || 32;
+      return progress * (trackH - bikeH);
+    }
+
+    function updateScroll() {
+      var maxScroll = Math.max(1, document.body.scrollHeight - window.innerHeight);
+      var progress  = Math.min(1, Math.max(0, window.scrollY / maxScroll));
+
+      /* Progress bar fill */
+      trackFill.style.height = (progress * 100) + '%';
+
+      /* Bike position — exactly in sync, no delay */
+      trackBike.style.top = getBikeTop(progress) + 'px';
+
+      /* Active section */
+      var mid    = window.scrollY + window.innerHeight * 0.4;
+      var active = 'home';
+      SECTIONS.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el && el.offsetTop <= mid) active = id;
+      });
+      navItems.forEach(function(item) {
+        item.classList.toggle('active', item.dataset.section === active);
+      });
+      Object.keys(dots).forEach(function(key) {
+        dots[key].classList.toggle('active', key === active);
+      });
+    }
+
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    updateScroll();
+
+    /* ── Wheel rotation — rAF loop ─────────── */
+    /* Wheels on the sidebar bike. The hero wheels use CSS animation directly.
+       This loop keeps sidebar wheels spinning at idle speed and adds extra
+       rotation proportional to scroll velocity. */
+    var wheelRear  = document.getElementById('swheel-rear');
+    var wheelFront = document.getElementById('swheel-front');
+    var angle      = 0;
+    var lastScrollY = window.scrollY;
+    var lastTime    = performance.now();
+
+    window.addEventListener('scroll', function() {
+      var delta   = window.scrollY - lastScrollY;
+      lastScrollY = window.scrollY;
+      /* Add scroll-proportional rotation (on top of idle) */
+      angle += delta * 1.6;
+    }, { passive: true });
+
+    (function spinLoop(ts) {
+      var dt = (ts - lastTime) / 1000;
+      lastTime = ts;
+      /* Idle spin: ~80 deg/sec */
+      angle += 80 * dt;
+      /* Apply via SVG transform attribute (center = 0,0 in each wheel's local space) */
+      wheelRear.setAttribute('transform',  'rotate(' + angle + ')');
+      wheelFront.setAttribute('transform', 'rotate(' + angle + ')');
+      requestAnimationFrame(spinLoop);
+    })(performance.now());
+  </script>
+</body>
+</html>
