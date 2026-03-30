@@ -2513,24 +2513,20 @@
           <!-- Form column -->
           <div class="fade-up" style="transition-delay:0.1s;">
 
-            <!-- Netlify Forms: data-netlify="true", honeypot, hidden form-name -->
+            <!-- Web3Forms -->
             <form
               class="form"
               id="contact-form"
-              name="contact"
-              method="POST"
-              data-netlify="true"
-              netlify-honeypot="bot-field"
               novalidate
             >
-              <!-- Required by Netlify for AJAX submissions -->
-              <input type="hidden" name="form-name" value="contact" />
+              <input type="hidden" name="access_key" value="1afc702a-1151-4988-b5e3-e45920fa99e3" />
+              <input type="hidden" name="subject" value="Nieuw contactbericht — Warnier Web Design" />
 
               <!-- Honeypot — hidden from real users, traps bots -->
               <div class="form__honeypot" aria-hidden="true">
                 <label>
                   Do not fill this field
-                  <input type="text" name="bot-field" tabindex="-1" autocomplete="off" />
+                  <input type="text" name="botcheck" tabindex="-1" autocomplete="off" />
                 </label>
               </div>
 
@@ -2959,7 +2955,7 @@
 
 
     /* ----------------------------------------------------------
-       CONTACT FORM — Netlify AJAX submit
+       CONTACT FORM — Web3Forms AJAX submit
     ---------------------------------------------------------- */
     const form       = document.getElementById('contact-form');
     const successMsg = document.getElementById('form-success');
@@ -2977,14 +2973,15 @@
       submitBtn.disabled = true;
 
       try {
-        const res = await fetch('/', {
+        const res  = await fetch('https://api.web3forms.com/submit', {
           method:  'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body:    new URLSearchParams(new FormData(form)).toString(),
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body:    JSON.stringify(Object.fromEntries(new FormData(form))),
         });
+        const data = await res.json();
 
-        if (res.ok) {
-          form.style.display   = 'none';
+        if (data.success) {
+          form.style.display       = 'none';
           successMsg.style.display = 'block';
         } else {
           const lang = htmlEl.dataset.lang;
