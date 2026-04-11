@@ -209,6 +209,8 @@ create policy "authenticated read"
     }
 
     input[type="text"],
+    input[type="email"],
+    input[type="tel"],
     input[type="date"],
     textarea,
     select {
@@ -254,15 +256,13 @@ create policy "authenticated read"
       user-select: none;
     }
     .check-item:hover { border-color: var(--navy); }
-    .check-item input[type="checkbox"] {
+    .check-item input[type="checkbox"],
+    .check-item input[type="radio"] {
       width: 18px; height: 18px;
-      border: 2px solid var(--border);
-      border-radius: 4px;
       accent-color: var(--orange);
       flex-shrink: 0;
       cursor: pointer;
     }
-    .check-item input[type="checkbox"]:checked { accent-color: var(--orange); }
     .check-item.selected {
       border-color: var(--orange);
       background: #fff8f4;
@@ -619,6 +619,19 @@ create policy "authenticated read"
           </div>
         </div>
 
+        <!-- Contact info -->
+        <div class="field-row">
+          <div class="field">
+            <label for="f-email">E-mailadres <span class="req">*</span></label>
+            <input type="email" id="f-email" name="email" placeholder="u@bedrijf.be" autocomplete="email" />
+            <div class="field-error" id="err-email">Vul een geldig e-mailadres in.</div>
+          </div>
+          <div class="field">
+            <label for="f-phone">Telefoonnummer</label>
+            <input type="tel" id="f-phone" name="phone" placeholder="+32 4…" autocomplete="tel" />
+          </div>
+        </div>
+
         <!-- Business type -->
         <div class="field">
           <label for="f-btype">Type onderneming <span class="req">*</span></label>
@@ -634,36 +647,29 @@ create policy "authenticated read"
           <span class="field-label">Wat heb je nodig? <span class="req">*</span></span>
           <span class="field-hint">Selecteer alles wat van toepassing is.</span>
           <div class="check-group" id="services-group">
-            <label class="check-item" id="ci-new">
-              <input type="checkbox" name="services" value="new_website" id="cb-new" />
+            <label class="check-item">
+              <input type="radio" name="service" value="new_website" id="rb-new" />
               <div>
                 <div class="check-item__label">Nieuwe website</div>
                 <div class="check-item__sub">Gebouwd van nul</div>
               </div>
             </label>
-            <label class="check-item" id="ci-redesign">
-              <input type="checkbox" name="services" value="redesign" id="cb-redesign" />
+            <label class="check-item">
+              <input type="radio" name="service" value="redesign" id="rb-redesign" />
               <div>
                 <div class="check-item__label">Redesign</div>
                 <div class="check-item__sub">Mijn bestaande site opfrissen</div>
               </div>
             </label>
-            <label class="check-item" id="ci-webshop">
-              <input type="checkbox" name="services" value="webshop" id="cb-webshop" />
+            <label class="check-item">
+              <input type="radio" name="service" value="webshop" id="rb-webshop" />
               <div>
                 <div class="check-item__label">Webshop</div>
                 <div class="check-item__sub">Klanten kunnen producten kopen</div>
               </div>
             </label>
-            <label class="check-item" id="ci-cms">
-              <input type="checkbox" name="services" value="cms" id="cb-cms" />
-              <div>
-                <div class="check-item__label">Bewerkbare site (CMS)</div>
-                <div class="check-item__sub">Zelf tekst of foto's aanpassen zonder technische kennis</div>
-              </div>
-            </label>
-            <label class="check-item" id="ci-other">
-              <input type="checkbox" name="services" value="other" id="cb-other" />
+            <label class="check-item">
+              <input type="radio" name="service" value="other" id="rb-other" />
               <div>
                 <div class="check-item__label">Iets anders</div>
                 <div class="check-item__sub">Omschrijf het hieronder</div>
@@ -893,8 +899,18 @@ create policy "authenticated read"
     const offerSummary   = document.getElementById('offer-summary');
     let ynCmsValue = null; // 'yes' | 'no' | null
 
-    /* ── Checkbox styling ────────────────────────────────────────── */
-    document.querySelectorAll('.check-item input[type="checkbox"]').forEach(function (cb) {
+    /* ── Service radio cards ─────────────────────────────────────── */
+    document.querySelectorAll('input[name="service"]').forEach(function (rb) {
+      rb.addEventListener('change', function () {
+        document.querySelectorAll('#services-group .check-item').forEach(function (item) {
+          item.classList.remove('selected');
+        });
+        if (this.checked) this.closest('.check-item').classList.add('selected');
+      });
+    });
+
+    /* ── Addon checkbox cards ────────────────────────────────────── */
+    document.querySelectorAll('input[name="addons"]').forEach(function (cb) {
       cb.addEventListener('change', function () {
         this.closest('.check-item').classList.toggle('selected', this.checked);
       });
@@ -933,7 +949,8 @@ create policy "authenticated read"
     }
 
     function getSelectedServices() {
-      return Array.from(document.querySelectorAll('input[name="services"]:checked')).map(function (cb) { return cb.value; });
+      const rb = document.querySelector('input[name="service"]:checked');
+      return rb ? [rb.value] : [];
     }
 
     function getSelectedAddons() {
@@ -957,6 +974,7 @@ create policy "authenticated read"
       hideErr(formError);
 
       const name      = document.getElementById('f-name').value.trim();
+      const emailVal  = document.getElementById('f-email').value.trim();
       const btype     = document.getElementById('f-btype').value.trim();
       const pages     = document.getElementById('f-pages').value;
       const services  = getSelectedServices();
@@ -964,6 +982,8 @@ create policy "authenticated read"
       let valid = true;
 
       setInvalid('f-name',  'err-name',  !name);     if (!name)  valid = false;
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal);
+      setInvalid('f-email', 'err-email', !emailOk);  if (!emailOk) valid = false;
       setInvalid('f-btype', 'err-btype', !btype);    if (!btype) valid = false;
       setInvalid('f-pages', 'err-pages', !pages);    if (!pages) valid = false;
 
@@ -1020,9 +1040,13 @@ create policy "authenticated read"
 
       const addonLabels = { multilingual: 'Meertalig', hosting: 'Domein & hosting', care: 'Care service' };
 
+      const phone    = document.getElementById('f-phone').value.trim();
+
       const rows = [
         ['Naam',             name],
         business ? ['Bedrijf', business] : null,
+        ['E-mail',           emailVal],
+        phone ? ['Telefoon', phone] : null,
         ['Type onderneming', btype],
         ['Gevraagde diensten', services.map(labelFor).join(', ')],
         ['Aantal pagina\'s',  pageLabel],
@@ -1058,6 +1082,8 @@ create policy "authenticated read"
 
       const name      = document.getElementById('f-name').value.trim();
       const business  = document.getElementById('f-business').value.trim();
+      const emailVal  = document.getElementById('f-email').value.trim();
+      const phone     = document.getElementById('f-phone').value.trim();
       const btype     = document.getElementById('f-btype').value.trim();
       const pages     = document.getElementById('f-pages').value;
       const services  = getSelectedServices();
@@ -1074,8 +1100,13 @@ create policy "authenticated read"
         const w3fPayload = new FormData();
         w3fPayload.append('access_key', W3F_KEY);
         w3fPayload.append('subject', `Nieuwe offerteaanvraag — ${name}${business ? ' (' + business + ')' : ''}`);
+        w3fPayload.append('from_name', 'Warnier Web Design — Offerteformulier');
+        w3fPayload.append('email',    emailVal);   // used by Web3Forms for auto-reply
+        w3fPayload.append('replyto',  emailVal);
         w3fPayload.append('Naam',              name);
         w3fPayload.append('Bedrijf',           business || '—');
+        w3fPayload.append('E-mail',            emailVal);
+        w3fPayload.append('Telefoon',          phone || '—');
         w3fPayload.append('Type onderneming',  btype);
         w3fPayload.append('Gevraagde diensten', services.map(labelFor).join(', '));
         w3fPayload.append('Aantal pagina\'s',   pages);
@@ -1096,6 +1127,8 @@ create policy "authenticated read"
         const { error: dbErr } = await db.from('quote_requests').insert({
           name:           name,
           business:       business || null,
+          email:          emailVal,
+          phone:          phone   || null,
           business_type:  btype,
           services:       services,
           page_count:     pages,
