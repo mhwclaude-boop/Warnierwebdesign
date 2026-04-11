@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <!-- Cropper.js -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1/dist/cropper.min.css" />
   <style>
     :root {
       --navy:     #0B1A4E;
@@ -79,7 +81,6 @@
 
     .toggle-row { display: flex; align-items: center; gap: 0.75rem; }
     .toggle-label { font-family: var(--font-h); font-weight: 600; font-size: 0.875rem; color: var(--navy); cursor: pointer; }
-    /* custom toggle switch */
     .toggle-wrap { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
     .toggle-wrap input { opacity: 0; width: 0; height: 0; }
     .toggle-track {
@@ -110,6 +111,7 @@
     .btn--ghost { background: transparent; color: rgba(255,255,255,0.75); border: 1.5px solid rgba(255,255,255,0.25); }
     .btn--ghost:hover:not(:disabled) { background: rgba(255,255,255,0.12); color: var(--white); }
     .btn--sm { padding: 0.375rem 0.75rem; font-size: 0.8125rem; }
+    .btn--active { background: var(--navy); color: var(--white); border-color: var(--navy); }
 
     /* Alert */
     .alert {
@@ -132,8 +134,10 @@
 
     .image-preview { margin-top: 0.75rem; }
     .image-preview img { max-width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--r-sm); border: 1px solid var(--border); display: block; }
-    .image-preview-clear { display: inline-flex; align-items: center; gap: 0.3rem; margin-top: 0.4rem; font-size: 0.8125rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: var(--font-b); }
+    .image-preview__actions { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+    .image-preview-clear { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8125rem; color: var(--danger); cursor: pointer; background: none; border: none; font-family: var(--font-b); padding: 0; }
     .image-preview-clear:hover { text-decoration: underline; }
+    .image-preview-recrop { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.8125rem; color: var(--navy); cursor: pointer; background: none; border: none; font-family: var(--font-b); padding: 0; text-decoration: underline; text-underline-offset: 2px; }
 
     /* Posts list */
     .posts-list { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -169,9 +173,9 @@
     .spinner--dark { border-color: var(--border); border-top-color: var(--navy); }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* Confirm overlay */
+    /* Overlays */
     .overlay {
-      position: fixed; inset: 0; background: rgba(11,26,78,0.45);
+      position: fixed; inset: 0; background: rgba(11,26,78,0.55);
       display: none; align-items: center; justify-content: center;
       z-index: 200; padding: 1.5rem;
     }
@@ -184,9 +188,45 @@
     .confirm-card h3 { font-family: var(--font-h); font-size: 1.125rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; }
     .confirm-card p { color: var(--muted); font-size: 0.9375rem; margin-bottom: 1.5rem; }
     .confirm-card__actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
+
+    /* ── Crop modal ── */
+    .crop-modal {
+      background: var(--white); border-radius: var(--r-md);
+      width: 100%; max-width: 780px;
+      box-shadow: 0 8px 40px rgba(11,26,78,0.25);
+      display: flex; flex-direction: column; overflow: hidden;
+      max-height: 90svh;
+    }
+    .crop-modal__header {
+      padding: 1.125rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+    }
+    .crop-modal__header h3 { font-family: var(--font-h); font-size: 1rem; font-weight: 800; color: var(--navy); }
+    .crop-modal__body {
+      flex: 1; overflow: hidden;
+      background: #111;
+      display: flex; align-items: center; justify-content: center;
+      min-height: 300px;
+    }
+    .crop-modal__body img { display: block; max-width: 100%; max-height: 100%; }
+    .crop-modal__footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; flex-shrink: 0;
+    }
+    .crop-modal__footer .ratio-label {
+      font-family: var(--font-h); font-size: 0.8125rem; font-weight: 700; color: var(--muted);
+      margin-right: 0.25rem; white-space: nowrap;
+    }
+    .crop-modal__footer .ratio-btns { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+    .crop-modal__footer .spacer { flex: 1; }
+    .crop-modal__footer .action-btns { display: flex; gap: 0.5rem; flex-shrink: 0; }
   </style>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Cropper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1/dist/cropper.min.js"></script>
 </head>
 <body>
 
@@ -258,7 +298,10 @@
             <input type="file" id="f-image" accept="image/*" />
             <div class="image-preview" id="image-preview" style="display:none;">
               <img id="image-preview-img" src="" alt="Preview" />
-              <button type="button" class="image-preview-clear" id="clear-image-btn">✕ Remove image</button>
+              <div class="image-preview__actions">
+                <button type="button" class="image-preview-recrop" id="recrop-btn">✎ Re-crop</button>
+                <button type="button" class="image-preview-clear" id="clear-image-btn">✕ Remove image</button>
+              </div>
             </div>
           </div>
           <div class="field">
@@ -285,6 +328,32 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════ CROP OVERLAY ══════════════════════════════════ -->
+  <div class="overlay" id="crop-overlay">
+    <div class="crop-modal">
+      <div class="crop-modal__header">
+        <h3>Crop Image</h3>
+        <button class="btn btn--secondary btn--sm" id="crop-cancel-btn">Cancel</button>
+      </div>
+      <div class="crop-modal__body">
+        <img id="crop-img" src="" alt="" />
+      </div>
+      <div class="crop-modal__footer">
+        <span class="ratio-label">Ratio:</span>
+        <div class="ratio-btns">
+          <button type="button" class="btn btn--secondary btn--sm btn--active" data-ratio="16/9">16:9</button>
+          <button type="button" class="btn btn--secondary btn--sm" data-ratio="4/3">4:3</button>
+          <button type="button" class="btn btn--secondary btn--sm" data-ratio="1/1">1:1</button>
+          <button type="button" class="btn btn--secondary btn--sm" data-ratio="free">Free</button>
+        </div>
+        <span class="spacer"></span>
+        <div class="action-btns">
+          <button type="button" class="btn btn--primary" id="crop-apply-btn">Apply Crop</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Delete confirm overlay -->
   <div class="overlay" id="delete-overlay">
     <div class="confirm-card">
@@ -300,7 +369,7 @@
   <script>
     'use strict';
 
-    /* ── Config — replace with your Supabase project values ── */
+    /* ── Config ── */
     const SUPABASE_URL  = 'https://anmglnaafymtudehnnpq.supabase.co';
     const SUPABASE_ANON = 'sb_publishable_gmXBUuzuGn1sVL5zRoaK9A_qSVawNKX';
 
@@ -308,49 +377,51 @@
     const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
     /* ── DOM refs ── */
-    const loginScreen   = document.getElementById('login-screen');
-    const dashboard     = document.getElementById('dashboard');
-    const loginForm     = document.getElementById('login-form');
-    const loginBtn      = document.getElementById('login-btn');
-    const loginError    = document.getElementById('login-error');
-    const topbarEmail   = document.getElementById('topbar-email');
-    const signoutBtn    = document.getElementById('signout-btn');
-    const dashError     = document.getElementById('dash-error');
-    const dashSuccess   = document.getElementById('dash-success');
-    const newPostBtn    = document.getElementById('new-post-btn');
-    const cancelFormBtn = document.getElementById('cancel-form-btn');
-    const postFormPanel = document.getElementById('post-form-panel');
-    const postForm      = document.getElementById('post-form');
-    const formTitle     = document.getElementById('form-title');
-    const saveBtn       = document.getElementById('save-btn');
-    const fTitle        = document.getElementById('f-title');
-    const fDesc         = document.getElementById('f-desc');
-    const fImage        = document.getElementById('f-image');
-    const fPublished    = document.getElementById('f-published');
-    const imagePreview  = document.getElementById('image-preview');
+    const loginScreen    = document.getElementById('login-screen');
+    const dashboard      = document.getElementById('dashboard');
+    const loginForm      = document.getElementById('login-form');
+    const loginBtn       = document.getElementById('login-btn');
+    const loginError     = document.getElementById('login-error');
+    const topbarEmail    = document.getElementById('topbar-email');
+    const signoutBtn     = document.getElementById('signout-btn');
+    const dashError      = document.getElementById('dash-error');
+    const dashSuccess    = document.getElementById('dash-success');
+    const newPostBtn     = document.getElementById('new-post-btn');
+    const cancelFormBtn  = document.getElementById('cancel-form-btn');
+    const postFormPanel  = document.getElementById('post-form-panel');
+    const postForm       = document.getElementById('post-form');
+    const formTitle      = document.getElementById('form-title');
+    const saveBtn        = document.getElementById('save-btn');
+    const fTitle         = document.getElementById('f-title');
+    const fDesc          = document.getElementById('f-desc');
+    const fImage         = document.getElementById('f-image');
+    const fPublished     = document.getElementById('f-published');
+    const imagePreview   = document.getElementById('image-preview');
     const imagePreviewImg = document.getElementById('image-preview-img');
-    const clearImageBtn = document.getElementById('clear-image-btn');
-    const postsListWrap = document.getElementById('posts-list-wrap');
-    const deleteOverlay = document.getElementById('delete-overlay');
-    const deleteCancelBtn  = document.getElementById('delete-cancel-btn');
-    const deleteConfirmBtn = document.getElementById('delete-confirm-btn');
+    const clearImageBtn  = document.getElementById('clear-image-btn');
+    const recropBtn      = document.getElementById('recrop-btn');
+    const postsListWrap  = document.getElementById('posts-list-wrap');
+    const deleteOverlay  = document.getElementById('delete-overlay');
+    const deleteCancelBtn   = document.getElementById('delete-cancel-btn');
+    const deleteConfirmBtn  = document.getElementById('delete-confirm-btn');
+    const cropOverlay    = document.getElementById('crop-overlay');
+    const cropImg        = document.getElementById('crop-img');
+    const cropApplyBtn   = document.getElementById('crop-apply-btn');
+    const cropCancelBtn  = document.getElementById('crop-cancel-btn');
 
     /* ── State ── */
-    let editingId       = null;   // uuid of post being edited, null = new
-    let existingImageUrl = null;  // current saved image URL when editing
-    let clearImageFlag  = false;  // user clicked "remove image"
-    let pendingDeleteId = null;
+    let editingId         = null;
+    let existingImageUrl  = null;
+    let clearImageFlag    = false;
+    let croppedBlob       = null;   // result of the crop operation
+    let rawDataUrl        = null;   // original file as data URL, for re-cropping
+    let cropperInstance   = null;
+    let pendingDeleteId   = null;
     let pendingDeleteImageUrl = null;
 
     /* ── Helpers ── */
-    function showAlert(el, msg) {
-      el.textContent = msg;
-      el.classList.add('show');
-    }
-    function hideAlert(el) {
-      el.textContent = '';
-      el.classList.remove('show');
-    }
+    function showAlert(el, msg) { el.textContent = msg; el.classList.add('show'); }
+    function hideAlert(el)      { el.textContent = ''; el.classList.remove('show'); }
     function flashSuccess(msg) {
       showAlert(dashSuccess, msg);
       setTimeout(() => hideAlert(dashSuccess), 4000);
@@ -358,14 +429,16 @@
     function formatDate(iso) {
       return new Date(iso).toLocaleDateString('en-GB', { year: 'numeric', month: 'short', day: 'numeric' });
     }
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
 
     /* ── Auth ── */
     db.auth.onAuthStateChange(function (event, session) {
-      if (session) {
-        showDashboard(session.user.email);
-      } else {
-        showLogin();
-      }
+      if (session) { showDashboard(session.user.email); }
+      else         { showLogin(); }
     });
 
     function showLogin() {
@@ -384,42 +457,121 @@
       hideAlert(loginError);
       loginBtn.disabled = true;
       loginBtn.textContent = 'Signing in…';
-
       const { error } = await db.auth.signInWithPassword({
         email:    document.getElementById('login-email').value.trim(),
         password: document.getElementById('login-password').value,
       });
-
       loginBtn.disabled = false;
       loginBtn.textContent = 'Sign in';
+      if (error) showAlert(loginError, error.message || 'Login failed. Check your credentials.');
+    });
 
-      if (error) {
-        showAlert(loginError, error.message || 'Login failed. Check your credentials.');
+    signoutBtn.addEventListener('click', async function () { await db.auth.signOut(); });
+
+    /* ══════════════════════════════ CROP LOGIC ══════════════════════════════ */
+
+    function openCropper(dataUrl) {
+      cropImg.src = dataUrl;
+      cropOverlay.classList.add('open');
+
+      /* Destroy any previous instance after the image loads */
+      cropImg.onload = function () {
+        if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+        cropperInstance = new Cropper(cropImg, {
+          aspectRatio: 16 / 9,
+          viewMode: 1,
+          autoCropArea: 1,
+          movable: true,
+          zoomable: true,
+          rotatable: false,
+          scalable: false,
+        });
+        /* Highlight default ratio button */
+        setActiveRatioBtn('16/9');
+      };
+      /* If src didn't change, onload won't fire — trigger manually */
+      if (cropImg.complete) cropImg.onload();
+    }
+
+    function setActiveRatioBtn(ratio) {
+      document.querySelectorAll('[data-ratio]').forEach(function (btn) {
+        btn.classList.toggle('btn--active', btn.dataset.ratio === ratio);
+      });
+    }
+
+    document.querySelectorAll('[data-ratio]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        if (!cropperInstance) return;
+        const r = btn.dataset.ratio;
+        if (r === 'free') {
+          cropperInstance.setAspectRatio(NaN);
+        } else {
+          const parts = r.split('/');
+          cropperInstance.setAspectRatio(Number(parts[0]) / Number(parts[1]));
+        }
+        setActiveRatioBtn(r);
+      });
+    });
+
+    cropApplyBtn.addEventListener('click', function () {
+      if (!cropperInstance) return;
+      cropperInstance.getCroppedCanvas({ maxWidth: 2400, maxHeight: 2400 }).toBlob(function (blob) {
+        croppedBlob = blob;
+        /* Show preview of the cropped result */
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          imagePreviewImg.src = e.target.result;
+          imagePreview.style.display = '';
+        };
+        reader.readAsDataURL(blob);
+        closeCropper();
+      }, 'image/jpeg', 0.92);
+    });
+
+    function closeCropper() {
+      cropOverlay.classList.remove('open');
+      if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
+    }
+
+    cropCancelBtn.addEventListener('click', function () {
+      closeCropper();
+      /* If no crop was previously applied and no existing image, reset the file input */
+      if (!croppedBlob && !existingImageUrl) {
+        fImage.value = '';
+        imagePreview.style.display = 'none';
       }
     });
 
-    signoutBtn.addEventListener('click', async function () {
-      await db.auth.signOut();
+    /* Re-crop button: open the cropper again with the original raw image */
+    recropBtn.addEventListener('click', function () {
+      if (rawDataUrl) {
+        openCropper(rawDataUrl);
+      }
     });
 
-    /* ── Post form ── */
+    /* ══════════════════════════════ POST FORM ══════════════════════════════ */
+
     function openForm(post) {
-      editingId        = post ? post.id   : null;
+      editingId        = post ? post.id        : null;
       existingImageUrl = post ? post.image_url : null;
       clearImageFlag   = false;
+      croppedBlob      = null;
+      rawDataUrl       = null;
 
-      formTitle.textContent = post ? 'Edit Post' : 'New Post';
-      fTitle.value       = post ? post.title       : '';
-      fDesc.value        = post ? post.description : '';
-      fPublished.checked = post ? post.is_published : false;
-      fImage.value       = '';
+      formTitle.textContent  = post ? 'Edit Post' : 'New Post';
+      fTitle.value           = post ? post.title       : '';
+      fDesc.value            = post ? post.description : '';
+      fPublished.checked     = post ? post.is_published : false;
+      fImage.value           = '';
 
       if (existingImageUrl) {
         imagePreviewImg.src = existingImageUrl;
         imagePreview.style.display = '';
+        recropBtn.style.display = 'none'; /* Can't re-crop an already-uploaded image without re-selecting */
       } else {
         imagePreview.style.display = 'none';
         imagePreviewImg.src = '';
+        recropBtn.style.display = '';
       }
 
       hideAlert(dashError);
@@ -429,22 +581,24 @@
 
     function closeForm() {
       postFormPanel.classList.remove('open');
-      editingId = null;
-      existingImageUrl = null;
-      clearImageFlag = false;
+      editingId = null; existingImageUrl = null;
+      clearImageFlag = false; croppedBlob = null; rawDataUrl = null;
     }
 
     newPostBtn.addEventListener('click', function () { openForm(null); });
     cancelFormBtn.addEventListener('click', closeForm);
 
+    /* When a file is picked, open the cropper immediately */
     fImage.addEventListener('change', function () {
       const file = fImage.files[0];
       if (!file) return;
       clearImageFlag = false;
+      croppedBlob = null;
       const reader = new FileReader();
       reader.onload = function (e) {
-        imagePreviewImg.src = e.target.result;
-        imagePreview.style.display = '';
+        rawDataUrl = e.target.result;
+        recropBtn.style.display = '';
+        openCropper(rawDataUrl);
       };
       reader.readAsDataURL(file);
     });
@@ -453,6 +607,8 @@
       fImage.value = '';
       imagePreviewImg.src = '';
       imagePreview.style.display = 'none';
+      croppedBlob = null;
+      rawDataUrl  = null;
       clearImageFlag = true;
     });
 
@@ -465,12 +621,13 @@
       try {
         let imageUrl = existingImageUrl;
 
-        /* Handle image upload */
-        if (fImage.files[0]) {
-          const file = fImage.files[0];
-          const ext  = file.name.split('.').pop();
+        if (croppedBlob) {
+          /* Upload the cropped blob */
+          const ext  = 'jpg';
           const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-          const { error: upErr } = await db.storage.from('news-images').upload(path, file, { upsert: false });
+          const { error: upErr } = await db.storage.from('news-images').upload(path, croppedBlob, {
+            upsert: false, contentType: 'image/jpeg',
+          });
           if (upErr) throw upErr;
           const { data: urlData } = db.storage.from('news-images').getPublicUrl(path);
           imageUrl = urlData.publicUrl;
@@ -481,7 +638,6 @@
             if (oldPath) await db.storage.from('news-images').remove([oldPath]);
           }
         } else if (clearImageFlag) {
-          /* User explicitly cleared the image */
           if (existingImageUrl) {
             const oldPath = existingImageUrl.split('/news-images/')[1];
             if (oldPath) await db.storage.from('news-images').remove([oldPath]);
@@ -517,20 +673,19 @@
       }
     });
 
-    /* ── Load + render posts ── */
+    /* ══════════════════════════════ POSTS LIST ══════════════════════════════ */
+
     async function loadPosts() {
       postsListWrap.innerHTML = '<div style="display:flex;justify-content:center;padding:3rem;"><div class="spinner spinner--dark"></div></div>';
 
       const { data, error } = await db
-        .from('news_posts')
-        .select('*')
+        .from('news_posts').select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
         postsListWrap.innerHTML = `<p style="color:var(--danger);padding:1rem;">Failed to load posts: ${error.message}</p>`;
         return;
       }
-
       if (!data || data.length === 0) {
         postsListWrap.innerHTML = '<p class="posts-empty">No posts yet. Create your first one above.</p>';
         return;
@@ -568,7 +723,6 @@
       postsListWrap.innerHTML = '';
       postsListWrap.appendChild(list);
 
-      /* Edit / delete listeners */
       postsListWrap.querySelectorAll('[data-edit]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           const post = data.find(function (p) { return p.id === btn.dataset.edit; });
@@ -584,28 +738,24 @@
       });
     }
 
-    /* ── Delete confirm ── */
+    /* ══════════════════════════════ DELETE CONFIRM ══════════════════════════════ */
+
     deleteCancelBtn.addEventListener('click', function () {
       deleteOverlay.classList.remove('open');
-      pendingDeleteId = null;
-      pendingDeleteImageUrl = null;
+      pendingDeleteId = null; pendingDeleteImageUrl = null;
     });
 
     deleteConfirmBtn.addEventListener('click', async function () {
       if (!pendingDeleteId) return;
       deleteConfirmBtn.disabled = true;
       deleteConfirmBtn.textContent = 'Deleting…';
-
       try {
-        /* Delete image from storage first */
         if (pendingDeleteImageUrl) {
           const oldPath = pendingDeleteImageUrl.split('/news-images/')[1];
           if (oldPath) await db.storage.from('news-images').remove([oldPath]);
         }
-
         const { error } = await db.from('news_posts').delete().eq('id', pendingDeleteId);
         if (error) throw error;
-
         deleteOverlay.classList.remove('open');
         flashSuccess('Post deleted.');
         await loadPosts();
@@ -615,27 +765,16 @@
       } finally {
         deleteConfirmBtn.disabled = false;
         deleteConfirmBtn.textContent = 'Delete';
-        pendingDeleteId = null;
-        pendingDeleteImageUrl = null;
+        pendingDeleteId = null; pendingDeleteImageUrl = null;
       }
     });
 
-    /* Close overlay on backdrop click */
     deleteOverlay.addEventListener('click', function (e) {
       if (e.target === deleteOverlay) {
         deleteOverlay.classList.remove('open');
-        pendingDeleteId = null;
-        pendingDeleteImageUrl = null;
+        pendingDeleteId = null; pendingDeleteImageUrl = null;
       }
     });
-
-    function escHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-    }
   </script>
 </body>
 </html>
