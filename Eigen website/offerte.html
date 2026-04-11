@@ -366,6 +366,47 @@ create policy "authenticated read"
       border-color: var(--danger);
     }
 
+    /* ── Info tooltip ── */
+    .info-tooltip {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      color: var(--muted);
+      cursor: default;
+      flex-shrink: 0;
+    }
+    .info-tooltip:hover { color: var(--navy); }
+    .info-tooltip__bubble {
+      display: none;
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      width: 240px;
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-b);
+      font-size: 0.8125rem;
+      font-weight: 400;
+      line-height: 1.5;
+      padding: 0.625rem 0.875rem;
+      border-radius: var(--r-sm);
+      box-shadow: var(--shadow-lg);
+      z-index: 10;
+      pointer-events: none;
+    }
+    .info-tooltip__bubble::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--navy);
+    }
+    .info-tooltip:hover .info-tooltip__bubble,
+    .info-tooltip:focus-within .info-tooltip__bubble { display: block; }
+
     /* ── Required asterisk ── */
     .req { color: var(--orange); margin-left: 2px; }
 
@@ -622,15 +663,24 @@ create policy "authenticated read"
             <label for="f-pages">Aantal pagina's <span class="req">*</span></label>
             <select id="f-pages" name="page_count">
               <option value="" disabled selected>Kies…</option>
-              <option value="1-3">1 – 3 pagina's</option>
-              <option value="4-6">4 – 6 pagina's</option>
-              <option value="7-10">7 – 10 pagina's</option>
-              <option value="10+">Meer dan 10</option>
+              <option value="1">1 pagina</option>
+              <option value="2">2 pagina's</option>
+              <option value="3">3 pagina's</option>
+              <option value="4">4 pagina's</option>
+              <option value="5+">5 of meer</option>
             </select>
             <div class="field-error" id="err-pages">Kies een optie.</div>
           </div>
           <div class="field">
-            <span class="field-label">Klanten mogen zelf de site aanpassen?</span>
+            <span class="field-label" style="display:flex;align-items:center;gap:0.4rem;">
+              Wilt u de website zelf aanpassen?
+              <span class="info-tooltip" aria-label="Meer uitleg">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span class="info-tooltip__bubble">
+                  Denk aan een autodealer die zelf nieuwe wagens wil toevoegen aan de website en oude wagens wil verwijderen — zonder u telkens te moeten bellen.
+                </span>
+              </span>
+            </span>
             <div class="yn-group" id="yn-cms">
               <button type="button" class="yn-btn" data-val="yes" id="yn-yes">Ja</button>
               <button type="button" class="yn-btn" data-val="no"  id="yn-no">Nee</button>
@@ -761,10 +811,11 @@ create policy "authenticated read"
     function calcEstimate(pages, services) {
       let base = 0;
       let plus = false;
-      if (pages === '1-3')  base = 400;
-      if (pages === '4-6')  base = 700;
-      if (pages === '7-10') base = 1100;
-      if (pages === '10+')  { base = 1500; plus = true; }
+      if (pages === '1')  base = 400;
+      if (pages === '2')  base = 500;
+      if (pages === '3')  base = 600;
+      if (pages === '4')  base = 700;
+      if (pages === '5+') { base = 900; plus = true; }
 
       let addons = 0;
       if (services.includes('cms'))     addons += 300;
@@ -887,7 +938,7 @@ create policy "authenticated read"
       offerPrice.textContent = fullLabel;
 
       /* Breakdown */
-      const pageLabel = { '1-3': '1–3 pagina\'s', '4-6': '4–6 pagina\'s', '7-10': '7–10 pagina\'s', '10+': '10+ pagina\'s' }[pages];
+      const pageLabel = { '1': '1 pagina', '2': '2 pagina\'s', '3': '3 pagina\'s', '4': '4 pagina\'s', '5+': '5 of meer pagina\'s' }[pages];
       let breakdownHtml = `<li><span>Website basis (${escHtml(pageLabel)})</span><strong>${fmtPrice(est.base, est.plus && est.addons === 0)}</strong></li>`;
       if (services.includes('cms'))     breakdownHtml += `<li><span>CMS / bewerkbaar</span><strong>+€300</strong></li>`;
       if (services.includes('webshop')) breakdownHtml += `<li><span>Webshop</span><strong>+€600</strong></li>`;
