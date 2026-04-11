@@ -724,12 +724,47 @@
       });
     }
 
+    /* ── Pricing helpers (mirrors offerte.html logic) ── */
+    function calcQuotePrice(pageCount, needsCms, addons) {
+      const pageNum = pageCount === '5+' ? 5 : parseInt(pageCount, 10);
+      if (isNaN(pageNum)) return null;
+      const base    = 250 + (pageNum - 1) * 100;
+      const plus    = pageCount === '5+';
+      let oneTime   = base;
+      let monthly   = 0;
+      if (needsCms)                         oneTime += 200;
+      if (addons.includes('multilingual'))  oneTime += 100;
+      if (addons.includes('hosting'))       monthly += 15;
+      if (addons.includes('care'))          monthly += 45;
+      return { base, plus, oneTime, monthly };
+    }
+    function fmtEur(n, plus) { return '€' + n.toLocaleString('nl-BE') + (plus ? '+' : ''); }
+
     /* ── Quote detail modal ── */
     function openQuoteDetail(q) {
       const rcvd = new Date(q.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
       const dl   = q.deadline ? new Date(q.deadline).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
       const svcs = Array.isArray(q.services) ? q.services.map(svcLabel).join(', ') : '—';
-      const addons = Array.isArray(q.addons) && q.addons.length > 0 ? q.addons.map(addonLabel).join(', ') : '—';
+      const addons = Array.isArray(q.addons) ? q.addons : [];
+
+      /* Per-line prices */
+      const p = calcQuotePrice(q.page_count, q.needs_cms === true, addons);
+      const baseLabel  = p ? `<span style="color:var(--muted);font-size:0.8125rem;margin-left:0.4rem;">(${fmtEur(p.base, p.plus)})</span>` : '';
+      const cmsLabel   = q.needs_cms === true  ? `Yes <span style="color:var(--muted);font-size:0.8125rem;">(+€200)</span>`
+                       : q.needs_cms === false ? 'No' : '—';
+
+      /* Add-ons with prices */
+      const addonPrices = { multilingual: '+€100', hosting: '+€15/maand', care: '+€45/maand' };
+      let addonsHtml;
+      if (addons.length === 0) {
+        addonsHtml = '—';
+      } else {
+        addonsHtml = addons.map(function (a) {
+          const lbl   = addonLabel(a);
+          const price = addonPrices[a] ? `<span style="color:var(--muted);font-size:0.8125rem;margin-left:0.3rem;">(${addonPrices[a]})</span>` : '';
+          return `<span style="display:block;">${escHtml(lbl)}${price}</span>`;
+        }).join('');
+      }
 
       qdTitle.textContent = q.name + (q.business ? ' — ' + q.business : '');
       qdSub.textContent   = 'Received ' + rcvd;
@@ -761,11 +796,11 @@
             <span class="qd-key">Service</span>
             <span class="qd-val">${escHtml(svcs)}</span>
             <span class="qd-key">Pages</span>
-            <span class="qd-val">${escHtml(q.page_count || '—')}</span>
+            <span class="qd-val">${escHtml(q.page_count || '—')}${baseLabel}</span>
             <span class="qd-key">Self-edit (CMS)</span>
-            <span class="qd-val">${q.needs_cms === true ? 'Yes (+€200)' : q.needs_cms === false ? 'No' : '—'}</span>
+            <span class="qd-val">${cmsLabel}</span>
             <span class="qd-key">Add-ons</span>
-            <span class="qd-val">${escHtml(addons)}</span>
+            <span class="qd-val">${addonsHtml}</span>
             <span class="qd-key">Deadline</span>
             <span class="qd-val">${escHtml(dl)}</span>
           </div>
