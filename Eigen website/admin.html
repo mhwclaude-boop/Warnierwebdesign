@@ -622,8 +622,7 @@
 
         if (croppedBlob) {
           /* Upload the cropped blob */
-          const ext  = 'jpg';
-          const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+          const path = `${crypto.randomUUID()}.jpg`;
           const { error: upErr } = await db.storage.from('news-images').upload(path, croppedBlob, {
             upsert: false, contentType: 'image/jpeg',
           });
@@ -634,12 +633,16 @@
           /* Delete old image if replacing */
           if (existingImageUrl) {
             const oldPath = existingImageUrl.split('/news-images/')[1];
-            if (oldPath) await db.storage.from('news-images').remove([oldPath]);
+            if (oldPath && !oldPath.includes('..') && !oldPath.includes('//')) {
+              await db.storage.from('news-images').remove([oldPath]);
+            }
           }
         } else if (clearImageFlag) {
           if (existingImageUrl) {
             const oldPath = existingImageUrl.split('/news-images/')[1];
-            if (oldPath) await db.storage.from('news-images').remove([oldPath]);
+            if (oldPath && !oldPath.includes('..') && !oldPath.includes('//')) {
+              await db.storage.from('news-images').remove([oldPath]);
+            }
           }
           imageUrl = null;
         }
@@ -682,7 +685,7 @@
         .order('created_at', { ascending: false });
 
       if (error) {
-        postsListWrap.innerHTML = `<p style="color:var(--danger);padding:1rem;">Failed to load posts: ${error.message}</p>`;
+        postsListWrap.innerHTML = `<p style="color:var(--danger);padding:1rem;">Failed to load posts: ${escHtml(error.message)}</p>`;
         return;
       }
       if (!data || data.length === 0) {
@@ -751,7 +754,9 @@
       try {
         if (pendingDeleteImageUrl) {
           const oldPath = pendingDeleteImageUrl.split('/news-images/')[1];
-          if (oldPath) await db.storage.from('news-images').remove([oldPath]);
+          if (oldPath && !oldPath.includes('..') && !oldPath.includes('//')) {
+            await db.storage.from('news-images').remove([oldPath]);
+          }
         }
         const { error } = await db.from('news_posts').delete().eq('id', pendingDeleteId);
         if (error) throw error;
