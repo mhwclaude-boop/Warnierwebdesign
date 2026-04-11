@@ -407,6 +407,24 @@ create policy "authenticated read"
     .info-tooltip:hover .info-tooltip__bubble,
     .info-tooltip:focus-within .info-tooltip__bubble { display: block; }
 
+    /* ── Addon price tag ── */
+    .addon-price {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: var(--orange);
+      margin-left: 0.35rem;
+    }
+
+    /* ── Monthly sub-price on offer card ── */
+    .offer-card__monthly {
+      font-family: var(--font-h);
+      font-size: 1rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      margin-top: 0.375rem;
+    }
+    .offer-card__monthly strong { color: var(--white); }
+
     /* ── Required asterisk ── */
     .req { color: var(--orange); margin-left: 2px; }
 
@@ -690,6 +708,37 @@ create policy "authenticated read"
 
         <hr class="divider" />
 
+        <!-- Add-ons -->
+        <div class="field">
+          <span class="field-label">Extra opties</span>
+          <span class="field-hint">Optioneel — voeg toe wat voor jou relevant is.</span>
+          <div class="check-group" id="addons-group">
+            <label class="check-item">
+              <input type="checkbox" name="addons" value="multilingual" id="cb-multilingual" />
+              <div>
+                <div class="check-item__label">Meertalig <span class="addon-price">+€100</span></div>
+                <div class="check-item__sub">Website in meerdere talen (bv. NL + FR + EN)</div>
+              </div>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="addons" value="hosting" id="cb-hosting" />
+              <div>
+                <div class="check-item__label">Domein &amp; hosting <span class="addon-price">+€15/maand</span></div>
+                <div class="check-item__sub">Domeinnaam + betrouwbare hosting, alles geregeld</div>
+              </div>
+            </label>
+            <label class="check-item">
+              <input type="checkbox" name="addons" value="care" id="cb-care" />
+              <div>
+                <div class="check-item__label">Care service <span class="addon-price">+€45/maand</span></div>
+                <div class="check-item__sub">Maandelijkse updates, backups en kleine aanpassingen</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <hr class="divider" />
+
         <!-- Deadline + referral -->
         <div class="field-row">
           <div class="field">
@@ -747,6 +796,7 @@ create policy "authenticated read"
       <div class="offer-card">
         <div class="offer-card__label">Indicatieve investering</div>
         <div class="offer-card__price" id="offer-price"></div>
+        <div class="offer-card__monthly" id="offer-price-monthly" style="display:none;"></div>
 
         <ul class="breakdown" id="offer-breakdown"></ul>
 
@@ -808,20 +858,20 @@ create policy "authenticated read"
     const db = createClient(SUPABASE_URL, SUPABASE_ANON);
 
     /* ── Pricing logic ───────────────────────────────────────────── */
-    function calcEstimate(pages, services) {
-      let base = 0;
-      let plus = false;
-      if (pages === '1')  base = 400;
-      if (pages === '2')  base = 500;
-      if (pages === '3')  base = 600;
-      if (pages === '4')  base = 700;
-      if (pages === '5+') { base = 900; plus = true; }
+    function calcEstimate(pages, selfEdit, addons) {
+      const pageNum = pages === '5+' ? 5 : parseInt(pages, 10);
+      const base    = 250 + (pageNum - 1) * 100;
+      const plus    = pages === '5+';
 
-      let addons = 0;
-      if (services.includes('cms'))     addons += 300;
-      if (services.includes('webshop')) addons += 600;
+      let oneTime = 0;
+      let monthly = 0;
 
-      return { base, addons, total: base + addons, plus };
+      if (selfEdit)                      oneTime += 200;
+      if (addons.includes('multilingual')) oneTime += 100;
+      if (addons.includes('hosting'))      monthly += 15;
+      if (addons.includes('care'))         monthly += 45;
+
+      return { base, oneTime, monthly, total: base + oneTime, plus };
     }
 
     function fmtPrice(n, plus) {
@@ -886,6 +936,10 @@ create policy "authenticated read"
       return Array.from(document.querySelectorAll('input[name="services"]:checked')).map(function (cb) { return cb.value; });
     }
 
+    function getSelectedAddons() {
+      return Array.from(document.querySelectorAll('input[name="addons"]:checked')).map(function (cb) { return cb.value; });
+    }
+
     function labelFor(val) {
       const map = {
         new_website: 'Nieuwe website',
@@ -928,22 +982,33 @@ create policy "authenticated read"
       }
 
       /* Build offer */
-      const est = calcEstimate(pages, services);
+      const selAddons = getSelectedAddons();
+      const selfEdit  = ynCmsValue === 'yes';
+      const est = calcEstimate(pages, selfEdit, selAddons);
 
       /* Price display */
-      offerPrice.innerHTML =
-        '<span>' + '€' + est.base.toLocaleString('nl-BE') + (est.addons > 0 || est.plus ? '' : (est.plus ? '<span class="offer-card__price-plus">+</span>' : '')) + '</span>';
+      const pageLabel = { '1': '1 pagina', '2': '2 pagina\'s', '3': '3 pagina\'s', '4': '4 pagina\'s', '5+': '5+ pagina\'s' }[pages];
+      offerPrice.textContent = fmtPrice(est.total, est.plus);
 
-      const fullLabel = fmtPrice(est.total, est.plus);
-      offerPrice.textContent = fullLabel;
+      const offerMonthly = document.getElementById('offer-price-monthly');
+      if (est.monthly > 0) {
+        offerMonthly.style.display = '';
+        offerMonthly.innerHTML = '+ <strong>€' + est.monthly + '/maand</strong>';
+      } else {
+        offerMonthly.style.display = 'none';
+      }
 
       /* Breakdown */
-      const pageLabel = { '1': '1 pagina', '2': '2 pagina\'s', '3': '3 pagina\'s', '4': '4 pagina\'s', '5+': '5 of meer pagina\'s' }[pages];
-      let breakdownHtml = `<li><span>Website basis (${escHtml(pageLabel)})</span><strong>${fmtPrice(est.base, est.plus && est.addons === 0)}</strong></li>`;
-      if (services.includes('cms'))     breakdownHtml += `<li><span>CMS / bewerkbaar</span><strong>+€300</strong></li>`;
-      if (services.includes('webshop')) breakdownHtml += `<li><span>Webshop</span><strong>+€600</strong></li>`;
-      if (est.addons > 0) {
-        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>Totaal (indicatief)</strong></span><strong>${fmtPrice(est.total, est.plus)}</strong></li>`;
+      let breakdownHtml = `<li><span>Website (${escHtml(pageLabel)})</span><strong>${fmtPrice(est.base, est.plus && est.oneTime === 0)}</strong></li>`;
+      if (selfEdit)                        breakdownHtml += `<li><span>Zelf aanpassen (CMS)</span><strong>+€200</strong></li>`;
+      if (selAddons.includes('multilingual')) breakdownHtml += `<li><span>Meertalig</span><strong>+€100</strong></li>`;
+      if (est.oneTime > 0) {
+        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>Totaal eenmalig</strong></span><strong>${fmtPrice(est.total, est.plus)}</strong></li>`;
+      }
+      if (selAddons.includes('hosting'))   breakdownHtml += `<li><span>Domein &amp; hosting</span><strong>+€15/maand</strong></li>`;
+      if (selAddons.includes('care'))      breakdownHtml += `<li><span>Care service</span><strong>+€45/maand</strong></li>`;
+      if (est.monthly > 0) {
+        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>Totaal maandelijks</strong></span><strong>€${est.monthly}/maand</strong></li>`;
       }
       offerBreakdown.innerHTML = breakdownHtml;
 
@@ -953,13 +1018,16 @@ create policy "authenticated read"
       const business = document.getElementById('f-business').value.trim();
       const extra    = document.getElementById('f-extra').value.trim();
 
+      const addonLabels = { multilingual: 'Meertalig', hosting: 'Domein & hosting', care: 'Care service' };
+
       const rows = [
         ['Naam',             name],
         business ? ['Bedrijf', business] : null,
         ['Type onderneming', btype],
         ['Gevraagde diensten', services.map(labelFor).join(', ')],
         ['Aantal pagina\'s',  pageLabel],
-        ynCmsValue ? ['Klanten passen zelf aan', ynCmsValue === 'yes' ? 'Ja' : 'Nee'] : null,
+        ynCmsValue ? ['Zelf aanpassen', ynCmsValue === 'yes' ? 'Ja (+€200)' : 'Nee'] : null,
+        selAddons.length > 0 ? ['Extra opties', selAddons.map(function(a) { return addonLabels[a] || a; }).join(', ')] : null,
         deadline ? ['Deadline', new Date(deadline).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })] : null,
         referral ? ['Gevonden via', referral] : null,
         extra    ? ['Extra info',   extra]    : null,
@@ -993,12 +1061,13 @@ create policy "authenticated read"
       const btype     = document.getElementById('f-btype').value.trim();
       const pages     = document.getElementById('f-pages').value;
       const services  = getSelectedServices();
+      const selAddons = getSelectedAddons();
       const deadline  = document.getElementById('f-deadline').value || null;
       const referral  = document.getElementById('f-referral').value.trim();
       const extra     = document.getElementById('f-extra').value.trim();
       const needsCms  = ynCmsValue === 'yes' ? true : ynCmsValue === 'no' ? false : null;
-      const est       = calcEstimate(pages, services);
-      const estLabel  = fmtPrice(est.total, est.plus);
+      const est       = calcEstimate(pages, ynCmsValue === 'yes', selAddons);
+      const estLabel  = fmtPrice(est.total, est.plus) + (est.monthly > 0 ? ' + €' + est.monthly + '/maand' : '');
 
       try {
         /* 1 ── Send email via Web3Forms */
@@ -1010,7 +1079,8 @@ create policy "authenticated read"
         w3fPayload.append('Type onderneming',  btype);
         w3fPayload.append('Gevraagde diensten', services.map(labelFor).join(', '));
         w3fPayload.append('Aantal pagina\'s',   pages);
-        w3fPayload.append('Klanten passen aan', needsCms === true ? 'Ja' : needsCms === false ? 'Nee' : '—');
+        w3fPayload.append('Zelf aanpassen',     needsCms === true ? 'Ja (+€200)' : needsCms === false ? 'Nee' : '—');
+        w3fPayload.append('Extra opties',       selAddons.length > 0 ? selAddons.join(', ') : '—');
         w3fPayload.append('Deadline',           deadline || '—');
         w3fPayload.append('Gevonden via',       referral || '—');
         w3fPayload.append('Extra info',         extra    || '—');
@@ -1030,6 +1100,7 @@ create policy "authenticated read"
           services:       services,
           page_count:     pages,
           needs_cms:      needsCms,
+          addons:         selAddons,
           deadline:       deadline,
           referral:       referral || null,
           extra_info:     extra    || null,
