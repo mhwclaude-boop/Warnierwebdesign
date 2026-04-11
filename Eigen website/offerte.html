@@ -34,7 +34,7 @@ create policy "authenticated read"
 
 =============================================================
 -->
-<html lang="nl">
+<html lang="nl" data-lang="nl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -60,12 +60,24 @@ create policy "authenticated read"
       --danger:      #D93025;
       --font-h:      'Plus Jakarta Sans', sans-serif;
       --font-b:      'Inter', sans-serif;
+      --font-heading:'Plus Jakarta Sans', sans-serif;
       --r-sm:        6px;
       --r-md:        12px;
       --r-lg:        20px;
+      --radius-sm:   6px;
       --shadow:      0 4px 24px rgba(11, 26, 78, 0.10);
       --shadow-lg:   0 8px 40px rgba(11, 26, 78, 0.18);
+      --nav-height:  72px;
+      --max-width:   1140px;
     }
+
+    /* Language toggle — hide/show */
+    [data-lang="nl"] [data-fr],
+    [data-lang="nl"] [data-en] { display: none !important; }
+    [data-lang="fr"] [data-nl],
+    [data-lang="fr"] [data-en] { display: none !important; }
+    [data-lang="en"] [data-nl],
+    [data-lang="en"] [data-fr] { display: none !important; }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -88,43 +100,164 @@ create policy "authenticated read"
       border-radius: var(--r-sm);
     }
 
-    /* ── Top bar ── */
-    .topbar {
-      background: var(--navy);
-      color: var(--white);
+    /* ── Navigation ── */
+    .nav {
+      position: fixed;
+      inset-block-start: 0;
+      inset-inline: 0;
+      height: var(--nav-height);
+      z-index: 100;
+      background: var(--white);
+      box-shadow: 0 2px 16px rgba(11, 26, 78, 0.10);
+    }
+    .nav__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
       padding: 0 1.5rem;
-      height: 64px;
+      height: 100%;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 1rem;
+      gap: 1.5rem;
     }
-    .topbar__brand {
-      font-family: var(--font-h);
-      font-weight: 700;
-      font-size: 1rem;
+    .nav__logo {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      flex-shrink: 0;
+      background: #FDFDFD;
+      border-radius: 8px;
+      padding: 4px 10px;
     }
-    .topbar__back {
-      font-family: var(--font-h);
-      font-size: 0.875rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.7);
+    .nav__logo img { height: 32px; width: auto; }
+    .nav__links {
       display: flex;
       align-items: center;
-      gap: 0.375rem;
+      gap: 2rem;
+    }
+    .nav__links a {
+      font-family: var(--font-heading);
+      font-weight: 500;
+      font-size: 0.9375rem;
+      color: var(--navy);
+      position: relative;
+      padding-bottom: 3px;
       transition: color 0.2s;
     }
-    .topbar__back:hover { color: var(--white); }
-    .topbar__back svg { flex-shrink: 0; }
+    .nav__links a::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0;
+      width: 0; height: 2px;
+      background: var(--orange);
+      transition: width 0.25s ease;
+      border-radius: 2px;
+    }
+    .nav__links a:hover::after,
+    .nav__links a.is-active::after { width: 100%; }
+    .lang-toggle {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: var(--off-white);
+      border-radius: 999px;
+      padding: 3px;
+      flex-shrink: 0;
+    }
+    .lang-btn {
+      font-family: var(--font-heading);
+      font-size: 0.8125rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      line-height: 1;
+    }
+    .lang-btn.active { background: var(--orange); color: var(--white); }
+    .nav__hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: var(--radius-sm);
+    }
+    .nav__hamburger span {
+      display: block;
+      width: 24px; height: 2px;
+      background: var(--navy);
+      border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .nav__hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .nav__hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .nav__hamburger[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+    .nav__mobile {
+      display: none;
+      flex-direction: column;
+      background: var(--white);
+      position: fixed;
+      top: var(--nav-height);
+      inset-inline: 0;
+      padding: 0.75rem 1.5rem 1.5rem;
+      box-shadow: 0 8px 32px rgba(11, 26, 78, 0.14);
+      border-top: 1px solid var(--border);
+      z-index: 99;
+    }
+    .nav__mobile.open { display: flex; }
+    .nav__mobile a {
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--navy);
+      padding: 0.875rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: color 0.2s;
+    }
+    .nav__mobile a:hover { color: var(--orange); }
+    .nav__mobile a:last-of-type { border-bottom: none; }
+    @media (max-width: 767px) {
+      .nav__links { display: none; }
+      .nav__hamburger { display: flex; }
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: var(--navy-dark);
+      color: rgba(255,255,255,0.55);
+      padding: 2.5rem 1.5rem;
+    }
+    .footer__inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      align-items: center;
+      text-align: center;
+    }
+    .footer__logo img {
+      height: 32px; width: auto;
+      background: #FDFDFD;
+      border-radius: 8px;
+      padding: 4px 10px;
+    }
+    .footer__copy { font-size: 0.875rem; }
+    @media (min-width: 768px) {
+      .footer__inner { flex-direction: row; justify-content: space-between; text-align: left; }
+    }
 
     /* ── Page wrapper ── */
     .page {
       max-width: 680px;
       margin: 0 auto;
-      padding: 3rem 1.5rem 5rem;
+      padding: calc(var(--nav-height) + 3rem) 1.5rem 5rem;
     }
 
     /* ── Progress indicator ── */
@@ -570,14 +703,53 @@ create policy "authenticated read"
 </head>
 <body>
 
-  <!-- Top bar -->
-  <div class="topbar">
-    <div class="topbar__brand">Warnier Web Design</div>
-    <a href="index.html" class="topbar__back">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
-      Terug naar home
-    </a>
-  </div>
+  <!-- Navigation -->
+  <nav class="nav" id="nav" role="navigation" aria-label="Hoofdnavigatie">
+    <div class="nav__inner">
+
+      <a href="index.html" class="nav__logo" aria-label="Warnier Web Design — naar startpagina">
+        <img src="file.svg" alt="Warnier Web Design" width="160" height="59" />
+      </a>
+
+      <ul class="nav__links" role="list">
+        <li><a href="index.html">Home</a></li>
+        <li>
+          <a href="news.html" data-nl>Nieuws</a>
+          <a href="news.html" data-fr>Actualités</a>
+          <a href="news.html" data-en>News</a>
+        </li>
+        <li><a href="art-of-the-possible.html">Art of the Possible</a></li>
+        <li>
+          <a href="offerte.html" class="is-active" data-nl>Offerte</a>
+          <a href="offerte.html" class="is-active" data-fr>Devis</a>
+          <a href="offerte.html" class="is-active" data-en>Quote</a>
+        </li>
+      </ul>
+
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-shrink:0;">
+        <div class="lang-toggle" role="group" aria-label="Taal kiezen">
+          <button class="lang-btn active" data-lang-btn="nl" aria-pressed="true">NL</button>
+          <button class="lang-btn" data-lang-btn="fr" aria-pressed="false">FR</button>
+          <button class="lang-btn" data-lang-btn="en" aria-pressed="false">EN</button>
+        </div>
+        <button class="nav__hamburger" id="hamburger" aria-expanded="false" aria-controls="mobile-nav" aria-label="Menu openen">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </div>
+
+    <div class="nav__mobile" id="mobile-nav" role="navigation" aria-label="Mobiel menu">
+      <a href="index.html">Home</a>
+      <a href="news.html" data-nl>Nieuws</a>
+      <a href="news.html" data-fr>Actualités</a>
+      <a href="news.html" data-en>News</a>
+      <a href="art-of-the-possible.html">Art of the Possible</a>
+      <a href="offerte.html" data-nl>Offerte</a>
+      <a href="offerte.html" data-fr>Devis</a>
+      <a href="offerte.html" data-en>Quote</a>
+    </div>
+  </nav>
 
   <div class="page">
 
@@ -848,6 +1020,20 @@ create policy "authenticated read"
     </div>
 
   </div><!-- /page -->
+
+  <!-- Footer -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer__inner">
+      <div class="footer__logo">
+        <img src="file.svg" alt="Warnier Web Design" width="140" height="52" />
+      </div>
+      <p class="footer__copy">
+        <span data-nl>© 2026 Warnier Web Design. Alle rechten voorbehouden.</span>
+        <span data-fr>© 2026 Warnier Web Design. Tous droits réservés.</span>
+        <span data-en>© 2026 Warnier Web Design. All rights reserved.</span>
+      </p>
+    </div>
+  </footer>
 
   <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1152,6 +1338,51 @@ create policy "authenticated read"
         showErr(sendError, 'Er liep iets mis bij het verzenden. Probeer het opnieuw of stuur me een e-mail.');
         sendBtn.disabled    = false;
         sendBtn.textContent = 'Stuur deze offerte-aanvraag in';
+      }
+    });
+
+    /* ── Language toggle ─────────────────────────────────────────── */
+    const htmlEl   = document.documentElement;
+    const langBtns = document.querySelectorAll('[data-lang-btn]');
+
+    function setLang(lang) {
+      htmlEl.setAttribute('data-lang', lang);
+      htmlEl.setAttribute('lang', lang);
+      localStorage.setItem('wwdLang', lang);
+      langBtns.forEach(function (btn) {
+        const active = btn.dataset.langBtn === lang;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', String(active));
+      });
+    }
+    setLang(localStorage.getItem('wwdLang') || 'nl');
+    langBtns.forEach(function (btn) {
+      btn.addEventListener('click', function () { setLang(btn.dataset.langBtn); });
+    });
+
+    /* ── Hamburger ───────────────────────────────────────────────── */
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+
+    hamburger.addEventListener('click', function () {
+      const isOpen = mobileNav.classList.toggle('open');
+      hamburger.setAttribute('aria-expanded', String(isOpen));
+      hamburger.setAttribute('aria-label', isOpen ? 'Menu sluiten' : 'Menu openen');
+    });
+
+    mobileNav.querySelectorAll('a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'Menu openen');
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!document.getElementById('nav').contains(e.target) && mobileNav.classList.contains('open')) {
+        mobileNav.classList.remove('open');
+        hamburger.setAttribute('aria-expanded', 'false');
+        hamburger.setAttribute('aria-label', 'Menu openen');
       }
     });
   </script>
