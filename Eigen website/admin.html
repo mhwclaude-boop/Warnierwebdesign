@@ -188,6 +188,77 @@
     .confirm-card p { color: var(--muted); font-size: 0.9375rem; margin-bottom: 1.5rem; }
     .confirm-card__actions { display: flex; gap: 0.75rem; justify-content: flex-end; }
 
+    /* ── Tabs ── */
+    .tabs {
+      display: flex;
+      gap: 0.25rem;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0;
+    }
+    .tab-btn {
+      font-family: var(--font-h);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 0.625rem 1.125rem;
+      border: none;
+      background: none;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      border-radius: var(--r-sm) var(--r-sm) 0 0;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .tab-btn:hover { color: var(--navy); }
+    .tab-btn.active { color: var(--navy); border-bottom-color: var(--orange); }
+
+    /* ── Quote requests table ── */
+    .quotes-table-wrap {
+      overflow-x: auto;
+      border-radius: var(--r-md);
+      border: 1px solid var(--border);
+      background: var(--white);
+    }
+    .quotes-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .quotes-table th {
+      font-family: var(--font-h);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--off-white);
+      white-space: nowrap;
+    }
+    .quotes-table td {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+      vertical-align: top;
+    }
+    .quotes-table tr:last-child td { border-bottom: none; }
+    .quotes-table tr:hover td { background: #fafbfd; }
+    .quotes-table .td-name { font-family: var(--font-h); font-weight: 700; color: var(--navy); }
+    .quotes-table .td-price {
+      font-family: var(--font-h);
+      font-weight: 700;
+      color: var(--orange);
+      white-space: nowrap;
+    }
+    .quotes-table .td-muted { color: var(--muted); font-size: 0.8125rem; }
+    .quotes-table .td-services { max-width: 180px; }
+    .quotes-table .td-date { white-space: nowrap; }
+
+    .quotes-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); font-size: 0.9375rem; }
+
     /* ── Crop modal ── */
     .crop-modal {
       background: var(--white); border-radius: var(--r-md);
@@ -269,13 +340,22 @@
     </div>
 
     <div class="dash">
-      <div class="dash__header">
-        <h2>News Posts</h2>
-        <button class="btn btn--primary" id="new-post-btn">+ New Post</button>
+
+      <!-- Tab navigation -->
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" id="tab-posts" role="tab" aria-selected="true"  aria-controls="panel-posts">News Posts</button>
+        <button class="tab-btn"        id="tab-quotes" role="tab" aria-selected="false" aria-controls="panel-quotes">Quote Requests</button>
       </div>
 
       <div class="alert alert--error" id="dash-error"></div>
       <div class="alert alert--success" id="dash-success"></div>
+
+      <!-- ── PANEL: News Posts ── -->
+      <div id="panel-posts" role="tabpanel">
+        <div class="dash__header">
+          <h2>News Posts</h2>
+          <button class="btn btn--primary" id="new-post-btn">+ New Post</button>
+        </div>
 
       <!-- Post form panel -->
       <div class="post-form-panel" id="post-form-panel">
@@ -324,8 +404,24 @@
           <div class="spinner spinner--dark"></div>
         </div>
       </div>
-    </div>
-  </div>
+
+      </div><!-- /panel-posts -->
+
+      <!-- ── PANEL: Quote Requests ── -->
+      <div id="panel-quotes" role="tabpanel" style="display:none;">
+        <div class="dash__header">
+          <h2>Quote Requests</h2>
+          <button class="btn btn--secondary btn--sm" id="refresh-quotes-btn">↺ Refresh</button>
+        </div>
+        <div id="quotes-wrap">
+          <div style="display:flex;justify-content:center;padding:3rem;">
+            <div class="spinner spinner--dark"></div>
+          </div>
+        </div>
+      </div><!-- /panel-quotes -->
+
+    </div><!-- /dash -->
+  </div><!-- /dashboard -->
 
   <!-- ══════════════════════════════════ CROP OVERLAY ══════════════════════════════════ -->
   <div class="overlay" id="crop-overlay">
@@ -449,6 +545,93 @@
       dashboard.style.display = 'block';
       topbarEmail.textContent = email;
       loadPosts();
+    }
+
+    /* ══════════════════════════════ TABS ══════════════════════════════ */
+
+    const tabPosts   = document.getElementById('tab-posts');
+    const tabQuotes  = document.getElementById('tab-quotes');
+    const panelPosts  = document.getElementById('panel-posts');
+    const panelQuotes = document.getElementById('panel-quotes');
+    let quotesLoaded  = false;
+
+    function switchTab(active) {
+      const isQuotes = active === 'quotes';
+      tabPosts.classList.toggle('active', !isQuotes);
+      tabQuotes.classList.toggle('active',  isQuotes);
+      tabPosts.setAttribute('aria-selected',  String(!isQuotes));
+      tabQuotes.setAttribute('aria-selected', String(isQuotes));
+      panelPosts.style.display  = isQuotes ? 'none' : '';
+      panelQuotes.style.display = isQuotes ? '' : 'none';
+      if (isQuotes && !quotesLoaded) { loadQuotes(); }
+    }
+
+    tabPosts.addEventListener('click',  function () { switchTab('posts');  });
+    tabQuotes.addEventListener('click', function () { switchTab('quotes'); });
+    document.getElementById('refresh-quotes-btn').addEventListener('click', function () {
+      quotesLoaded = false;
+      loadQuotes();
+    });
+
+    /* ══════════════════════════════ QUOTE REQUESTS ══════════════════════════════ */
+
+    const quotesWrap = document.getElementById('quotes-wrap');
+
+    async function loadQuotes() {
+      quotesWrap.innerHTML = '<div style="display:flex;justify-content:center;padding:3rem;"><div class="spinner spinner--dark"></div></div>';
+      quotesLoaded = true;
+
+      const { data, error } = await db
+        .from('quote_requests')
+        .select('id, created_at, name, business, services, estimate_label, deadline')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        quotesWrap.innerHTML = `<p style="color:var(--danger);padding:1rem;">Failed to load quotes: ${escHtml(error.message)}</p>`;
+        return;
+      }
+      if (!data || data.length === 0) {
+        quotesWrap.innerHTML = '<p class="quotes-empty">No quote requests yet.</p>';
+        return;
+      }
+
+      const serviceLabel = function (val) {
+        const map = { new_website: 'New website', redesign: 'Redesign', webshop: 'Webshop', cms: 'CMS', other: 'Other' };
+        return map[val] || val;
+      };
+
+      const rows = data.map(function (q) {
+        const svcs = Array.isArray(q.services) ? q.services.map(serviceLabel).join(', ') : '—';
+        const dl   = q.deadline ? new Date(q.deadline).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        const rcvd = new Date(q.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        return `
+          <tr>
+            <td>
+              <div class="td-name">${escHtml(q.name)}</div>
+              ${q.business ? '<div class="td-muted">' + escHtml(q.business) + '</div>' : ''}
+            </td>
+            <td class="td-services td-muted">${escHtml(svcs)}</td>
+            <td class="td-price">${escHtml(q.estimate_label || '—')}</td>
+            <td class="td-date td-muted">${escHtml(dl)}</td>
+            <td class="td-date td-muted">${escHtml(rcvd)}</td>
+          </tr>`;
+      }).join('');
+
+      quotesWrap.innerHTML = `
+        <div class="quotes-table-wrap">
+          <table class="quotes-table">
+            <thead>
+              <tr>
+                <th>Name / Business</th>
+                <th>Services</th>
+                <th>Estimate</th>
+                <th>Deadline</th>
+                <th>Received</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+          </table>
+        </div>`;
     }
 
     loginForm.addEventListener('submit', async function (e) {
