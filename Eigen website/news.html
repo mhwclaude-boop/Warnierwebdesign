@@ -19,12 +19,13 @@
       --font-heading: 'Plus Jakarta Sans', sans-serif;
       --font-body:    'Inter', sans-serif;
       --radius-sm:    6px;
+      --radius-md:    12px;
       --nav-height:   72px;
       --max-width:    1140px;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { font-family: var(--font-body); font-size: 1rem; line-height: 1.65; color: var(--text); background: var(--white); }
+    body { font-family: var(--font-body); font-size: 1rem; line-height: 1.65; color: var(--text); background: var(--off-white); }
     a { color: inherit; text-decoration: none; }
 
     /* Language */
@@ -46,7 +47,6 @@
     .nav__logo { display: flex; align-items: center; flex-shrink: 0; background: #FDFDFD; border-radius: 8px; padding: 4px 10px; }
     .nav__logo img { height: 32px; width: auto; }
 
-    /* Desktop nav links */
     .nav__links { display: flex; align-items: center; gap: 2rem; list-style: none; }
     .nav__links a {
       font-family: var(--font-heading); font-weight: 500; font-size: 0.9375rem;
@@ -59,16 +59,13 @@
     }
     .nav__links a:hover::after, .nav__links a.is-active::after { width: 100%; }
 
-    /* Lang toggle */
     .lang-toggle { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,0.15); border-radius: 999px; padding: 3px; flex-shrink: 0; }
     .lang-btn { font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700; padding: 4px 11px; border-radius: 999px; border: none; background: transparent; color: rgba(255,255,255,0.65); cursor: pointer; transition: background 0.2s, color 0.2s; line-height: 1; }
     .lang-btn.active { background: var(--orange); color: var(--white); }
 
-    /* Hamburger */
     .nav__hamburger { display: none; flex-direction: column; justify-content: center; gap: 5px; background: none; border: none; cursor: pointer; padding: 6px; border-radius: var(--radius-sm); }
     .nav__hamburger span { display: block; width: 24px; height: 2px; background: var(--white); border-radius: 2px; transition: transform 0.3s ease, opacity 0.3s ease; }
 
-    /* Mobile drawer */
     .nav__mobile { display: none; flex-direction: column; background: var(--white); position: fixed; top: var(--nav-height); inset-inline: 0; padding: 0.75rem 1.5rem 1.5rem; box-shadow: 0 8px 32px rgba(11,26,78,0.14); border-top: 1px solid var(--border); }
     .nav__mobile.open { display: flex; }
     .nav__mobile a { font-family: var(--font-heading); font-weight: 600; font-size: 1rem; color: var(--navy); padding: 0.875rem 0; border-bottom: 1px solid var(--border); transition: color 0.2s; }
@@ -80,19 +77,78 @@
       .nav__hamburger { display: flex; }
     }
 
-    /* Page content */
-    .page-content {
-      padding-top: var(--nav-height);
+    /* Page */
+    .page {
+      padding-top: calc(var(--nav-height) + 3rem);
+      padding-bottom: 5rem;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
       min-height: 100svh;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 1rem; text-align: center;
-      background: var(--off-white);
-      padding-left: 1.5rem; padding-right: 1.5rem; padding-bottom: 4rem;
     }
-    .page-content h1 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3.25rem); font-weight: 800; color: var(--navy); }
-    .page-content p { color: var(--muted); font-size: 1.0625rem; max-width: 480px; }
-    .coming-soon-badge { display: inline-block; background: rgba(244,98,25,0.12); color: var(--orange); font-family: var(--font-heading); font-size: 0.8125rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; padding: 0.375rem 0.875rem; border-radius: 999px; }
-    .back-link { font-family: var(--font-heading); font-weight: 600; color: var(--navy); font-size: 0.9375rem; text-decoration: underline; text-underline-offset: 3px; }
+    .page__inner { max-width: var(--max-width); margin: 0 auto; }
+
+    .page__header { margin-bottom: 3rem; }
+    .page__header h1 { font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; color: var(--navy); line-height: 1.15; }
+    .page__header p { color: var(--muted); font-size: 1.0625rem; margin-top: 0.625rem; max-width: 560px; }
+
+    /* News grid */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .news-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .news-card:hover { box-shadow: 0 8px 32px rgba(11,26,78,0.10); transform: translateY(-2px); }
+
+    .news-card__image {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      background: var(--off-white);
+      display: block;
+    }
+    .news-card__image-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, var(--navy) 0%, #1a3080 100%);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .news-card__image-placeholder svg { opacity: 0.25; }
+
+    .news-card__body {
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.5rem;
+      flex: 1;
+    }
+    .news-card__date { font-size: 0.8125rem; color: var(--muted); font-family: var(--font-heading); font-weight: 500; }
+    .news-card__title { font-family: var(--font-heading); font-size: 1.125rem; font-weight: 700; color: var(--navy); line-height: 1.3; }
+    .news-card__desc { font-size: 0.9375rem; color: var(--muted); line-height: 1.6; flex: 1; }
+
+    /* States */
+    .state-loading, .state-empty, .state-error {
+      text-align: center; padding: 5rem 1rem;
+      display: flex; flex-direction: column; align-items: center; gap: 1rem;
+    }
+    .state-loading .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--orange);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .state-empty h2, .state-error h2 { font-family: var(--font-heading); font-size: 1.375rem; font-weight: 700; color: var(--navy); }
+    .state-empty p, .state-error p { color: var(--muted); max-width: 380px; }
+    .state-error h2 { color: #c0392b; }
 
     /* Footer */
     .footer { background: var(--navy-dark, #070F30); color: rgba(255,255,255,0.55); padding: 2.5rem 1.5rem; }
@@ -109,6 +165,8 @@
   <!-- Vercel Speed Insights -->
   <script>window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };</script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -149,23 +207,25 @@
     </div>
   </nav>
 
-  <main class="page-content">
-    <span class="coming-soon-badge" data-nl>Binnenkort beschikbaar</span>
-    <span class="coming-soon-badge" data-fr>Bientôt disponible</span>
-    <span class="coming-soon-badge" data-en>Coming soon</span>
+  <main class="page">
+    <div class="page__inner">
+      <div class="page__header">
+        <h1>
+          <span data-nl>Nieuws</span>
+          <span data-fr>Actualités</span>
+          <span data-en>News</span>
+        </h1>
+        <p data-nl>Updates, projecten en inzichten van Warnier Web Design.</p>
+        <p data-fr>Mises à jour, projets et insights de Warnier Web Design.</p>
+        <p data-en>Updates, projects, and insights from Warnier Web Design.</p>
+      </div>
 
-    <h1>
-      <span data-nl>Nieuws</span>
-      <span data-fr>Actualités</span>
-      <span data-en>News</span>
-    </h1>
-    <p data-nl>Hier verschijnen binnenkort updates, projecten en inzichten van Warnier Web Design.</p>
-    <p data-fr>Retrouvez bientôt ici les mises à jour, projets et insights de Warnier Web Design.</p>
-    <p data-en>Updates, projects, and insights from Warnier Web Design — coming soon.</p>
-
-    <a href="index.html" class="back-link" data-nl>← Terug naar home</a>
-    <a href="index.html" class="back-link" data-fr>← Retour à l'accueil</a>
-    <a href="index.html" class="back-link" data-en>← Back to home</a>
+      <div id="news-container">
+        <div class="state-loading">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <footer class="footer" role="contentinfo">
@@ -183,6 +243,8 @@
 
   <script>
     'use strict';
+
+    /* ── Language toggle ── */
     const htmlEl = document.documentElement;
     const langBtns = document.querySelectorAll('[data-lang-btn]');
     function setLang(lang) {
@@ -200,6 +262,7 @@
       btn.addEventListener('click', function () { setLang(btn.dataset.langBtn); });
     });
 
+    /* ── Mobile nav ── */
     const hamburger = document.getElementById('hamburger');
     const mobileNav = document.getElementById('mobile-nav');
     hamburger.addEventListener('click', function () {
@@ -214,6 +277,95 @@
         hamburger.setAttribute('aria-label', 'Menu openen');
       });
     });
+
+    /* ── Supabase news feed ── */
+    const SUPABASE_URL  = 'https://anmglnaafymtudehnnpq.supabase.co';
+    const SUPABASE_ANON = 'sb_publishable_gmXBUuzuGn1sVL5zRoaK9A_qSVawNKX';
+
+    const { createClient } = supabase;
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    function formatDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('nl-BE', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function renderPosts(posts) {
+      const container = document.getElementById('news-container');
+      const lang = htmlEl.getAttribute('data-lang') || 'nl';
+
+      if (posts.length === 0) {
+        const emptyText = {
+          nl: ['Nog geen nieuws', 'Er zijn nog geen berichten gepubliceerd. Kom binnenkort terug!'],
+          fr: ['Pas encore de nouvelles', 'Aucun article publié pour l\'instant. Revenez bientôt\u00a0!'],
+          en: ['No posts yet', 'No articles have been published yet. Check back soon!'],
+        };
+        const [title, desc] = emptyText[lang] || emptyText.nl;
+        container.innerHTML = `<div class="state-empty"><h2>${title}</h2><p>${desc}</p></div>`;
+        return;
+      }
+
+      const grid = document.createElement('div');
+      grid.className = 'news-grid';
+
+      posts.forEach(function (post) {
+        const card = document.createElement('article');
+        card.className = 'news-card';
+
+        const imageHtml = post.image_url
+          ? `<img class="news-card__image" src="${escHtml(post.image_url)}" alt="${escHtml(post.title)}" loading="lazy" />`
+          : `<div class="news-card__image-placeholder">
+               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+                 <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                 <polyline points="21 15 16 10 5 21"/>
+               </svg>
+             </div>`;
+
+        card.innerHTML = `
+          ${imageHtml}
+          <div class="news-card__body">
+            <span class="news-card__date">${formatDate(post.created_at)}</span>
+            <h2 class="news-card__title">${escHtml(post.title)}</h2>
+            <p class="news-card__desc">${escHtml(post.description)}</p>
+          </div>`;
+
+        grid.appendChild(card);
+      });
+
+      container.innerHTML = '';
+      container.appendChild(grid);
+    }
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    async function loadNews() {
+      const container = document.getElementById('news-container');
+      try {
+        const { data, error } = await db
+          .from('news_posts')
+          .select('id, title, description, image_url, created_at')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        renderPosts(data || []);
+      } catch (err) {
+        console.error('News load error:', err);
+        container.innerHTML = `
+          <div class="state-error">
+            <h2>Oops</h2>
+            <p>Could not load posts. Please try again later.</p>
+          </div>`;
+      }
+    }
+
+    loadNews();
   </script>
 </body>
 </html>
