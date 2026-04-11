@@ -107,8 +107,8 @@ create policy "authenticated read"
       inset-inline: 0;
       height: var(--nav-height);
       z-index: 100;
-      background: var(--white);
-      box-shadow: 0 2px 16px rgba(11, 26, 78, 0.10);
+      background: var(--navy);
+      box-shadow: 0 2px 16px rgba(11, 26, 78, 0.25);
     }
     .nav__inner {
       max-width: var(--max-width);
@@ -138,7 +138,7 @@ create policy "authenticated read"
       font-family: var(--font-heading);
       font-weight: 500;
       font-size: 0.9375rem;
-      color: var(--navy);
+      color: rgba(255,255,255,0.85);
       position: relative;
       padding-bottom: 3px;
       transition: color 0.2s;
@@ -191,7 +191,7 @@ create policy "authenticated read"
     .nav__hamburger span {
       display: block;
       width: 24px; height: 2px;
-      background: var(--navy);
+      background: rgba(255,255,255,0.9);
       border-radius: 2px;
       transition: transform 0.3s ease, opacity 0.3s ease;
     }
@@ -762,17 +762,25 @@ create policy "authenticated read"
       <div class="progress" aria-label="Stap 1 van 2">
         <div class="progress__step active" id="prog-step-1">
           <div class="progress__dot">1</div>
-          Jouw project
+          <span data-nl>Jouw project</span><span data-fr>Votre projet</span><span data-en>Your project</span>
         </div>
         <div class="progress__line" id="prog-line"></div>
         <div class="progress__step" id="prog-step-2">
           <div class="progress__dot">2</div>
-          Indicatieve prijs
+          <span data-nl>Indicatieve prijs</span><span data-fr>Prix indicatif</span><span data-en>Indicative price</span>
         </div>
       </div>
 
-      <h1 class="page-title">Vraag een vrijblijvende offerte aan</h1>
-      <p class="page-sub">Vertel me iets over je project, dan bereken ik een indicatieve prijs. Geen verplichtingen.</p>
+      <h1 class="page-title">
+        <span data-nl>Vraag een vrijblijvende offerte aan</span>
+        <span data-fr>Demandez un devis sans engagement</span>
+        <span data-en>Request a free quote</span>
+      </h1>
+      <p class="page-sub">
+        <span data-nl>Vertel me iets over je project, dan bereken ik een indicatieve prijs. Geen verplichtingen.</span>
+        <span data-fr>Parlez-moi de votre projet et je calculerai un prix indicatif. Sans engagement.</span>
+        <span data-en>Tell me about your project and I'll calculate an indicative price. No obligations.</span>
+      </p>
 
       <div class="error-msg" id="form-error"></div>
 
@@ -781,12 +789,14 @@ create policy "authenticated read"
         <!-- Name + business -->
         <div class="field-row">
           <div class="field">
-            <label for="f-name">Naam <span class="req">*</span></label>
+            <label for="f-name"><span data-nl>Naam</span><span data-fr>Nom</span><span data-en>Name</span> <span class="req">*</span></label>
             <input type="text" id="f-name" name="name" placeholder="Voornaam Achternaam" autocomplete="name" />
-            <div class="field-error" id="err-name">Naam is verplicht.</div>
+            <div class="field-error" id="err-name">
+              <span data-nl>Naam is verplicht.</span><span data-fr>Le nom est obligatoire.</span><span data-en>Name is required.</span>
+            </div>
           </div>
           <div class="field">
-            <label for="f-business">Bedrijfsnaam</label>
+            <label for="f-business"><span data-nl>Bedrijfsnaam</span><span data-fr>Nom de l'entreprise</span><span data-en>Business name</span></label>
             <input type="text" id="f-business" name="business" placeholder="Optioneel" autocomplete="organization" />
           </div>
         </div>
@@ -794,61 +804,67 @@ create policy "authenticated read"
         <!-- Contact info -->
         <div class="field-row">
           <div class="field">
-            <label for="f-email">E-mailadres <span class="req">*</span></label>
+            <label for="f-email"><span data-nl>E-mailadres</span><span data-fr>Adresse e-mail</span><span data-en>Email address</span> <span class="req">*</span></label>
             <input type="email" id="f-email" name="email" placeholder="u@bedrijf.be" autocomplete="email" />
-            <div class="field-error" id="err-email">Vul een geldig e-mailadres in.</div>
+            <div class="field-error" id="err-email">
+              <span data-nl>Vul een geldig e-mailadres in.</span><span data-fr>Entrez une adresse e-mail valide.</span><span data-en>Enter a valid email address.</span>
+            </div>
           </div>
           <div class="field">
-            <label for="f-phone">Telefoonnummer</label>
+            <label for="f-phone"><span data-nl>Telefoonnummer</span><span data-fr>Numéro de téléphone</span><span data-en>Phone number</span></label>
             <input type="tel" id="f-phone" name="phone" placeholder="+32 4…" autocomplete="tel" />
           </div>
         </div>
 
         <!-- Business type -->
         <div class="field">
-          <label for="f-btype">Type onderneming <span class="req">*</span></label>
-          <span class="field-hint">bv. kapsalon, restaurant, advocatenkantoor…</span>
+          <label for="f-btype"><span data-nl>Type onderneming</span><span data-fr>Type d'entreprise</span><span data-en>Type of business</span> <span class="req">*</span></label>
+          <span class="field-hint"><span data-nl>bv. kapsalon, restaurant, advocatenkantoor…</span><span data-fr>p.ex. salon de coiffure, restaurant, cabinet d'avocats…</span><span data-en>e.g. hair salon, restaurant, law firm…</span></span>
           <input type="text" id="f-btype" name="business_type" placeholder="Wat doe jij of je bedrijf?" />
-          <div class="field-error" id="err-btype">Dit veld is verplicht.</div>
+          <div class="field-error" id="err-btype">
+            <span data-nl>Dit veld is verplicht.</span><span data-fr>Ce champ est obligatoire.</span><span data-en>This field is required.</span>
+          </div>
         </div>
 
         <hr class="divider" />
 
         <!-- Services checkboxes -->
         <div class="field">
-          <span class="field-label">Wat heb je nodig? <span class="req">*</span></span>
-          <span class="field-hint">Selecteer alles wat van toepassing is.</span>
+          <span class="field-label"><span data-nl>Wat heb je nodig?</span><span data-fr>De quoi avez-vous besoin&nbsp;?</span><span data-en>What do you need?</span> <span class="req">*</span></span>
+          <span class="field-hint"><span data-nl>Selecteer alles wat van toepassing is.</span><span data-fr>Sélectionnez tout ce qui s'applique.</span><span data-en>Select all that apply.</span></span>
           <div class="check-group" id="services-group">
             <label class="check-item">
               <input type="radio" name="service" value="new_website" id="rb-new" />
               <div>
-                <div class="check-item__label">Nieuwe website</div>
-                <div class="check-item__sub">Gebouwd van nul</div>
+                <div class="check-item__label"><span data-nl>Nieuwe website</span><span data-fr>Nouveau site web</span><span data-en>New website</span></div>
+                <div class="check-item__sub"><span data-nl>Gebouwd van nul</span><span data-fr>Construit de zéro</span><span data-en>Built from scratch</span></div>
               </div>
             </label>
             <label class="check-item">
               <input type="radio" name="service" value="redesign" id="rb-redesign" />
               <div>
                 <div class="check-item__label">Redesign</div>
-                <div class="check-item__sub">Mijn bestaande site opfrissen</div>
+                <div class="check-item__sub"><span data-nl>Mijn bestaande site opfrissen</span><span data-fr>Rafraîchir mon site existant</span><span data-en>Refresh my existing site</span></div>
               </div>
             </label>
             <label class="check-item">
               <input type="radio" name="service" value="webshop" id="rb-webshop" />
               <div>
-                <div class="check-item__label">Webshop</div>
-                <div class="check-item__sub">Klanten kunnen producten kopen</div>
+                <div class="check-item__label"><span data-nl>Webshop</span><span data-fr>Boutique en ligne</span><span data-en>Webshop</span></div>
+                <div class="check-item__sub"><span data-nl>Klanten kunnen producten kopen</span><span data-fr>Les clients peuvent acheter des produits</span><span data-en>Customers can buy products</span></div>
               </div>
             </label>
             <label class="check-item">
               <input type="radio" name="service" value="other" id="rb-other" />
               <div>
-                <div class="check-item__label">Iets anders</div>
-                <div class="check-item__sub">Omschrijf het hieronder</div>
+                <div class="check-item__label"><span data-nl>Iets anders</span><span data-fr>Autre chose</span><span data-en>Something else</span></div>
+                <div class="check-item__sub"><span data-nl>Omschrijf het hieronder</span><span data-fr>Décrivez-le ci-dessous</span><span data-en>Describe it below</span></div>
               </div>
             </label>
           </div>
-          <div class="field-error" id="err-services">Selecteer minstens één optie.</div>
+          <div class="field-error" id="err-services">
+            <span data-nl>Selecteer minstens één optie.</span><span data-fr>Sélectionnez au moins une option.</span><span data-en>Select at least one option.</span>
+          </div>
         </div>
 
         <hr class="divider" />
@@ -856,30 +872,34 @@ create policy "authenticated read"
         <!-- Pages + CMS -->
         <div class="field-row">
           <div class="field">
-            <label for="f-pages">Aantal pagina's <span class="req">*</span></label>
+            <label for="f-pages"><span data-nl>Aantal pagina's</span><span data-fr>Nombre de pages</span><span data-en>Number of pages</span> <span class="req">*</span></label>
             <select id="f-pages" name="page_count">
-              <option value="" disabled selected>Kies…</option>
-              <option value="1">1 pagina</option>
-              <option value="2">2 pagina's</option>
-              <option value="3">3 pagina's</option>
-              <option value="4">4 pagina's</option>
-              <option value="5+">5 of meer</option>
+              <option value="" disabled selected data-nl>Kies…</option>
+              <option value="1" data-nl>1 pagina</option>
+              <option value="2" data-nl>2 pagina's</option>
+              <option value="3" data-nl>3 pagina's</option>
+              <option value="4" data-nl>4 pagina's</option>
+              <option value="5+" data-nl>5 of meer</option>
             </select>
-            <div class="field-error" id="err-pages">Kies een optie.</div>
+            <div class="field-error" id="err-pages">
+              <span data-nl>Kies een optie.</span><span data-fr>Choisissez une option.</span><span data-en>Choose an option.</span>
+            </div>
           </div>
           <div class="field">
             <span class="field-label" style="display:flex;align-items:center;gap:0.4rem;">
-              Wilt u de website zelf aanpassen?
+              <span data-nl>Wilt u de website zelf aanpassen?</span><span data-fr>Souhaitez-vous modifier le site vous-même&nbsp;?</span><span data-en>Do you want to edit the website yourself?</span>
               <span class="info-tooltip" aria-label="Meer uitleg">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                 <span class="info-tooltip__bubble">
-                  Denk aan een autodealer die zelf nieuwe wagens wil toevoegen aan de website en oude wagens wil verwijderen — zonder u telkens te moeten bellen.
+                  <span data-nl>Denk aan een autodealer die zelf nieuwe wagens wil toevoegen aan de website en oude wagens wil verwijderen — zonder u telkens te moeten bellen.</span>
+                  <span data-fr>Pensez à un concessionnaire automobile qui veut ajouter de nouvelles voitures et en supprimer d'anciennes — sans devoir vous appeler à chaque fois.</span>
+                  <span data-en>Think of a car dealer who wants to add new cars and remove old ones from the site — without having to call you every time.</span>
                 </span>
               </span>
             </span>
             <div class="yn-group" id="yn-cms">
-              <button type="button" class="yn-btn" data-val="yes" id="yn-yes">Ja</button>
-              <button type="button" class="yn-btn" data-val="no"  id="yn-no">Nee</button>
+              <button type="button" class="yn-btn" data-val="yes" id="yn-yes"><span data-nl>Ja</span><span data-fr>Oui</span><span data-en>Yes</span></button>
+              <button type="button" class="yn-btn" data-val="no"  id="yn-no"><span data-nl>Nee</span><span data-fr>Non</span><span data-en>No</span></button>
             </div>
           </div>
         </div>
@@ -888,28 +908,28 @@ create policy "authenticated read"
 
         <!-- Add-ons -->
         <div class="field">
-          <span class="field-label">Extra opties</span>
-          <span class="field-hint">Optioneel — voeg toe wat voor jou relevant is.</span>
+          <span class="field-label"><span data-nl>Extra opties</span><span data-fr>Options supplémentaires</span><span data-en>Extra options</span></span>
+          <span class="field-hint"><span data-nl>Optioneel — voeg toe wat voor jou relevant is.</span><span data-fr>Optionnel — ajoutez ce qui est pertinent pour vous.</span><span data-en>Optional — add what's relevant for you.</span></span>
           <div class="check-group" id="addons-group">
             <label class="check-item">
               <input type="checkbox" name="addons" value="multilingual" id="cb-multilingual" />
               <div>
-                <div class="check-item__label">Meertalig <span class="addon-price">+€100</span></div>
-                <div class="check-item__sub">Website in meerdere talen (bv. NL + FR + EN)</div>
+                <div class="check-item__label"><span data-nl>Meertalig</span><span data-fr>Multilingue</span><span data-en>Multilingual</span> <span class="addon-price">+€100</span></div>
+                <div class="check-item__sub"><span data-nl>Website in meerdere talen (bv. NL + FR + EN)</span><span data-fr>Site web en plusieurs langues (p.ex. NL + FR + EN)</span><span data-en>Website in multiple languages (e.g. NL + FR + EN)</span></div>
               </div>
             </label>
             <label class="check-item">
               <input type="checkbox" name="addons" value="hosting" id="cb-hosting" />
               <div>
-                <div class="check-item__label">Domein &amp; hosting <span class="addon-price">+€15/maand</span></div>
-                <div class="check-item__sub">Domeinnaam + betrouwbare hosting, alles geregeld</div>
+                <div class="check-item__label"><span data-nl>Domein &amp; hosting</span><span data-fr>Domaine &amp; hébergement</span><span data-en>Domain &amp; hosting</span> <span class="addon-price"><span data-nl>+€15/maand</span><span data-fr>+€15/mois</span><span data-en>+€15/month</span></span></div>
+                <div class="check-item__sub"><span data-nl>Domeinnaam + betrouwbare hosting, alles geregeld</span><span data-fr>Nom de domaine + hébergement fiable, tout réglé</span><span data-en>Domain name + reliable hosting, all arranged</span></div>
               </div>
             </label>
             <label class="check-item">
               <input type="checkbox" name="addons" value="care" id="cb-care" />
               <div>
-                <div class="check-item__label">Care service <span class="addon-price">+€45/maand</span></div>
-                <div class="check-item__sub">Maandelijkse updates, backups en kleine aanpassingen</div>
+                <div class="check-item__label">Care service <span class="addon-price"><span data-nl>+€45/maand</span><span data-fr>+€45/mois</span><span data-en>+€45/month</span></span></div>
+                <div class="check-item__sub"><span data-nl>Maandelijkse updates, backups en kleine aanpassingen</span><span data-fr>Mises à jour mensuelles, sauvegardes et petites modifications</span><span data-en>Monthly updates, backups and small adjustments</span></div>
               </div>
             </label>
           </div>
@@ -920,25 +940,25 @@ create policy "authenticated read"
         <!-- Deadline + referral -->
         <div class="field-row">
           <div class="field">
-            <label for="f-deadline">Gewenste deadline</label>
+            <label for="f-deadline"><span data-nl>Gewenste deadline</span><span data-fr>Date limite souhaitée</span><span data-en>Desired deadline</span></label>
             <input type="date" id="f-deadline" name="deadline" />
           </div>
           <div class="field">
-            <label for="f-referral">Hoe heb je me gevonden?</label>
+            <label for="f-referral"><span data-nl>Hoe heb je me gevonden?</span><span data-fr>Comment m'avez-vous trouvé&nbsp;?</span><span data-en>How did you find me?</span></label>
             <input type="text" id="f-referral" name="referral" placeholder="Google, via een kennis…" />
           </div>
         </div>
 
         <!-- Extra info -->
         <div class="field">
-          <label for="f-extra">Aanvullende informatie</label>
-          <span class="field-hint">Stijlvoorkeur, inspiratiesites, speciale wensen…</span>
+          <label for="f-extra"><span data-nl>Aanvullende informatie</span><span data-fr>Informations supplémentaires</span><span data-en>Additional information</span></label>
+          <span class="field-hint"><span data-nl>Stijlvoorkeur, inspiratiesites, speciale wensen…</span><span data-fr>Préférence de style, sites d'inspiration, souhaits particuliers…</span><span data-en>Style preference, inspiration sites, special wishes…</span></span>
           <textarea id="f-extra" name="extra_info" placeholder="Alles wat je kwijt wil over je project…"></textarea>
         </div>
 
         <div style="margin-top:2rem;">
           <button type="submit" class="btn btn--primary btn--lg" id="calc-btn">
-            Bereken mijn indicatieve prijs
+            <span data-nl>Bereken mijn indicatieve prijs</span><span data-fr>Calculer mon prix indicatif</span><span data-en>Calculate my indicative price</span>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
         </div>
@@ -958,34 +978,42 @@ create policy "authenticated read"
           <div class="progress__dot">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          Jouw project
+          <span data-nl>Jouw project</span><span data-fr>Votre projet</span><span data-en>Your project</span>
         </div>
         <div class="progress__line done"></div>
         <div class="progress__step active">
           <div class="progress__dot">2</div>
-          Indicatieve prijs
+          <span data-nl>Indicatieve prijs</span><span data-fr>Prix indicatif</span><span data-en>Indicative price</span>
         </div>
       </div>
 
-      <h1 class="page-title">Jouw indicatieve offerte</h1>
-      <p class="page-sub">Gebaseerd op je keuzes. Dit is een schatting — de definitieve prijs bespreken we samen.</p>
+      <h1 class="page-title">
+        <span data-nl>Jouw indicatieve offerte</span><span data-fr>Votre devis indicatif</span><span data-en>Your indicative quote</span>
+      </h1>
+      <p class="page-sub">
+        <span data-nl>Gebaseerd op je keuzes. Dit is een schatting — de definitieve prijs bespreken we samen.</span>
+        <span data-fr>Basé sur vos choix. Il s'agit d'une estimation — le prix définitif sera discuté ensemble.</span>
+        <span data-en>Based on your choices. This is an estimate — the final price will be discussed together.</span>
+      </p>
 
       <!-- Offer card -->
       <div class="offer-card">
-        <div class="offer-card__label">Indicatieve investering</div>
+        <div class="offer-card__label"><span data-nl>Indicatieve investering</span><span data-fr>Investissement indicatif</span><span data-en>Indicative investment</span></div>
         <div class="offer-card__price" id="offer-price"></div>
         <div class="offer-card__monthly" id="offer-price-monthly" style="display:none;"></div>
 
         <ul class="breakdown" id="offer-breakdown"></ul>
 
         <p class="offer-card__disclaimer">
-          Dit is een vrijblijvende, indicatieve schatting. De definitieve prijs wordt bevestigd na ons kennismakingsgesprek.
+          <span data-nl>Dit is een vrijblijvende, indicatieve schatting. De definitieve prijs wordt bevestigd na ons kennismakingsgesprek.</span>
+          <span data-fr>Il s'agit d'une estimation indicative sans engagement. Le prix définitif est confirmé après notre entretien de connaissance.</span>
+          <span data-en>This is a non-binding, indicative estimate. The final price is confirmed after our introductory meeting.</span>
         </p>
       </div>
 
       <!-- Summary -->
       <div class="summary-card">
-        <h3>Samenvatting van je aanvraag</h3>
+        <h3><span data-nl>Samenvatting van je aanvraag</span><span data-fr>Résumé de votre demande</span><span data-en>Summary of your request</span></h3>
         <div class="summary-grid" id="offer-summary"></div>
       </div>
 
@@ -993,13 +1021,13 @@ create policy "authenticated read"
       <div class="error-msg" id="send-error"></div>
 
       <button type="button" class="btn btn--primary btn--lg" id="send-btn">
-        Stuur deze offerte-aanvraag in
+        <span data-nl>Stuur deze offerte-aanvraag in</span><span data-fr>Envoyer cette demande de devis</span><span data-en>Send this quote request</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
       </button>
 
       <p style="text-align:center;margin-top:1rem;font-size:0.875rem;color:var(--muted);">
-        Nog iets aanpassen?
-        <button type="button" id="back-btn" style="background:none;border:none;cursor:pointer;color:var(--navy);font-family:var(--font-h);font-weight:600;font-size:0.875rem;text-decoration:underline;text-underline-offset:2px;padding:0;">Terug naar het formulier</button>
+        <span data-nl>Nog iets aanpassen?</span><span data-fr>Quelque chose à modifier&nbsp;?</span><span data-en>Something to adjust?</span>
+        <button type="button" id="back-btn" style="background:none;border:none;cursor:pointer;color:var(--navy);font-family:var(--font-h);font-weight:600;font-size:0.875rem;text-decoration:underline;text-underline-offset:2px;padding:0;"><span data-nl>Terug naar het formulier</span><span data-fr>Retour au formulaire</span><span data-en>Back to the form</span></button>
       </p>
 
     </div><!-- /stage-2 -->
@@ -1013,9 +1041,15 @@ create policy "authenticated read"
         <div class="thankyou__icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="#1E7E52" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <h2>Aanvraag ontvangen!</h2>
-        <p>Bedankt voor je aanvraag. Ik neem zo snel mogelijk contact met je op om alles verder te bespreken.</p>
-        <a href="index.html" class="btn btn--secondary" style="display:inline-flex;width:auto;">← Terug naar home</a>
+        <h2><span data-nl>Aanvraag ontvangen!</span><span data-fr>Demande reçue&nbsp;!</span><span data-en>Request received!</span></h2>
+        <p>
+          <span data-nl>Bedankt voor je aanvraag. Ik neem zo snel mogelijk contact met je op om alles verder te bespreken.</span>
+          <span data-fr>Merci pour votre demande. Je vous contacterai dans les plus brefs délais pour discuter de tout.</span>
+          <span data-en>Thank you for your request. I'll contact you as soon as possible to discuss everything.</span>
+        </p>
+        <a href="index.html" class="btn btn--secondary" style="display:inline-flex;width:auto;">
+          <span data-nl>← Terug naar home</span><span data-fr>← Retour à l'accueil</span><span data-en>← Back to home</span>
+        </a>
       </div>
     </div>
 
@@ -1193,28 +1227,29 @@ create policy "authenticated read"
       const est = calcEstimate(pages, selfEdit, selAddons);
 
       /* Price display */
-      const pageLabel = { '1': '1 pagina', '2': '2 pagina\'s', '3': '3 pagina\'s', '4': '4 pagina\'s', '5+': '5+ pagina\'s' }[pages];
+      const tr        = t();
+      const pageLabel = tr.pageLabel[pages] || pages;
       offerPrice.textContent = fmtPrice(est.total, est.plus);
 
       const offerMonthly = document.getElementById('offer-price-monthly');
       if (est.monthly > 0) {
         offerMonthly.style.display = '';
-        offerMonthly.innerHTML = '+ <strong>€' + est.monthly + '/maand</strong>';
+        offerMonthly.innerHTML = '+ <strong>€' + est.monthly + tr.monthly + '</strong>';
       } else {
         offerMonthly.style.display = 'none';
       }
 
       /* Breakdown */
-      let breakdownHtml = `<li><span>Website (${escHtml(pageLabel)})</span><strong>${fmtPrice(est.base, est.plus && est.oneTime === 0)}</strong></li>`;
-      if (selfEdit)                        breakdownHtml += `<li><span>Zelf aanpassen (CMS)</span><strong>+€200</strong></li>`;
-      if (selAddons.includes('multilingual')) breakdownHtml += `<li><span>Meertalig</span><strong>+€100</strong></li>`;
+      let breakdownHtml = `<li><span>${escHtml(tr.webSite)} (${escHtml(pageLabel)})</span><strong>${fmtPrice(est.base, est.plus && est.oneTime === 0)}</strong></li>`;
+      if (selfEdit)                           breakdownHtml += `<li><span>${escHtml(tr.selfEdit)}</span><strong>+€200</strong></li>`;
+      if (selAddons.includes('multilingual')) breakdownHtml += `<li><span>${escHtml(tr.addonLabels.multilingual)}</span><strong>+€100</strong></li>`;
       if (est.oneTime > 0) {
-        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>Totaal eenmalig</strong></span><strong>${fmtPrice(est.total, est.plus)}</strong></li>`;
+        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>${escHtml(tr.totalOneTime)}</strong></span><strong>${fmtPrice(est.total, est.plus)}</strong></li>`;
       }
-      if (selAddons.includes('hosting'))   breakdownHtml += `<li><span>Domein &amp; hosting</span><strong>+€15/maand</strong></li>`;
-      if (selAddons.includes('care'))      breakdownHtml += `<li><span>Care service</span><strong>+€45/maand</strong></li>`;
+      if (selAddons.includes('hosting'))  breakdownHtml += `<li><span>${escHtml(tr.addonLabels.hosting)}</span><strong>+€15${tr.monthly}</strong></li>`;
+      if (selAddons.includes('care'))     breakdownHtml += `<li><span>${escHtml(tr.addonLabels.care)}</span><strong>+€45${tr.monthly}</strong></li>`;
       if (est.monthly > 0) {
-        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>Totaal maandelijks</strong></span><strong>€${est.monthly}/maand</strong></li>`;
+        breakdownHtml += `<hr class="breakdown__divider" /><li><span><strong>${escHtml(tr.totalMonthly)}</strong></span><strong>€${est.monthly}${tr.monthly}</strong></li>`;
       }
       offerBreakdown.innerHTML = breakdownHtml;
 
@@ -1224,23 +1259,22 @@ create policy "authenticated read"
       const business = document.getElementById('f-business').value.trim();
       const extra    = document.getElementById('f-extra').value.trim();
 
-      const addonLabels = { multilingual: 'Meertalig', hosting: 'Domein & hosting', care: 'Care service' };
-
       const phone    = document.getElementById('f-phone').value.trim();
+      const sk       = tr.summaryKeys;
 
       const rows = [
-        ['Naam',             name],
-        business ? ['Bedrijf', business] : null,
-        ['E-mail',           emailVal],
-        phone ? ['Telefoon', phone] : null,
-        ['Type onderneming', btype],
-        ['Gevraagde diensten', services.map(labelFor).join(', ')],
-        ['Aantal pagina\'s',  pageLabel],
-        ynCmsValue ? ['Zelf aanpassen', ynCmsValue === 'yes' ? 'Ja (+€200)' : 'Nee'] : null,
-        selAddons.length > 0 ? ['Extra opties', selAddons.map(function(a) { return addonLabels[a] || a; }).join(', ')] : null,
-        deadline ? ['Deadline', new Date(deadline).toLocaleDateString('nl-BE', { day: 'numeric', month: 'long', year: 'numeric' })] : null,
-        referral ? ['Gevonden via', referral] : null,
-        extra    ? ['Extra info',   extra]    : null,
+        [sk.name,     name],
+        business ? [sk.business, business] : null,
+        [sk.email,    emailVal],
+        phone ? [sk.phone, phone] : null,
+        [sk.btype,    btype],
+        [sk.services, services.map(function(s) { return tr.svcLabel[s] || s; }).join(', ')],
+        [sk.pages,    pageLabel],
+        ynCmsValue ? [sk.cms, ynCmsValue === 'yes' ? tr.cmsYes : tr.cmsNo] : null,
+        selAddons.length > 0 ? [sk.addons, selAddons.map(function(a) { return tr.addonLabels[a] || a; }).join(', ')] : null,
+        deadline ? [sk.deadline, new Date(deadline).toLocaleDateString(htmlEl.getAttribute('lang') || 'nl', { day: 'numeric', month: 'long', year: 'numeric' })] : null,
+        referral ? [sk.referral, referral] : null,
+        extra    ? [sk.extra,    extra]    : null,
       ].filter(Boolean);
 
       offerSummary.innerHTML = rows.map(function (r) {
@@ -1264,7 +1298,7 @@ create policy "authenticated read"
     sendBtn.addEventListener('click', async function () {
       hideErr(sendError);
       sendBtn.disabled = true;
-      sendBtn.textContent = 'Bezig met verzenden…';
+      sendBtn.textContent = t().sending;
 
       const name      = document.getElementById('f-name').value.trim();
       const business  = document.getElementById('f-business').value.trim();
@@ -1335,15 +1369,68 @@ create policy "authenticated read"
 
       } catch (err) {
         console.error(err);
-        showErr(sendError, 'Er liep iets mis bij het verzenden. Probeer het opnieuw of stuur me een e-mail.');
+        showErr(sendError, t().sendError);
         sendBtn.disabled    = false;
-        sendBtn.textContent = 'Stuur deze offerte-aanvraag in';
+        sendBtn.textContent = t().sendReset;
       }
     });
 
     /* ── Language toggle ─────────────────────────────────────────── */
     const htmlEl   = document.documentElement;
     const langBtns = document.querySelectorAll('[data-lang-btn]');
+
+    /* Translatable strings for JS-generated content */
+    const T = {
+      nl: {
+        pageLabel:    { '1': '1 pagina', '2': "2 pagina's", '3': "3 pagina's", '4': "4 pagina's", '5+': "5+ pagina's" },
+        selectPlaceholder: 'Kies…',
+        webSite:      'Website',
+        selfEdit:     'Zelf aanpassen (CMS)',
+        totalOneTime: 'Totaal eenmalig',
+        totalMonthly: 'Totaal maandelijks',
+        monthly:      '/maand',
+        addonLabels:  { multilingual: 'Meertalig', hosting: 'Domein & hosting', care: 'Care service' },
+        summaryKeys:  { name: 'Naam', business: 'Bedrijf', email: 'E-mail', phone: 'Telefoon', btype: 'Type onderneming', services: 'Gevraagde diensten', pages: "Aantal pagina's", cms: 'Zelf aanpassen', addons: 'Extra opties', deadline: 'Deadline', referral: 'Gevonden via', extra: 'Extra info' },
+        cmsYes:       'Ja (+€200)', cmsNo: 'Nee',
+        sending:      'Bezig met verzenden…',
+        sendReset:    'Stuur deze offerte-aanvraag in',
+        sendError:    'Er liep iets mis bij het verzenden. Probeer het opnieuw of stuur me een e-mail.',
+        svcLabel:     { new_website: 'Nieuwe website', redesign: 'Redesign', webshop: 'Webshop', other: 'Iets anders' },
+      },
+      fr: {
+        pageLabel:    { '1': '1 page', '2': '2 pages', '3': '3 pages', '4': '4 pages', '5+': '5+ pages' },
+        selectPlaceholder: 'Choisir…',
+        webSite:      'Site web',
+        selfEdit:     'Modification soi-même (CMS)',
+        totalOneTime: 'Total unique',
+        totalMonthly: 'Total mensuel',
+        monthly:      '/mois',
+        addonLabels:  { multilingual: 'Multilingue', hosting: 'Domaine & hébergement', care: 'Care service' },
+        summaryKeys:  { name: 'Nom', business: 'Entreprise', email: 'E-mail', phone: 'Téléphone', btype: "Type d'entreprise", services: 'Services demandés', pages: 'Nombre de pages', cms: 'Modification soi-même', addons: 'Options supplémentaires', deadline: 'Date limite', referral: 'Trouvé via', extra: 'Info supplémentaire' },
+        cmsYes:       'Oui (+€200)', cmsNo: 'Non',
+        sending:      'Envoi en cours…',
+        sendReset:    'Envoyer cette demande de devis',
+        sendError:    "Une erreur s'est produite lors de l'envoi. Réessayez ou envoyez-moi un e-mail.",
+        svcLabel:     { new_website: 'Nouveau site web', redesign: 'Redesign', webshop: 'Boutique en ligne', other: 'Autre chose' },
+      },
+      en: {
+        pageLabel:    { '1': '1 page', '2': '2 pages', '3': '3 pages', '4': '4 pages', '5+': '5+ pages' },
+        selectPlaceholder: 'Choose…',
+        webSite:      'Website',
+        selfEdit:     'Self-edit (CMS)',
+        totalOneTime: 'Total one-time',
+        totalMonthly: 'Total monthly',
+        monthly:      '/month',
+        addonLabels:  { multilingual: 'Multilingual', hosting: 'Domain & hosting', care: 'Care service' },
+        summaryKeys:  { name: 'Name', business: 'Business', email: 'Email', phone: 'Phone', btype: 'Business type', services: 'Services requested', pages: 'Number of pages', cms: 'Self-edit', addons: 'Extra options', deadline: 'Deadline', referral: 'Found via', extra: 'Extra info' },
+        cmsYes:       'Yes (+€200)', cmsNo: 'No',
+        sending:      'Sending…',
+        sendReset:    'Send this quote request',
+        sendError:    'Something went wrong. Please try again or send me an email.',
+        svcLabel:     { new_website: 'New website', redesign: 'Redesign', webshop: 'Webshop', other: 'Something else' },
+      },
+    };
+    function t() { return T[htmlEl.getAttribute('data-lang')] || T.nl; }
 
     function setLang(lang) {
       htmlEl.setAttribute('data-lang', lang);
@@ -1354,6 +1441,15 @@ create policy "authenticated read"
         btn.classList.toggle('active', active);
         btn.setAttribute('aria-pressed', String(active));
       });
+      /* Update select options */
+      const sel = document.getElementById('f-pages');
+      const tr  = T[lang] || T.nl;
+      sel.options[0].text = tr.selectPlaceholder;
+      sel.options[1].text = tr.pageLabel['1'];
+      sel.options[2].text = tr.pageLabel['2'];
+      sel.options[3].text = tr.pageLabel['3'];
+      sel.options[4].text = tr.pageLabel['4'];
+      sel.options[5].text = tr.pageLabel['5+'];
     }
     setLang(localStorage.getItem('wwdLang') || 'nl');
     langBtns.forEach(function (btn) {
