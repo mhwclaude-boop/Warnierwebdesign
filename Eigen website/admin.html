@@ -279,12 +279,6 @@
     .quote-modal__header h3 { font-family: var(--font-h); font-size: 1.125rem; font-weight: 800; color: var(--navy); }
     .quote-modal__header .sub { font-size: 0.8125rem; color: var(--muted); margin-top: 2px; }
     .quote-modal__body { padding: 1.5rem; overflow-y: auto; flex: 1; }
-    .quote-modal__footer {
-      padding: 1rem 1.5rem;
-      border-top: 1px solid var(--border);
-      display: flex; justify-content: flex-end;
-      flex-shrink: 0;
-    }
     .qd-section { margin-bottom: 1.25rem; }
     .qd-section:last-child { margin-bottom: 0; }
     .qd-label {
@@ -526,9 +520,6 @@
         <button class="btn btn--secondary btn--sm" id="qd-close-btn">✕ Close</button>
       </div>
       <div class="quote-modal__body" id="qd-body"></div>
-      <div class="quote-modal__footer">
-        <button class="btn btn--secondary btn--sm" id="qd-close-btn2">Close</button>
-      </div>
     </div>
   </div>
 
@@ -827,7 +818,6 @@
     }
 
     document.getElementById('qd-close-btn').addEventListener('click', closeQuoteDetail);
-    document.getElementById('qd-close-btn2').addEventListener('click', closeQuoteDetail);
     quoteDetailOverlay.addEventListener('click', function (e) {
       if (e.target === quoteDetailOverlay) closeQuoteDetail();
     });
