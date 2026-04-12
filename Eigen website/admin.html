@@ -30,7 +30,7 @@ create table if not exists public.projects (
   client_name  text not null,
   project_type text not null default '',
   status       text not null default 'Discovery'
-    check (status in ('Discovery','In Progress','Review','Launch','Done','On Hold')),
+    check (status in ('Discovery','In Progress','Review','Deploy','Done','On Hold')),
   start_date   date,
   deadline     date,
   quote_value  numeric(10,2),
@@ -433,7 +433,7 @@ create policy "Authenticated users can delete projects"
     .status-badge--discovery   { background: #EEF2FF; color: #4F46E5; }
     .status-badge--in-progress { background: #FFF0E6; color: #F46219; }
     .status-badge--review      { background: #F5F3FF; color: #7C3AED; }
-    .status-badge--launch      { background: #ECFDF5; color: #059669; }
+    .status-badge--deploy      { background: #ECFDF5; color: #059669; }
     .status-badge--done        { background: #E6F4EE; color: var(--success); }
     .status-badge--on-hold     { background: #F3F4F6; color: #6B7280; }
 
@@ -523,7 +523,7 @@ create policy "Authenticated users can delete projects"
     .status-pick-btn.is-active[data-pstatus="Discovery"]   { background: #EEF2FF; color: #4F46E5;        border-color: #4F46E5; }
     .status-pick-btn.is-active[data-pstatus="In Progress"] { background: #FFF0E6; color: #F46219;        border-color: #F46219; }
     .status-pick-btn.is-active[data-pstatus="Review"]      { background: #F5F3FF; color: #7C3AED;        border-color: #7C3AED; }
-    .status-pick-btn.is-active[data-pstatus="Launch"]      { background: #ECFDF5; color: #059669;        border-color: #059669; }
+    .status-pick-btn.is-active[data-pstatus="Deploy"]      { background: #ECFDF5; color: #059669;        border-color: #059669; }
     .status-pick-btn.is-active[data-pstatus="Done"]        { background: #E6F4EE; color: var(--success); border-color: var(--success); }
     .status-pick-btn.is-active[data-pstatus="On Hold"]     { background: #F3F4F6; color: #6B7280;        border-color: #9CA3AF; }
   </style>
@@ -686,7 +686,7 @@ create policy "Authenticated users can delete projects"
                   <option value="Discovery">Discovery</option>
                   <option value="In Progress">In Progress</option>
                   <option value="Review">Review</option>
-                  <option value="Launch">Launch</option>
+                  <option value="Deploy">Deploy</option>
                   <option value="Done">Done</option>
                   <option value="On Hold">On Hold</option>
                 </select>
@@ -729,7 +729,7 @@ create policy "Authenticated users can delete projects"
           <button class="btn btn--secondary btn--sm" data-filter="Discovery">Discovery</button>
           <button class="btn btn--secondary btn--sm" data-filter="In Progress">In Progress</button>
           <button class="btn btn--secondary btn--sm" data-filter="Review">Review</button>
-          <button class="btn btn--secondary btn--sm" data-filter="Launch">Launch</button>
+          <button class="btn btn--secondary btn--sm" data-filter="Deploy">Deploy</button>
           <button class="btn btn--secondary btn--sm" data-filter="Done">Done</button>
           <button class="btn btn--secondary btn--sm" data-filter="On Hold">On Hold</button>
         </div>
@@ -1637,7 +1637,7 @@ create policy "Authenticated users can delete projects"
       { key: 'final_payment',      label: 'Final payment received' },
     ];
 
-    var PROJ_STATUSES = ['Discovery', 'In Progress', 'Review', 'Launch', 'Done', 'On Hold'];
+    var PROJ_STATUSES = ['Discovery', 'In Progress', 'Review', 'Deploy', 'Done', 'On Hold'];
 
     function projStatusClass(status) {
       return (status || 'discovery').toLowerCase().replace(/\s+/g, '-');
@@ -1701,12 +1701,12 @@ create policy "Authenticated users can delete projects"
           '<div class="kpi-card__sub">excl. done &amp; on hold</div>' +
         '</div>' +
         '<div class="kpi-card">' +
-          '<div class="kpi-card__label">Total pipeline</div>' +
+          '<div class="kpi-card__label">Total</div>' +
           '<div class="kpi-card__value kpi-card__value--orange">€' + totalVal.toLocaleString('nl-BE') + '</div>' +
           '<div class="kpi-card__sub">all projects</div>' +
         '</div>' +
         '<div class="kpi-card">' +
-          '<div class="kpi-card__label">Active pipeline</div>' +
+          '<div class="kpi-card__label">Pipeline</div>' +
           '<div class="kpi-card__value kpi-card__value--orange">€' + activeVal.toLocaleString('nl-BE') + '</div>' +
           '<div class="kpi-card__sub">excl. done &amp; on hold</div>' +
         '</div>';
