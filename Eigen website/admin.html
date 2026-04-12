@@ -113,7 +113,7 @@ create policy "Authenticated users can delete projects"
     .topbar__brand span { background: var(--orange); font-size: 0.6875rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; }
     .topbar__actions { display: flex; align-items: center; gap: 0.75rem; }
 
-    .dash { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+    .dash { width: 75%; max-width: 1400px; min-width: 320px; margin: 0 auto; padding: 2.5rem 1.5rem; }
     .dash__header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem; flex-wrap: wrap; }
     .dash__header h2 { font-family: var(--font-h); font-size: 1.375rem; font-weight: 800; color: var(--navy); }
 
@@ -586,7 +586,7 @@ create policy "Authenticated users can delete projects"
       <div class="alert alert--success" id="dash-success"></div>
 
       <!-- ── PANEL: News Posts ── -->
-      <div id="panel-posts" role="tabpanel" style="display:none;"
+      <div id="panel-posts" role="tabpanel" style="display:none;">
         <div class="dash__header">
           <h2>News Posts</h2>
           <button class="btn btn--primary" id="new-post-btn">+ New Post</button>
@@ -933,6 +933,7 @@ create policy "Authenticated users can delete projects"
 
     let quotesLoaded   = false;
     let projectsLoaded = false;
+    let postsLoaded    = false;
 
     function switchTab(active) {
       ['posts', 'quotes', 'projects'].forEach(function (name) {
@@ -943,6 +944,7 @@ create policy "Authenticated users can delete projects"
         btn.setAttribute('aria-selected', String(isActive));
         panel.style.display = isActive ? '' : 'none';
       });
+      if (active === 'posts'    && !postsLoaded)    { postsLoaded = true; loadPosts(); }
       if (active === 'quotes'   && !quotesLoaded)   { loadQuotes(); }
       if (active === 'projects' && !projectsLoaded) { loadProjects(); }
     }
