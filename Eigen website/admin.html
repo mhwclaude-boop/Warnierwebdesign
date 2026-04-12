@@ -23,6 +23,34 @@ create policy "Authenticated users can delete quote_requests"
   to authenticated
   using (true);
 
+-- 3. Projects table
+create table if not exists public.projects (
+  id           uuid primary key default gen_random_uuid(),
+  quote_id     uuid references public.quote_requests(id) on delete set null,
+  client_name  text not null,
+  project_type text not null default '',
+  status       text not null default 'Discovery'
+    check (status in ('Discovery','In Progress','Review','Launch','Done','On Hold')),
+  start_date   date,
+  deadline     date,
+  quote_value  numeric(10,2),
+  notes        text not null default '',
+  milestones   jsonb not null default '{}',
+  created_at   timestamptz not null default now(),
+  updated_at   timestamptz not null default now()
+);
+
+alter table public.projects enable row level security;
+
+create policy "Authenticated users can select projects"
+  on public.projects for select to authenticated using (true);
+create policy "Authenticated users can insert projects"
+  on public.projects for insert to authenticated with check (true);
+create policy "Authenticated users can update projects"
+  on public.projects for update to authenticated using (true) with check (true);
+create policy "Authenticated users can delete projects"
+  on public.projects for delete to authenticated using (true);
+
 =============================================================
 -->
 <html lang="en">
@@ -90,7 +118,7 @@ create policy "Authenticated users can delete quote_requests"
 
     /* ── Shared form / card styles ── */
     label { display: block; font-family: var(--font-h); font-weight: 600; font-size: 0.875rem; color: var(--navy); margin-bottom: 0.4rem; }
-    input[type="text"], input[type="email"], input[type="password"], input[type="file"], textarea, select {
+    input[type="text"], input[type="email"], input[type="password"], input[type="number"], input[type="date"], input[type="file"], textarea, select {
       width: 100%; padding: 0.625rem 0.875rem;
       border: 1.5px solid var(--border); border-radius: var(--r-sm);
       font-family: var(--font-b); font-size: 0.9375rem; color: var(--text);
@@ -399,6 +427,83 @@ create policy "Authenticated users can delete quote_requests"
     .crop-modal__footer .ratio-btns { display: flex; gap: 0.375rem; flex-wrap: wrap; }
     .crop-modal__footer .spacer { flex: 1; }
     .crop-modal__footer .action-btns { display: flex; gap: 0.5rem; flex-shrink: 0; }
+
+    /* ── Project status badges ── */
+    .status-badge--discovery   { background: #EEF2FF; color: #4F46E5; }
+    .status-badge--in-progress { background: #FFF0E6; color: #F46219; }
+    .status-badge--review      { background: #F5F3FF; color: #7C3AED; }
+    .status-badge--launch      { background: #ECFDF5; color: #059669; }
+    .status-badge--done        { background: #E6F4EE; color: var(--success); }
+    .status-badge--on-hold     { background: #F3F4F6; color: #6B7280; }
+
+    /* ── Deadline badge ── */
+    .deadline-badge { font-size: 0.8125rem; font-weight: 600; }
+    .deadline-badge--soon    { color: #D97706; }
+    .deadline-badge--overdue { color: var(--danger); }
+
+    /* ── Project filter bar ── */
+    .proj-filters { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+
+    /* ── 2-column field row ── */
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+    .field-row .field { margin-bottom: 0; }
+
+    /* ── Project edit modal ── */
+    .proj-modal {
+      background: var(--white);
+      border-radius: var(--r-md);
+      width: 100%; max-width: 600px;
+      box-shadow: 0 8px 40px rgba(11,26,78,0.25);
+      max-height: 90svh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .proj-modal__header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+      flex-shrink: 0;
+    }
+    .proj-modal__header h3 { font-family: var(--font-h); font-size: 1.125rem; font-weight: 800; color: var(--navy); }
+    .proj-modal__body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+    .proj-modal__body .field { margin-bottom: 1rem; }
+    .proj-modal__body .field:last-child { margin-bottom: 0; }
+    .proj-modal__body .field-row { margin-bottom: 1rem; }
+    .proj-modal__footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      flex-shrink: 0;
+    }
+
+    /* ── Milestone checklist ── */
+    .milestone-list { display: flex; flex-direction: column; gap: 0.25rem; margin-top: 0.5rem; }
+    .milestone-item {
+      display: flex; align-items: center; gap: 0.625rem;
+      cursor: pointer; padding: 0.4375rem 0.625rem;
+      border-radius: var(--r-sm);
+      transition: background 0.15s;
+      font-size: 0.9rem; color: var(--text);
+      font-family: var(--font-b);
+      user-select: none;
+    }
+    .milestone-item:hover { background: var(--off-white); }
+    .milestone-item input[type="checkbox"] {
+      width: 15px; height: 15px; flex-shrink: 0;
+      accent-color: var(--navy); cursor: pointer;
+      padding: 0; margin: 0; border: none; background: none;
+    }
+    .milestone-item.is-done { color: var(--muted); }
+    .milestone-item.is-done span { text-decoration: line-through; }
+
+    /* ── Status pick buttons for project statuses ── */
+    .status-pick-btn.is-active[data-pstatus="Discovery"]   { background: #EEF2FF; color: #4F46E5;        border-color: #4F46E5; }
+    .status-pick-btn.is-active[data-pstatus="In Progress"] { background: #FFF0E6; color: #F46219;        border-color: #F46219; }
+    .status-pick-btn.is-active[data-pstatus="Review"]      { background: #F5F3FF; color: #7C3AED;        border-color: #7C3AED; }
+    .status-pick-btn.is-active[data-pstatus="Launch"]      { background: #ECFDF5; color: #059669;        border-color: #059669; }
+    .status-pick-btn.is-active[data-pstatus="Done"]        { background: #E6F4EE; color: var(--success); border-color: var(--success); }
+    .status-pick-btn.is-active[data-pstatus="On Hold"]     { background: #F3F4F6; color: #6B7280;        border-color: #9CA3AF; }
   </style>
   <!-- Supabase JS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -451,7 +556,8 @@ create policy "Authenticated users can delete quote_requests"
       <!-- Tab navigation -->
       <div class="tabs" role="tablist">
         <button class="tab-btn active" id="tab-posts" role="tab" aria-selected="true"  aria-controls="panel-posts">News Posts</button>
-        <button class="tab-btn"        id="tab-quotes" role="tab" aria-selected="false" aria-controls="panel-quotes">Quote Requests</button>
+        <button class="tab-btn"        id="tab-quotes"   role="tab" aria-selected="false" aria-controls="panel-quotes">Quote Requests</button>
+        <button class="tab-btn"        id="tab-projects" role="tab" aria-selected="false" aria-controls="panel-projects">Projects</button>
       </div>
 
       <div class="alert alert--error" id="dash-error"></div>
@@ -527,6 +633,86 @@ create policy "Authenticated users can delete quote_requests"
         </div>
       </div><!-- /panel-quotes -->
 
+      <!-- ── PANEL: Projects ── -->
+      <div id="panel-projects" role="tabpanel" style="display:none;">
+        <div class="dash__header">
+          <h2>Projects</h2>
+          <button class="btn btn--primary" id="new-project-btn">+ Add Project</button>
+        </div>
+
+        <!-- Add project form panel -->
+        <div class="post-form-panel" id="project-form-panel">
+          <div class="post-form-panel__header">
+            <h3 id="proj-form-title">New Project</h3>
+            <button class="btn btn--secondary btn--sm" id="cancel-proj-btn">Cancel</button>
+          </div>
+          <form id="project-form">
+            <div class="field-row" style="margin-bottom:1.25rem;">
+              <div class="field">
+                <label for="pf-client">Client name</label>
+                <input type="text" id="pf-client" required placeholder="e.g. Acme Corp" />
+              </div>
+              <div class="field">
+                <label for="pf-type">Project type</label>
+                <input type="text" id="pf-type" placeholder="e.g. New website, Webshop" />
+              </div>
+            </div>
+            <div class="field-row" style="margin-bottom:1.25rem;">
+              <div class="field">
+                <label for="pf-status">Status</label>
+                <select id="pf-status">
+                  <option value="Discovery">Discovery</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Review">Review</option>
+                  <option value="Launch">Launch</option>
+                  <option value="Done">Done</option>
+                  <option value="On Hold">On Hold</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="pf-value">Quote value (€)</label>
+                <input type="number" id="pf-value" min="0" step="50" placeholder="e.g. 1200" />
+              </div>
+            </div>
+            <div class="field-row" style="margin-bottom:1.25rem;">
+              <div class="field">
+                <label for="pf-start">Start date</label>
+                <input type="date" id="pf-start" />
+              </div>
+              <div class="field">
+                <label for="pf-deadline">Deadline</label>
+                <input type="date" id="pf-deadline" />
+              </div>
+            </div>
+            <div class="field">
+              <label for="pf-notes">Notes</label>
+              <textarea id="pf-notes" placeholder="Any notes about this project…" style="min-height:80px;"></textarea>
+            </div>
+            <div style="display:flex;gap:0.75rem;margin-top:1.5rem;justify-content:flex-end;">
+              <button type="submit" class="btn btn--primary" id="save-proj-btn">Save Project</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="proj-filters" id="proj-filters">
+          <button class="btn btn--secondary btn--sm btn--active" data-filter="all">All</button>
+          <button class="btn btn--secondary btn--sm" data-filter="Discovery">Discovery</button>
+          <button class="btn btn--secondary btn--sm" data-filter="In Progress">In Progress</button>
+          <button class="btn btn--secondary btn--sm" data-filter="Review">Review</button>
+          <button class="btn btn--secondary btn--sm" data-filter="Launch">Launch</button>
+          <button class="btn btn--secondary btn--sm" data-filter="Done">Done</button>
+          <button class="btn btn--secondary btn--sm" data-filter="On Hold">On Hold</button>
+        </div>
+
+        <!-- Projects table -->
+        <div id="projects-wrap">
+          <div style="display:flex;justify-content:center;padding:3rem;">
+            <div class="spinner spinner--dark"></div>
+          </div>
+        </div>
+      </div><!-- /panel-projects -->
+
     </div><!-- /dash -->
   </div><!-- /dashboard -->
 
@@ -579,8 +765,9 @@ create policy "Authenticated users can delete quote_requests"
         <button class="btn btn--secondary btn--sm" id="qd-close-btn">✕ Close</button>
       </div>
       <div class="quote-modal__body" id="qd-body"></div>
-      <div class="quote-modal__footer">
+      <div class="quote-modal__footer" style="gap:0.75rem;">
         <button class="btn btn--danger btn--sm" id="qd-delete-btn">Delete quote</button>
+        <button class="btn btn--secondary btn--sm" id="qd-create-proj-btn">→ Create Project</button>
       </div>
     </div>
   </div>
@@ -593,6 +780,36 @@ create policy "Authenticated users can delete quote_requests"
       <div class="confirm-card__actions">
         <button class="btn btn--secondary" id="quote-delete-cancel-btn">Cancel</button>
         <button class="btn btn--danger" id="quote-delete-confirm-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project edit / detail overlay -->
+  <div class="overlay" id="proj-edit-overlay">
+    <div class="proj-modal">
+      <div class="proj-modal__header">
+        <div>
+          <h3 id="pm-title"></h3>
+          <div id="pm-sub" style="font-size:0.8125rem;color:var(--muted);margin-top:2px;"></div>
+        </div>
+        <button class="btn btn--secondary btn--sm" id="pm-close-btn">✕ Close</button>
+      </div>
+      <div class="proj-modal__body" id="pm-body"></div>
+      <div class="proj-modal__footer">
+        <button class="btn btn--danger btn--sm" id="pm-delete-btn">Delete project</button>
+        <button class="btn btn--primary btn--sm" id="pm-save-btn">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Project delete confirm overlay -->
+  <div class="overlay" id="proj-delete-overlay">
+    <div class="confirm-card">
+      <h3>Delete project?</h3>
+      <p>This will permanently remove the project. This cannot be undone.</p>
+      <div class="confirm-card__actions">
+        <button class="btn btn--secondary" id="proj-delete-cancel-btn">Cancel</button>
+        <button class="btn btn--danger" id="proj-delete-confirm-btn">Delete</button>
       </div>
     </div>
   </div>
@@ -685,25 +902,25 @@ create policy "Authenticated users can delete quote_requests"
 
     /* ══════════════════════════════ TABS ══════════════════════════════ */
 
-    const tabPosts   = document.getElementById('tab-posts');
-    const tabQuotes  = document.getElementById('tab-quotes');
-    const panelPosts  = document.getElementById('panel-posts');
-    const panelQuotes = document.getElementById('panel-quotes');
-    let quotesLoaded  = false;
+    let quotesLoaded   = false;
+    let projectsLoaded = false;
 
     function switchTab(active) {
-      const isQuotes = active === 'quotes';
-      tabPosts.classList.toggle('active', !isQuotes);
-      tabQuotes.classList.toggle('active',  isQuotes);
-      tabPosts.setAttribute('aria-selected',  String(!isQuotes));
-      tabQuotes.setAttribute('aria-selected', String(isQuotes));
-      panelPosts.style.display  = isQuotes ? 'none' : '';
-      panelQuotes.style.display = isQuotes ? '' : 'none';
-      if (isQuotes && !quotesLoaded) { loadQuotes(); }
+      ['posts', 'quotes', 'projects'].forEach(function (name) {
+        var btn   = document.getElementById('tab-' + name);
+        var panel = document.getElementById('panel-' + name);
+        var isActive = name === active;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', String(isActive));
+        panel.style.display = isActive ? '' : 'none';
+      });
+      if (active === 'quotes'   && !quotesLoaded)   { loadQuotes(); }
+      if (active === 'projects' && !projectsLoaded) { loadProjects(); }
     }
 
-    tabPosts.addEventListener('click',  function () { switchTab('posts');  });
-    tabQuotes.addEventListener('click', function () { switchTab('quotes'); });
+    document.getElementById('tab-posts').addEventListener('click',    function () { switchTab('posts');    });
+    document.getElementById('tab-quotes').addEventListener('click',   function () { switchTab('quotes');   });
+    document.getElementById('tab-projects').addEventListener('click', function () { switchTab('projects'); });
     document.getElementById('refresh-quotes-btn').addEventListener('click', function () {
       quotesLoaded = false;
       loadQuotes();
@@ -967,6 +1184,9 @@ create policy "Authenticated users can delete quote_requests"
         closeQuoteDetail();
         quoteDeleteOverlay.classList.remove('open');
         pendingDeleteQuoteId = null;
+        closeProjEdit();
+        document.getElementById('proj-delete-overlay').classList.remove('open');
+        pendingDeleteProjId = null;
       }
     });
 
@@ -1022,6 +1242,20 @@ create policy "Authenticated users can delete quote_requests"
         confirmBtn.disabled = false;
         confirmBtn.textContent = 'Delete';
         pendingDeleteQuoteId = null;
+      }
+    });
+
+    /* ── "Create Project" from quote detail ── */
+    document.getElementById('qd-create-proj-btn').addEventListener('click', function () {
+      var id = quoteDetailOverlay.dataset.quoteId;
+      var q  = quotesData.find(function (x) { return x.id === id; });
+      closeQuoteDetail();
+      switchTab('projects');
+      if (q) {
+        var clientName = q.name + (q.business ? ' — ' + q.business : '');
+        openProjForm({ client_name: clientName, quote_value: parseEstimateValue(q.estimate_label), quote_id: q.id });
+      } else {
+        openProjForm(null);
       }
     });
 
@@ -1351,6 +1585,387 @@ create policy "Authenticated users can delete quote_requests"
       if (e.target === deleteOverlay) {
         deleteOverlay.classList.remove('open');
         pendingDeleteId = null; pendingDeleteImageUrl = null;
+      }
+    });
+
+    /* ══════════════════════════════ PROJECTS ══════════════════════════════ */
+
+    var projectsData       = [];
+    var activeFilter       = 'all';
+    var importQuoteId      = null;
+    var pendingDeleteProjId = null;
+
+    var MILESTONES = [
+      { key: 'scope_sent',         label: 'Scope document sent' },
+      { key: 'deposit_received',   label: 'Deposit received' },
+      { key: 'first_draft',        label: 'First draft shared' },
+      { key: 'revisions_complete', label: 'Revisions complete' },
+      { key: 'client_approval',    label: 'Client approval received' },
+      { key: 'site_launched',      label: 'Site launched' },
+      { key: 'handoff_sent',       label: 'Handoff document sent' },
+      { key: 'final_payment',      label: 'Final payment received' },
+    ];
+
+    var PROJ_STATUSES = ['Discovery', 'In Progress', 'Review', 'Launch', 'Done', 'On Hold'];
+
+    function projStatusClass(status) {
+      return (status || 'discovery').toLowerCase().replace(/\s+/g, '-');
+    }
+
+    function projStatusBadgeHtml(status) {
+      var s = status || 'Discovery';
+      return '<span class="status-badge status-badge--' + escHtml(projStatusClass(s)) + '">' + escHtml(s) + '</span>';
+    }
+
+    function deadlineDisplay(dateStr) {
+      if (!dateStr) return '—';
+      var today = new Date(); today.setHours(0, 0, 0, 0);
+      var dl    = new Date(dateStr + 'T00:00:00'); dl.setHours(0, 0, 0, 0);
+      var days  = Math.round((dl - today) / 86400000);
+      var fmt   = new Date(dateStr + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+      if (days < 0)  return '<span class="deadline-badge deadline-badge--overdue">' + escHtml(fmt) + ' (overdue)</span>';
+      if (days <= 7) return '<span class="deadline-badge deadline-badge--soon">'    + escHtml(fmt) + ' (' + days + 'd left)</span>';
+      return escHtml(fmt);
+    }
+
+    function parseEstimateValue(label) {
+      if (!label) return '';
+      var m = label.replace(/\./g, '').match(/\d+/);
+      return m ? m[0] : '';
+    }
+
+    /* ── Load & render ── */
+
+    async function loadProjects() {
+      var wrap = document.getElementById('projects-wrap');
+      wrap.innerHTML = '<div style="display:flex;justify-content:center;padding:3rem;"><div class="spinner spinner--dark"></div></div>';
+      projectsLoaded = true;
+      var result = await db.from('projects').select('*').order('created_at', { ascending: false });
+      if (result.error) {
+        wrap.innerHTML = '<p style="color:var(--danger);padding:1rem;">Failed to load projects: ' + escHtml(result.error.message) + '</p>';
+        return;
+      }
+      projectsData = result.data || [];
+      renderProjects();
+    }
+
+    function renderProjects() {
+      var wrap = document.getElementById('projects-wrap');
+      var filtered = activeFilter === 'all'
+        ? projectsData
+        : projectsData.filter(function (p) { return p.status === activeFilter; });
+
+      document.querySelectorAll('#proj-filters [data-filter]').forEach(function (btn) {
+        btn.classList.toggle('btn--active', btn.dataset.filter === activeFilter);
+      });
+
+      if (filtered.length === 0) {
+        wrap.innerHTML = '<p class="quotes-empty">' + (activeFilter === 'all' ? 'No projects yet. Add your first one above.' : 'No projects with this status.') + '</p>';
+        return;
+      }
+
+      var rows = filtered.map(function (p) {
+        var startStr = p.start_date ? new Date(p.start_date + 'T00:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+        var valueStr = p.quote_value != null ? '€' + Number(p.quote_value).toLocaleString('nl-BE') : '—';
+        var notesTrunc = p.notes ? (p.notes.length > 55 ? p.notes.substring(0, 55) + '…' : p.notes) : '—';
+        return '<tr data-proj-id="' + escHtml(p.id) + '" title="Click to edit">' +
+          '<td><div class="td-name">' + escHtml(p.client_name) + '</div></td>' +
+          '<td class="td-muted">' + escHtml(p.project_type || '—') + '</td>' +
+          '<td>' + projStatusBadgeHtml(p.status) + '</td>' +
+          '<td class="td-muted td-date">' + escHtml(startStr) + '</td>' +
+          '<td class="td-date">' + deadlineDisplay(p.deadline) + '</td>' +
+          '<td class="td-price">' + escHtml(valueStr) + '</td>' +
+          '<td class="td-muted" style="max-width:160px;font-size:0.8125rem;">' + escHtml(notesTrunc) + '</td>' +
+          '</tr>';
+      }).join('');
+
+      wrap.innerHTML =
+        '<div class="quotes-table-wrap">' +
+          '<table class="quotes-table">' +
+            '<thead><tr>' +
+              '<th>Client</th><th>Type</th><th>Status</th><th>Start</th><th>Deadline</th><th>Value</th><th>Notes</th>' +
+            '</tr></thead>' +
+            '<tbody>' + rows + '</tbody>' +
+          '</table>' +
+        '</div>';
+
+      wrap.querySelectorAll('tr[data-proj-id]').forEach(function (tr) {
+        tr.addEventListener('click', function () {
+          var p = projectsData.find(function (x) { return x.id === tr.dataset.projId; });
+          if (p) openProjEdit(p);
+        });
+      });
+    }
+
+    /* ── Add project form ── */
+
+    var projFormPanel = document.getElementById('project-form-panel');
+    var projectForm   = document.getElementById('project-form');
+    var saveProjBtn   = document.getElementById('save-proj-btn');
+
+    function openProjForm(prefill) {
+      importQuoteId = prefill && prefill.quote_id ? prefill.quote_id : null;
+      document.getElementById('proj-form-title').textContent = 'New Project';
+      document.getElementById('pf-client').value   = prefill && prefill.client_name  ? prefill.client_name  : '';
+      document.getElementById('pf-type').value     = prefill && prefill.project_type ? prefill.project_type : '';
+      document.getElementById('pf-status').value   = 'Discovery';
+      document.getElementById('pf-value').value    = prefill && prefill.quote_value  ? prefill.quote_value  : '';
+      document.getElementById('pf-start').value    = '';
+      document.getElementById('pf-deadline').value = '';
+      document.getElementById('pf-notes').value    = '';
+      hideAlert(dashError);
+      projFormPanel.classList.add('open');
+      document.getElementById('pf-client').focus();
+    }
+
+    function closeProjForm() {
+      projFormPanel.classList.remove('open');
+      importQuoteId = null;
+    }
+
+    document.getElementById('new-project-btn').addEventListener('click', function () { openProjForm(null); });
+    document.getElementById('cancel-proj-btn').addEventListener('click', closeProjForm);
+
+    projectForm.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      hideAlert(dashError);
+      saveProjBtn.disabled = true;
+      saveProjBtn.textContent = 'Saving…';
+      try {
+        var payload = {
+          client_name:  document.getElementById('pf-client').value.trim(),
+          project_type: document.getElementById('pf-type').value.trim(),
+          status:       document.getElementById('pf-status').value,
+          quote_value:  document.getElementById('pf-value').value !== '' ? Number(document.getElementById('pf-value').value) : null,
+          start_date:   document.getElementById('pf-start').value    || null,
+          deadline:     document.getElementById('pf-deadline').value || null,
+          notes:        document.getElementById('pf-notes').value.trim(),
+          milestones:   {},
+          updated_at:   new Date().toISOString(),
+        };
+        if (importQuoteId) payload.quote_id = importQuoteId;
+        var result = await db.from('projects').insert(payload);
+        if (result.error) throw result.error;
+        closeProjForm();
+        flashSuccess('Project created.');
+        projectsLoaded = false;
+        await loadProjects();
+      } catch (err) {
+        showAlert(dashError, err.message || 'Could not save project.');
+      } finally {
+        saveProjBtn.disabled = false;
+        saveProjBtn.textContent = 'Save Project';
+      }
+    });
+
+    /* ── Filter bar ── */
+
+    document.getElementById('proj-filters').addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-filter]');
+      if (!btn) return;
+      activeFilter = btn.dataset.filter;
+      renderProjects();
+    });
+
+    /* ── Project edit modal ── */
+
+    var projEditOverlay = document.getElementById('proj-edit-overlay');
+
+    function milestoneCountLabel(milestones) {
+      var done = MILESTONES.filter(function (m) { return milestones && milestones[m.key]; }).length;
+      return done + '/' + MILESTONES.length + ' complete';
+    }
+
+    function openProjEdit(p) {
+      projEditOverlay.dataset.projId = p.id;
+      document.getElementById('pm-title').textContent = p.client_name;
+      document.getElementById('pm-sub').textContent   = p.project_type || '';
+
+      var milestones = p.milestones || {};
+      var statusPicker = PROJ_STATUSES.map(function (s) {
+        return '<button class="status-pick-btn' + (s === p.status ? ' is-active' : '') + '" data-pstatus="' + escHtml(s) + '">' + escHtml(s) + '</button>';
+      }).join('');
+
+      var milestoneHtml = MILESTONES.map(function (m) {
+        var checked   = milestones[m.key] ? 'checked' : '';
+        var doneClass = milestones[m.key] ? ' is-done' : '';
+        return '<label class="milestone-item' + doneClass + '">' +
+          '<input type="checkbox" data-key="' + m.key + '" ' + checked + ' />' +
+          '<span>' + escHtml(m.label) + '</span>' +
+          '</label>';
+      }).join('');
+
+      var valueStr = p.quote_value != null ? String(p.quote_value) : '';
+      var startStr = p.start_date  || '';
+      var dlStr    = p.deadline    || '';
+
+      document.getElementById('pm-body').innerHTML =
+        '<div class="qd-section">' +
+          '<div class="qd-label">Status</div>' +
+          '<div class="status-picker" id="pm-status-picker">' + statusPicker + '</div>' +
+        '</div>' +
+        '<hr class="qd-divider" />' +
+        '<div class="field-row" style="margin-bottom:1rem;">' +
+          '<div class="field"><label for="pm-client">Client name</label><input type="text" id="pm-client" value="' + escHtml(p.client_name) + '" /></div>' +
+          '<div class="field"><label for="pm-type">Project type</label><input type="text" id="pm-type" value="' + escHtml(p.project_type || '') + '" /></div>' +
+        '</div>' +
+        '<div class="field-row" style="margin-bottom:1rem;">' +
+          '<div class="field"><label for="pm-start">Start date</label><input type="date" id="pm-start" value="' + escHtml(startStr) + '" /></div>' +
+          '<div class="field"><label for="pm-deadline">Deadline</label><input type="date" id="pm-deadline" value="' + escHtml(dlStr) + '" /></div>' +
+        '</div>' +
+        '<div class="field-row" style="margin-bottom:1rem;">' +
+          '<div class="field"><label for="pm-value">Quote value (€)</label><input type="number" id="pm-value" min="0" step="50" value="' + escHtml(valueStr) + '" /></div>' +
+        '</div>' +
+        '<div class="field">' +
+          '<label for="pm-notes">Notes</label>' +
+          '<textarea id="pm-notes" style="min-height:80px;">' + escHtml(p.notes || '') + '</textarea>' +
+        '</div>' +
+        '<hr class="qd-divider" />' +
+        '<div class="qd-section">' +
+          '<div class="qd-label">Milestones <span id="pm-milestone-count" style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.8125rem;color:var(--muted);">' + milestoneCountLabel(milestones) + '</span></div>' +
+          '<div class="milestone-list" id="pm-milestones">' + milestoneHtml + '</div>' +
+        '</div>';
+
+      projEditOverlay.classList.add('open');
+    }
+
+    function closeProjEdit() {
+      projEditOverlay.classList.remove('open');
+    }
+
+    document.getElementById('pm-close-btn').addEventListener('click', closeProjEdit);
+
+    projEditOverlay.addEventListener('click', function (e) {
+      /* Backdrop click → close */
+      if (e.target === projEditOverlay) { closeProjEdit(); return; }
+
+      /* Status pick button */
+      var statusBtn = e.target.closest('.status-pick-btn[data-pstatus]');
+      if (!statusBtn) return;
+      var newStatus = statusBtn.dataset.pstatus;
+      var id = projEditOverlay.dataset.projId;
+      if (!id || !newStatus) return;
+
+      statusBtn.disabled = true;
+      db.from('projects').update({ status: newStatus, updated_at: new Date().toISOString() }).eq('id', id)
+        .then(function (result) {
+          statusBtn.disabled = false;
+          if (result.error) { showAlert(dashError, 'Failed to save status: ' + result.error.message); return; }
+          var p = projectsData.find(function (x) { return x.id === id; });
+          if (p) p.status = newStatus;
+          projEditOverlay.querySelectorAll('.status-pick-btn[data-pstatus]').forEach(function (b) {
+            b.classList.toggle('is-active', b.dataset.pstatus === newStatus);
+          });
+          /* Update badge in table row */
+          var row = document.querySelector('#projects-wrap tr[data-proj-id="' + id + '"]');
+          if (row && row.cells[2]) row.cells[2].innerHTML = projStatusBadgeHtml(newStatus);
+          flashSuccess('Status saved.');
+        });
+    });
+
+    /* Milestone checkbox auto-save */
+    projEditOverlay.addEventListener('change', async function (e) {
+      var cb = e.target;
+      if (cb.type !== 'checkbox' || !cb.dataset.key) return;
+      var id = projEditOverlay.dataset.projId;
+      var p  = projectsData.find(function (x) { return x.id === id; });
+      if (!p) return;
+      if (!p.milestones) p.milestones = {};
+      p.milestones[cb.dataset.key] = cb.checked;
+
+      var lbl = cb.closest('.milestone-item');
+      if (lbl) lbl.classList.toggle('is-done', cb.checked);
+
+      var countEl = document.getElementById('pm-milestone-count');
+      if (countEl) countEl.textContent = milestoneCountLabel(p.milestones);
+
+      var result = await db.from('projects').update({ milestones: p.milestones, updated_at: new Date().toISOString() }).eq('id', id);
+      if (result.error) {
+        showAlert(dashError, 'Failed to save milestone: ' + result.error.message);
+        /* Revert */
+        p.milestones[cb.dataset.key] = !cb.checked;
+        cb.checked = !cb.checked;
+        if (lbl) lbl.classList.toggle('is-done', !cb.checked);
+        if (countEl) countEl.textContent = milestoneCountLabel(p.milestones);
+      }
+    });
+
+    /* Save changes button */
+    document.getElementById('pm-save-btn').addEventListener('click', async function () {
+      var id = projEditOverlay.dataset.projId;
+      if (!id) return;
+      var btn = document.getElementById('pm-save-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving…';
+      try {
+        var pmValueEl    = document.getElementById('pm-value');
+        var payload = {
+          client_name:  document.getElementById('pm-client').value.trim(),
+          project_type: document.getElementById('pm-type').value.trim(),
+          start_date:   document.getElementById('pm-start').value    || null,
+          deadline:     document.getElementById('pm-deadline').value || null,
+          quote_value:  pmValueEl && pmValueEl.value !== '' ? Number(pmValueEl.value) : null,
+          notes:        document.getElementById('pm-notes').value.trim(),
+          updated_at:   new Date().toISOString(),
+        };
+        var result = await db.from('projects').update(payload).eq('id', id);
+        if (result.error) throw result.error;
+        var p = projectsData.find(function (x) { return x.id === id; });
+        if (p) Object.assign(p, payload);
+        renderProjects();
+        flashSuccess('Project saved.');
+        closeProjEdit();
+      } catch (err) {
+        showAlert(dashError, err.message || 'Could not save project.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Save changes';
+      }
+    });
+
+    /* ── Delete project ── */
+
+    var projDeleteOverlay = document.getElementById('proj-delete-overlay');
+
+    document.getElementById('pm-delete-btn').addEventListener('click', function () {
+      var id = projEditOverlay.dataset.projId;
+      if (!id) return;
+      pendingDeleteProjId = id;
+      projDeleteOverlay.classList.add('open');
+    });
+
+    document.getElementById('proj-delete-cancel-btn').addEventListener('click', function () {
+      projDeleteOverlay.classList.remove('open');
+      pendingDeleteProjId = null;
+    });
+
+    projDeleteOverlay.addEventListener('click', function (e) {
+      if (e.target === projDeleteOverlay) {
+        projDeleteOverlay.classList.remove('open');
+        pendingDeleteProjId = null;
+      }
+    });
+
+    document.getElementById('proj-delete-confirm-btn').addEventListener('click', async function () {
+      if (!pendingDeleteProjId) return;
+      var btn = document.getElementById('proj-delete-confirm-btn');
+      btn.disabled = true;
+      btn.textContent = 'Deleting…';
+      try {
+        var result = await db.from('projects').delete().eq('id', pendingDeleteProjId);
+        if (result.error) throw result.error;
+        projectsData = projectsData.filter(function (p) { return p.id !== pendingDeleteProjId; });
+        projDeleteOverlay.classList.remove('open');
+        closeProjEdit();
+        renderProjects();
+        flashSuccess('Project deleted.');
+      } catch (err) {
+        showAlert(dashError, err.message || 'Delete failed.');
+        projDeleteOverlay.classList.remove('open');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+        pendingDeleteProjId = null;
       }
     });
   </script>
