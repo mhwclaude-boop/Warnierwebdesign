@@ -142,7 +142,7 @@
     }
 
     .nav.scrolled {
-      background: var(--white);
+      background: var(--navy);
       box-shadow: 0 2px 16px rgba(11, 26, 78, 0.10);
     }
 
@@ -200,7 +200,7 @@
     .nav__links a:hover::after,
     .nav__links a.is-active::after { width: 100%; }
 
-    .nav.scrolled .nav__links a { color: var(--navy); }
+    .nav.scrolled .nav__links a { color: var(--white); }
 
     /* Language toggle */
     .lang-toggle {
@@ -214,7 +214,7 @@
       transition: background 0.35s ease;
     }
 
-    .nav.scrolled .lang-toggle { background: var(--off-white); }
+    .nav.scrolled .lang-toggle { background: rgba(255, 255, 255, 0.15); }
 
     .lang-btn {
       font-family: var(--font-heading);
@@ -235,7 +235,7 @@
       color: var(--white);
     }
 
-    .nav.scrolled .lang-btn { color: var(--muted); }
+    .nav.scrolled .lang-btn { color: rgba(255, 255, 255, 0.65); }
     .nav.scrolled .lang-btn.active { color: var(--white); }
 
     /* Hamburger button */
@@ -260,7 +260,7 @@
       transition: transform 0.3s ease, opacity 0.3s ease;
     }
 
-    .nav.scrolled .nav__hamburger span { background: var(--navy); }
+    .nav.scrolled .nav__hamburger span { background: var(--white); }
 
     .nav__hamburger[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .nav__hamburger[aria-expanded="true"] span:nth-child(2) { opacity: 0; transform: scaleX(0); }
