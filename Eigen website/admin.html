@@ -1,12 +1,27 @@
 <!DOCTYPE html>
 <!--
 =============================================================
-  SUPABASE MIGRATION — run once in the Supabase SQL editor
+  SUPABASE SETUP — run once in the Supabase SQL editor
 =============================================================
 
+-- 1. Add status column (if not done yet)
 alter table public.quote_requests
   add column if not exists status text not null default 'open'
   check (status in ('open','responded','ongoing','finished','cancelled'));
+
+-- 2. RLS policies — allow authenticated (logged-in admin) to update and delete
+create policy "Authenticated users can update quote_requests"
+  on public.quote_requests
+  for update
+  to authenticated
+  using (true)
+  with check (true);
+
+create policy "Authenticated users can delete quote_requests"
+  on public.quote_requests
+  for delete
+  to authenticated
+  using (true);
 
 =============================================================
 -->
@@ -904,9 +919,13 @@ alter table public.quote_requests
     }
 
     async function updateQuoteStatus(id, newStatus) {
-      const { error } = await db.from('quote_requests').update({ status: newStatus }).eq('id', id);
+      const { data, error } = await db.from('quote_requests').update({ status: newStatus }).eq('id', id).select('id');
       if (error) {
         showAlert(dashError, 'Failed to save status: ' + error.message);
+        return false;
+      }
+      if (!data || data.length === 0) {
+        showAlert(dashError, 'Status not saved — Supabase RLS is blocking UPDATE. Run the policy SQL in your Supabase SQL editor (see comment at top of this file).');
         return false;
       }
       /* Update in-memory data */
@@ -980,8 +999,9 @@ alter table public.quote_requests
       confirmBtn.disabled = true;
       confirmBtn.textContent = 'Deleting…';
       try {
-        const { error } = await db.from('quote_requests').delete().eq('id', pendingDeleteQuoteId);
+        const { data, error } = await db.from('quote_requests').delete().eq('id', pendingDeleteQuoteId).select('id');
         if (error) throw error;
+        if (!data || data.length === 0) throw new Error('Row not deleted — Supabase RLS is blocking DELETE. Run the policy SQL in your Supabase SQL editor (see comment at top of this file).');
         /* Remove from in-memory data */
         quotesData = quotesData.filter(function (q) { return q.id !== pendingDeleteQuoteId; });
         /* Remove row from table */
