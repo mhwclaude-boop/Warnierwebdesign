@@ -290,6 +290,12 @@ alter table public.quote_requests
     .quote-modal__header h3 { font-family: var(--font-h); font-size: 1.125rem; font-weight: 800; color: var(--navy); }
     .quote-modal__header .sub { font-size: 0.8125rem; color: var(--muted); margin-top: 2px; }
     .quote-modal__body { padding: 1.5rem; overflow-y: auto; flex: 1; }
+    .quote-modal__footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: flex-start;
+      flex-shrink: 0;
+    }
     .qd-section { margin-bottom: 1.25rem; }
     .qd-section:last-child { margin-bottom: 0; }
     .qd-label {
@@ -558,6 +564,21 @@ alter table public.quote_requests
         <button class="btn btn--secondary btn--sm" id="qd-close-btn">✕ Close</button>
       </div>
       <div class="quote-modal__body" id="qd-body"></div>
+      <div class="quote-modal__footer">
+        <button class="btn btn--danger btn--sm" id="qd-delete-btn">Delete quote</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quote delete confirm overlay -->
+  <div class="overlay" id="quote-delete-overlay">
+    <div class="confirm-card">
+      <h3>Delete quote request?</h3>
+      <p>This will permanently remove the quote request from Supabase. This cannot be undone.</p>
+      <div class="confirm-card__actions">
+        <button class="btn btn--secondary" id="quote-delete-cancel-btn">Cancel</button>
+        <button class="btn btn--danger" id="quote-delete-confirm-btn">Delete</button>
+      </div>
     </div>
   </div>
 
@@ -884,7 +905,10 @@ alter table public.quote_requests
 
     async function updateQuoteStatus(id, newStatus) {
       const { error } = await db.from('quote_requests').update({ status: newStatus }).eq('id', id);
-      if (error) { alert('Failed to update status: ' + error.message); return false; }
+      if (error) {
+        showAlert(dashError, 'Failed to save status: ' + error.message);
+        return false;
+      }
       /* Update in-memory data */
       const q = quotesData.find(function (x) { return x.id === id; });
       if (q) q.status = newStatus;
@@ -894,6 +918,7 @@ alter table public.quote_requests
         const cell = row.querySelector('[data-status-cell]');
         if (cell) cell.innerHTML = statusBadgeHtml(newStatus);
       }
+      flashSuccess('Status saved.');
       return true;
     }
 
@@ -919,7 +944,65 @@ alter table public.quote_requests
       if (e.target === quoteDetailOverlay) closeQuoteDetail();
     });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeQuoteDetail();
+      if (e.key === 'Escape') {
+        closeQuoteDetail();
+        quoteDeleteOverlay.classList.remove('open');
+        pendingDeleteQuoteId = null;
+      }
+    });
+
+    /* ── Delete quote ── */
+    const quoteDeleteOverlay = document.getElementById('quote-delete-overlay');
+    let pendingDeleteQuoteId = null;
+
+    document.getElementById('qd-delete-btn').addEventListener('click', function () {
+      const id = quoteDetailOverlay.dataset.quoteId;
+      if (!id) return;
+      pendingDeleteQuoteId = id;
+      quoteDeleteOverlay.classList.add('open');
+    });
+
+    document.getElementById('quote-delete-cancel-btn').addEventListener('click', function () {
+      quoteDeleteOverlay.classList.remove('open');
+      pendingDeleteQuoteId = null;
+    });
+
+    quoteDeleteOverlay.addEventListener('click', function (e) {
+      if (e.target === quoteDeleteOverlay) {
+        quoteDeleteOverlay.classList.remove('open');
+        pendingDeleteQuoteId = null;
+      }
+    });
+
+    document.getElementById('quote-delete-confirm-btn').addEventListener('click', async function () {
+      if (!pendingDeleteQuoteId) return;
+      const confirmBtn = document.getElementById('quote-delete-confirm-btn');
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = 'Deleting…';
+      try {
+        const { error } = await db.from('quote_requests').delete().eq('id', pendingDeleteQuoteId);
+        if (error) throw error;
+        /* Remove from in-memory data */
+        quotesData = quotesData.filter(function (q) { return q.id !== pendingDeleteQuoteId; });
+        /* Remove row from table */
+        const row = quotesWrap.querySelector(`tr[data-quote-id="${pendingDeleteQuoteId}"]`);
+        if (row) row.remove();
+        /* Show empty message if no rows remain */
+        const tbody = quotesWrap.querySelector('tbody');
+        if (tbody && tbody.children.length === 0) {
+          quotesWrap.innerHTML = '<p class="quotes-empty">No quote requests yet.</p>';
+        }
+        quoteDeleteOverlay.classList.remove('open');
+        closeQuoteDetail();
+        flashSuccess('Quote request deleted.');
+      } catch (err) {
+        showAlert(dashError, err.message || 'Delete failed. Please try again.');
+        quoteDeleteOverlay.classList.remove('open');
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Delete';
+        pendingDeleteQuoteId = null;
+      }
     });
 
     loginForm.addEventListener('submit', async function (e) {
