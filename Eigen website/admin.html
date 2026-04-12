@@ -35,6 +35,7 @@ create table if not exists public.projects (
   deadline     date,
   quote_value  numeric(10,2),
   notes        text not null default '',
+  draft_url    text,
   milestones   jsonb not null default '{}',
   created_at   timestamptz not null default now(),
   updated_at   timestamptz not null default now()
@@ -441,6 +442,27 @@ create policy "Authenticated users can delete projects"
     .deadline-badge--soon    { color: #D97706; }
     .deadline-badge--overdue { color: var(--danger); }
 
+    /* ── Project KPI boxes ── */
+    .proj-kpis { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    .kpi-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--r-md); padding: 1rem 1.25rem;
+      flex: 1; min-width: 130px;
+    }
+    .kpi-card__label {
+      font-family: var(--font-h); font-size: 0.6875rem; font-weight: 700;
+      letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.375rem;
+    }
+    .kpi-card__value {
+      font-family: var(--font-h); font-size: 1.5rem; font-weight: 800; color: var(--navy);
+      line-height: 1;
+    }
+    .kpi-card__value--orange { color: var(--orange); }
+    .kpi-card__sub {
+      font-size: 0.75rem; color: var(--muted); margin-top: 0.25rem;
+    }
+
     /* ── Project filter bar ── */
     .proj-filters { display: flex; gap: 0.375rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
 
@@ -555,16 +577,16 @@ create policy "Authenticated users can delete projects"
 
       <!-- Tab navigation -->
       <div class="tabs" role="tablist">
-        <button class="tab-btn active" id="tab-posts" role="tab" aria-selected="true"  aria-controls="panel-posts">News Posts</button>
+        <button class="tab-btn active" id="tab-projects" role="tab" aria-selected="true"  aria-controls="panel-projects">Projects</button>
         <button class="tab-btn"        id="tab-quotes"   role="tab" aria-selected="false" aria-controls="panel-quotes">Quote Requests</button>
-        <button class="tab-btn"        id="tab-projects" role="tab" aria-selected="false" aria-controls="panel-projects">Projects</button>
+        <button class="tab-btn"        id="tab-posts"    role="tab" aria-selected="false" aria-controls="panel-posts">News Posts</button>
       </div>
 
       <div class="alert alert--error" id="dash-error"></div>
       <div class="alert alert--success" id="dash-success"></div>
 
       <!-- ── PANEL: News Posts ── -->
-      <div id="panel-posts" role="tabpanel">
+      <div id="panel-posts" role="tabpanel" style="display:none;"
         <div class="dash__header">
           <h2>News Posts</h2>
           <button class="btn btn--primary" id="new-post-btn">+ New Post</button>
@@ -634,7 +656,7 @@ create policy "Authenticated users can delete projects"
       </div><!-- /panel-quotes -->
 
       <!-- ── PANEL: Projects ── -->
-      <div id="panel-projects" role="tabpanel" style="display:none;">
+      <div id="panel-projects" role="tabpanel">
         <div class="dash__header">
           <h2>Projects</h2>
           <button class="btn btn--primary" id="new-project-btn">+ Add Project</button>
@@ -685,6 +707,10 @@ create policy "Authenticated users can delete projects"
               </div>
             </div>
             <div class="field">
+              <label for="pf-draft-url">Draft website URL</label>
+              <input type="text" id="pf-draft-url" placeholder="e.g. https://staging.netlify.app" />
+            </div>
+            <div class="field">
               <label for="pf-notes">Notes</label>
               <textarea id="pf-notes" placeholder="Any notes about this project…" style="min-height:80px;"></textarea>
             </div>
@@ -693,6 +719,9 @@ create policy "Authenticated users can delete projects"
             </div>
           </form>
         </div>
+
+        <!-- KPI summary -->
+        <div class="proj-kpis" id="proj-kpis"></div>
 
         <!-- Filter bar -->
         <div class="proj-filters" id="proj-filters">
@@ -897,7 +926,7 @@ create policy "Authenticated users can delete projects"
       loginScreen.style.display = 'none';
       dashboard.style.display = 'block';
       topbarEmail.textContent = email;
-      loadPosts();
+      loadProjects();
     }
 
     /* ══════════════════════════════ TABS ══════════════════════════════ */
@@ -1649,7 +1678,40 @@ create policy "Authenticated users can delete projects"
       renderProjects();
     }
 
+    function renderKpis() {
+      var kpiEl = document.getElementById('proj-kpis');
+      if (!kpiEl) return;
+      var total     = projectsData.length;
+      var active    = projectsData.filter(function (p) { return p.status !== 'Done' && p.status !== 'On Hold'; }).length;
+      var totalVal  = projectsData.reduce(function (sum, p) { return sum + (p.quote_value ? Number(p.quote_value) : 0); }, 0);
+      var activeVal = projectsData.filter(function (p) { return p.status !== 'Done' && p.status !== 'On Hold'; })
+                        .reduce(function (sum, p) { return sum + (p.quote_value ? Number(p.quote_value) : 0); }, 0);
+      var doneCount = projectsData.filter(function (p) { return p.status === 'Done'; }).length;
+      kpiEl.innerHTML =
+        '<div class="kpi-card">' +
+          '<div class="kpi-card__label">Total projects</div>' +
+          '<div class="kpi-card__value">' + total + '</div>' +
+          '<div class="kpi-card__sub">' + doneCount + ' completed</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-card__label">Active projects</div>' +
+          '<div class="kpi-card__value">' + active + '</div>' +
+          '<div class="kpi-card__sub">excl. done &amp; on hold</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-card__label">Total pipeline</div>' +
+          '<div class="kpi-card__value kpi-card__value--orange">€' + totalVal.toLocaleString('nl-BE') + '</div>' +
+          '<div class="kpi-card__sub">all projects</div>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<div class="kpi-card__label">Active pipeline</div>' +
+          '<div class="kpi-card__value kpi-card__value--orange">€' + activeVal.toLocaleString('nl-BE') + '</div>' +
+          '<div class="kpi-card__sub">excl. done &amp; on hold</div>' +
+        '</div>';
+    }
+
     function renderProjects() {
+      renderKpis();
       var wrap = document.getElementById('projects-wrap');
       var filtered = activeFilter === 'all'
         ? projectsData
@@ -1711,8 +1773,9 @@ create policy "Authenticated users can delete projects"
       document.getElementById('pf-status').value   = 'Discovery';
       document.getElementById('pf-value').value    = prefill && prefill.quote_value  ? prefill.quote_value  : '';
       document.getElementById('pf-start').value    = '';
-      document.getElementById('pf-deadline').value = '';
-      document.getElementById('pf-notes').value    = '';
+      document.getElementById('pf-deadline').value  = '';
+      document.getElementById('pf-draft-url').value = '';
+      document.getElementById('pf-notes').value     = '';
       hideAlert(dashError);
       projFormPanel.classList.add('open');
       document.getElementById('pf-client').focus();
@@ -1739,6 +1802,7 @@ create policy "Authenticated users can delete projects"
           quote_value:  document.getElementById('pf-value').value !== '' ? Number(document.getElementById('pf-value').value) : null,
           start_date:   document.getElementById('pf-start').value    || null,
           deadline:     document.getElementById('pf-deadline').value || null,
+          draft_url:    document.getElementById('pf-draft-url').value.trim() || null,
           notes:        document.getElementById('pf-notes').value.trim(),
           milestones:   {},
           updated_at:   new Date().toISOString(),
@@ -1815,6 +1879,10 @@ create policy "Authenticated users can delete projects"
         '</div>' +
         '<div class="field-row" style="margin-bottom:1rem;">' +
           '<div class="field"><label for="pm-value">Quote value (€)</label><input type="number" id="pm-value" min="0" step="50" value="' + escHtml(valueStr) + '" /></div>' +
+        '</div>' +
+        '<div class="field" style="margin-bottom:1rem;">' +
+          '<label for="pm-draft-url">Draft website URL</label>' +
+          '<input type="text" id="pm-draft-url" value="' + escHtml(p.draft_url || '') + '" placeholder="e.g. https://staging.netlify.app" />' +
         '</div>' +
         '<div class="field">' +
           '<label for="pm-notes">Notes</label>' +
@@ -1905,6 +1973,7 @@ create policy "Authenticated users can delete projects"
           start_date:   document.getElementById('pm-start').value    || null,
           deadline:     document.getElementById('pm-deadline').value || null,
           quote_value:  pmValueEl && pmValueEl.value !== '' ? Number(pmValueEl.value) : null,
+          draft_url:    document.getElementById('pm-draft-url').value.trim() || null,
           notes:        document.getElementById('pm-notes').value.trim(),
           updated_at:   new Date().toISOString(),
         };
